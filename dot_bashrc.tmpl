@@ -121,7 +121,11 @@ export PATH=$HOME/.local/bin:$HOME/go/bin:$HOME/.cargo/env:/usr/local/go/bin:/op
 
 [ -s "$HOME/.nvm/nvm.sh" ] && \. "$HOME/.nvm/nvm.sh"  # This loads nvm
 [ -s "$HOME/.nvm/bash_completion" ] && \. "$HOME/.nvm/bash_completion"  # This loads nvm bash_completion
+{{- if .is_work }}
 
-# alias gemini='/google/bin/releases/gemini-cli/tools/gemini'
-
-export ADB_VENDOR_KEYS="/usr/local/google/home/weichenglee/adb-keys/security/adb/7.1.adb_key:/usr/local/google/home/weichenglee/adb-keys/security/adb/8.1.0.adb_key:/usr/local/google/home/weichenglee/adb-keys/security/adb/12.adb_key:/usr/local/google/home/weichenglee/adb-keys/security/adb/7.0.adb_key:/usr/local/google/home/weichenglee/adb-keys/security/adb/10.adb_key:/usr/local/google/home/weichenglee/adb-keys/security/adb/11.adb_key:/usr/local/google/home/weichenglee/adb-keys/security/adb/UpsideDownCake.adb_key:/usr/local/google/home/weichenglee/adb-keys/security/adb/S.adb_key:/usr/local/google/home/weichenglee/adb-keys/security/adb/15.adb_key:/usr/local/google/home/weichenglee/adb-keys/security/adb/CinnamonBun.adb_key:/usr/local/google/home/weichenglee/adb-keys/security/adb/DEV.adb_key:/usr/local/google/home/weichenglee/adb-keys/security/adb/CANARY.adb_key:/usr/local/google/home/weichenglee/adb-keys/security/adb/7.1.1.adb_key:/usr/local/google/home/weichenglee/adb-keys/security/adb/9.adb_key:/usr/local/google/home/weichenglee/adb-keys/security/adb/Tiramisu.adb_key:/usr/local/google/home/weichenglee/adb-keys/security/adb/17.adb_key:/usr/local/google/home/weichenglee/adb-keys/security/adb/7.1.2.adb_key:/usr/local/google/home/weichenglee/adb-keys/security/adb/16.adb_key:/usr/local/google/home/weichenglee/adb-keys/security/adb/13.adb_key:/usr/local/google/home/weichenglee/adb-keys/security/adb/8.0.1.adb_key:/usr/local/google/home/weichenglee/adb-keys/security/adb/VanillaIceCream.adb_key:/usr/local/google/home/weichenglee/adb-keys/security/adb/Baklava.adb_key:/usr/local/google/home/weichenglee/adb-keys/security/adb/R.adb_key:/usr/local/google/home/weichenglee/adb-keys/security/adb/14.adb_key:/usr/local/google/home/weichenglee/adb-keys/security/adb/Q.adb_key:/usr/local/google/home/weichenglee/adb-keys/security/adb/8.0.0.adb_key"
+# Work-specific settings (Cloudtop)
+# Dynamically load ADB vendor keys
+if [ -d "$HOME/adb-keys/security/adb" ]; then
+    export ADB_VENDOR_KEYS=$(find "$HOME/adb-keys/security/adb" -name '*.adb_key' 2>/dev/null | paste -sd ":" -)
+fi
+{{- end }}
