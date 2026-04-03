@@ -95,11 +95,11 @@ chezmoi diff      # Review changes
 chezmoi apply     # Apply if looks good
 ```
 
-### Re-run setup scripts
+### First-time setup on a new machine
 
-Setup scripts (`run_once_*`) only run once per machine. To force re-run:
+After `chezmoi apply` deploys the dotfiles, run the setup scripts manually:
 
 ```bash
-chezmoi state delete-bucket --bucket=scriptState
-chezmoi apply
+~/setup.sh          # Install zsh, oh-my-zsh, powerlevel10k, fonts
+~/setup_adb.sh      # (Cloudtop only) Clone ADB vendor keys
 ```
