@@ -30,10 +30,76 @@ The config template automatically detects the environment:
 
 ## Daily Usage
 
+### Edit a dotfile
+
 ```bash
-chezmoi edit --apply ~/.zshrc   # Edit and apply a dotfile
-chezmoi add ~/.some_config      # Add a new file to chezmoi
-chezmoi update                  # Pull latest changes and apply
-chezmoi diff                    # Preview pending changes
-chezmoi cd                      # Enter source directory (git repo)
+# Edit and apply in one step
+chezmoi edit --apply ~/.zshrc
+
+# Or edit first, review, then apply
+chezmoi edit ~/.zshrc
+chezmoi diff          # Preview what will change
+chezmoi apply         # Apply changes
+```
+
+> **Important:** Do not edit `~/.zshrc` (or other managed files) directly — `chezmoi apply` will overwrite your changes. Always use `chezmoi edit`.
+
+### Add a new file
+
+```bash
+chezmoi add ~/.some_config
+```
+
+If the file needs per-machine customization, add it as a template:
+
+```bash
+chezmoi add --template ~/.some_config
+```
+
+### Remove a managed file
+
+```bash
+chezmoi forget ~/.some_config   # Stop managing (keeps the file)
+chezmoi destroy ~/.some_config  # Stop managing and delete the file
+```
+
+### Check status
+
+```bash
+chezmoi status    # Show which files differ from source
+chezmoi diff      # Show detailed diff
+chezmoi managed   # List all managed files
+chezmoi data      # Show template data (is_work, is_codespace, etc.)
+```
+
+### Push changes to GitHub
+
+```bash
+chezmoi cd                          # Enter source directory
+git add -A && git commit -m "..."   # Commit
+git push                            # Push
+exit                                # Back to previous directory
+```
+
+### Pull changes from GitHub (on another machine)
+
+```bash
+chezmoi update    # = git pull + chezmoi apply
+```
+
+Or review before applying:
+
+```bash
+chezmoi git pull
+chezmoi diff      # Review changes
+chezmoi apply     # Apply if looks good
+```
+
+### Re-run setup scripts
+
+Setup scripts (`run_once_*`) only run once per machine. To force re-run:
+
+```bash
+chezmoi state delete-bucket --bucket=scriptState
+chezmoi apply
 ```
