@@ -17,6 +17,26 @@ else
     sudo apt-get install -y zsh vim wget fontconfig git curl
 fi
 
+echo "設定 VS Code apt 套件源..."
+if [ "$IS_MAC" = false ]; then
+    if [ ! -f /usr/share/keyrings/microsoft.gpg ]; then
+        wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > /tmp/microsoft.gpg
+        sudo install -D -o root -g root -m 644 /tmp/microsoft.gpg /usr/share/keyrings/microsoft.gpg
+        rm -f /tmp/microsoft.gpg
+    fi
+    if [ ! -f /etc/apt/sources.list.d/vscode.sources ]; then
+        sudo tee /etc/apt/sources.list.d/vscode.sources > /dev/null <<VSCODE
+Types: deb
+URIs: https://packages.microsoft.com/repos/code
+Suites: stable
+Components: main
+Architectures: amd64,arm64,armhf
+Signed-By: /usr/share/keyrings/microsoft.gpg
+VSCODE
+        sudo apt-get update
+    fi
+fi
+
 echo "下載並安裝 MesloLGS NF 字體..."
 if [ "$IS_MAC" = true ]; then
     FONT_DIR="$HOME/Library/Fonts"
