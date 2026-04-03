@@ -1,0 +1,11 @@
+{{- $isWork := false -}}
+{{- $isCodespace := false -}}
+{{- if eq (env "CODESPACES") "true" -}}
+{{-   $isCodespace = true -}}
+{{- else if hasSuffix ".c.googlers.com" .chezmoi.fqdnHostname -}}
+{{-   $isWork = true -}}
+{{- end -}}
+
+[data]
+    is_work = {{ $isWork }}
+    is_codespace = {{ $isCodespace }}
