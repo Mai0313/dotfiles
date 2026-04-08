@@ -31,6 +31,10 @@
       }
     }
   },
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
   "language": "zh-TW",
   "effortLevel": "high",
   "autoDreamEnabled": true,
