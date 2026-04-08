@@ -37,20 +37,7 @@ VSCODE
     fi
 fi
 
-echo "下載並安裝 MesloLGS NF 字體..."
-if [ "$IS_MAC" = true ]; then
-    FONT_DIR="$HOME/Library/Fonts"
-else
-    FONT_DIR="$HOME/.local/share/fonts/meslo"
-fi
-mkdir -p "$FONT_DIR"
-
-wget -qO "$FONT_DIR/MesloLGS NF Regular.ttf" "https://github.com/romkatv/dotfiles-public/raw/master/.local/share/fonts/NerdFonts/MesloLGS%20NF%20Regular.ttf"
-wget -qO "$FONT_DIR/MesloLGS NF Bold.ttf" "https://github.com/romkatv/dotfiles-public/raw/master/.local/share/fonts/NerdFonts/MesloLGS%20NF%20Bold.ttf"
-wget -qO "$FONT_DIR/MesloLGS NF Italic.ttf" "https://github.com/romkatv/dotfiles-public/raw/master/.local/share/fonts/NerdFonts/MesloLGS%20NF%20Italic.ttf"
-wget -qO "$FONT_DIR/MesloLGS NF Bold Italic.ttf" "https://github.com/romkatv/dotfiles-public/raw/master/.local/share/fonts/NerdFonts/MesloLGS%20NF%20Bold%20Italic.ttf"
-
-# macOS 不需要 fc-cache，放入 ~/Library/Fonts 即可自動載入
+echo "更新字體快取（字體檔案由 chezmoi 管理）..."
 if [ "$IS_MAC" = false ]; then
     fc-cache -fv
 fi
