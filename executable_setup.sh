@@ -85,6 +85,43 @@ if ! grep -q "export PATH=\$HOME/bin:\$HOME/.local/bin:/usr/local/bin:\$PATH" "$
     echo 'export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH' >> "$HOME/.zshrc"
 fi
 
+echo "安裝 Neovim..."
+if ! command -v nvim &>/dev/null; then
+    if [ "$IS_MAC" = true ]; then
+        brew install neovim
+    else
+        sudo add-apt-repository -y ppa:neovim-ppa/unstable
+        sudo apt-get update
+        sudo apt-get install -y neovim
+    fi
+else
+    echo "Neovim 已安裝，跳過此步驟。"
+fi
+
+echo "安裝 Neovim 相關依賴（ripgrep, fd-find, lazygit）..."
+if [ "$IS_MAC" = true ]; then
+    brew install ripgrep fd lazygit
+else
+    sudo apt-get install -y ripgrep fd-find
+    # lazygit 需要從 GitHub release 安裝
+    if ! command -v lazygit &>/dev/null; then
+        LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "v\K[^"]*')
+        curl -Lo /tmp/lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
+        tar xf /tmp/lazygit.tar.gz -C /tmp lazygit
+        mkdir -p "$HOME/.local/bin"
+        install /tmp/lazygit "$HOME/.local/bin"
+        rm -f /tmp/lazygit /tmp/lazygit.tar.gz
+    fi
+fi
+
+echo "設定 LazyVim..."
+if [ ! -d "$HOME/.config/nvim" ]; then
+    git clone https://github.com/LazyVim/starter "$HOME/.config/nvim"
+    rm -rf "$HOME/.config/nvim/.git"
+else
+    echo "Neovim 設定已存在，跳過此步驟。"
+fi
+
 echo "設定預設 Shell 為 Zsh..."
 if [ "$IS_MAC" = true ]; then
     # macOS 已預設 zsh，但確保設定正確
