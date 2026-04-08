@@ -1,58 +1,58 @@
 {{- if .is_work -}}
 #!/bin/bash
 
-# 遇到錯誤即停止執行
+# Exit on error
 set -e
 
-# 定義變數
+# Define variables
 BASE_DIR="$HOME/adb-keys"
 SECURITY_DIR="$BASE_DIR/security"
 REPO_URL="sso://googleplex-android/platform/vendor/google/security"
 
-# 偵測是否為 macOS
+# Detect macOS
 IS_MAC=$([[ "$OSTYPE" == "darwin"* ]] && echo true || echo false)
 
-echo "=> 1. 準備下載 Security 儲存庫..."
+echo "=> 1. Cloning security repository..."
 mkdir -p "$BASE_DIR"
 
 if [ ! -d "$SECURITY_DIR" ]; then
     git clone "$REPO_URL" "$SECURITY_DIR"
 else
-    echo "=> 儲存庫已存在，為您執行 git pull 更新至最新版..."
+    echo "=> Repository already exists, running git pull to update..."
     git -C "$SECURITY_DIR" pull
 fi
 
-echo "=> 2. 尋找並設定 ADB_VENDOR_KEYS..."
+echo "=> 2. Finding and setting ADB_VENDOR_KEYS..."
 
-# 修正 paste 在不同平台的相容性
+# Fix paste compatibility across platforms
 KEY_PATHS=$(find "$SECURITY_DIR/adb" -name '*.adb_key' 2>/dev/null | paste -sd ":" - || true)
 
 if [ -z "$KEY_PATHS" ]; then
-    echo "⚠️ 警告：在 $SECURITY_DIR/adb 中沒有找到任何 .adb_key 檔案！"
+    echo "Warning: No .adb_key files found in $SECURITY_DIR/adb!"
 else
-    # 匯出給當前腳本環境使用
+    # Export for the current script environment
     export ADB_VENDOR_KEYS="$KEY_PATHS"
-    echo "=> ✅ 成功設定 ADB_VENDOR_KEYS"
+    echo "=> ADB_VENDOR_KEYS set successfully"
 fi
 
-# 邏輯分歧：只有非 macOS (Linux) 才執行 Pontis/systemd 相關邏輯
+# Only run Pontis/systemd logic on Linux (not macOS)
 if [ "$IS_MAC" = false ]; then
-    echo "=> 3. 偵測為 Linux，正在處理 systemd/pontisd..."
+    echo "=> 3. Detected Linux, configuring systemd/pontisd..."
     if command -v systemctl >/dev/null 2>&1; then
         systemctl --user set-environment ADB_VENDOR_KEYS="$KEY_PATHS"
         systemctl --user daemon-reload
         systemctl --user restart pontisd
-        echo "=> ✅ pontisd 已重啟"
+        echo "=> pontisd restarted successfully"
     else
-        echo "=> ⚠️ 找不到 systemctl，跳過服務重啟"
+        echo "=> systemctl not found, skipping service restart"
     fi
 else
-    echo "=> 3. 偵測為 macOS，跳過 Pontis 服務設定 (僅保留環境變數)。"
+    echo "=> 3. Detected macOS, skipping Pontis service setup (env var only)."
 fi
 
 echo "---"
-echo "🎉 執行完成！"
-echo "請執行 'source ~/.zshrc' (或重新開啟終端機) 以確保變數生效。"
+echo "Done!"
+echo "Run 'source ~/.zshrc' (or restart your terminal) to apply the changes."
 {{- else -}}
 #!/bin/bash
 # Not a work machine, skip ADB setup

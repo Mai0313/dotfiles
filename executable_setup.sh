@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# 遇到錯誤即停止執行
+# Exit on error
 set -e
 
 IS_MAC=$([[ "$OSTYPE" == "darwin"* ]] && echo true || echo false)
 
-echo "更新系統並安裝必備套件..."
+echo "Updating system and installing prerequisites..."
 if [ "$IS_MAC" = true ]; then
     # Install Homebrew if not present
     if ! command -v brew &>/dev/null; then
@@ -17,7 +17,7 @@ else
     sudo apt-get install -y zsh vim wget fontconfig git curl
 fi
 
-echo "設定 VS Code apt 套件源..."
+echo "Setting up VS Code apt repository..."
 if [ "$IS_MAC" = false ]; then
     if [ ! -f /usr/share/keyrings/microsoft.gpg ]; then
         wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > /tmp/microsoft.gpg
@@ -37,19 +37,19 @@ VSCODE
     fi
 fi
 
-echo "更新字體快取（字體檔案由 chezmoi 管理）..."
+echo "Updating font cache (font files managed by chezmoi)..."
 if [ "$IS_MAC" = false ]; then
     fc-cache -fv
 fi
 
-echo "安裝 Oh My Zsh..."
+echo "Installing Oh My Zsh..."
 if [ ! -d "$HOME/.oh-my-zsh" ]; then
     RUNZSH=no CHSH=yes sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 else
-    echo "Oh My Zsh 已安裝，跳過此步驟。"
+    echo "Oh My Zsh already installed, skipping."
 fi
 
-echo "下載 Powerlevel10k 與 Zsh 擴充套件..."
+echo "Installing Powerlevel10k and Zsh plugins..."
 ZSH_CUSTOM="$HOME/.oh-my-zsh/custom"
 
 [ ! -d "$ZSH_CUSTOM/themes/powerlevel10k" ] && git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$ZSH_CUSTOM/themes/powerlevel10k"
@@ -57,7 +57,7 @@ ZSH_CUSTOM="$HOME/.oh-my-zsh/custom"
 [ ! -d "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" ] && git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting.git "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting"
 [ ! -d "$ZSH_CUSTOM/plugins/zsh-z" ] && git clone --depth=1 https://github.com/agkozak/zsh-z "$ZSH_CUSTOM/plugins/zsh-z"
 
-echo "配置 .zshrc..."
+echo "Configuring .zshrc..."
 if [ "$IS_MAC" = true ]; then
     sed -i '' 's|^ZSH_THEME=.*$|ZSH_THEME="powerlevel10k/powerlevel10k"|' "$HOME/.zshrc"
     sed -i '' 's|^plugins=(.*)$|plugins=(git zsh-autosuggestions zsh-syntax-highlighting zsh-z)|' "$HOME/.zshrc"
@@ -72,7 +72,7 @@ if ! grep -q "export PATH=\$HOME/bin:\$HOME/.local/bin:/usr/local/bin:\$PATH" "$
     echo 'export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH' >> "$HOME/.zshrc"
 fi
 
-echo "安裝 Neovim..."
+echo "Installing Neovim..."
 if ! command -v nvim &>/dev/null; then
     if [ "$IS_MAC" = true ]; then
         brew install neovim
@@ -82,15 +82,15 @@ if ! command -v nvim &>/dev/null; then
         sudo apt-get install -y neovim
     fi
 else
-    echo "Neovim 已安裝，跳過此步驟。"
+    echo "Neovim already installed, skipping."
 fi
 
-echo "安裝 Neovim 相關依賴（ripgrep, fd-find, lazygit）..."
+echo "Installing Neovim dependencies (ripgrep, fd-find, lazygit)..."
 if [ "$IS_MAC" = true ]; then
     brew install ripgrep fd lazygit
 else
     sudo apt-get install -y ripgrep fd-find
-    # lazygit 需要從 GitHub release 安裝
+    # lazygit needs to be installed from GitHub release
     if ! command -v lazygit &>/dev/null; then
         LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "v\K[^"]*')
         curl -Lo /tmp/lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
@@ -101,23 +101,23 @@ else
     fi
 fi
 
-echo "設定 LazyVim..."
+echo "Setting up LazyVim..."
 if [ ! -d "$HOME/.config/nvim" ]; then
     git clone https://github.com/LazyVim/starter "$HOME/.config/nvim"
     rm -rf "$HOME/.config/nvim/.git"
 else
-    echo "Neovim 設定已存在，跳過此步驟。"
+    echo "Neovim config already exists, skipping."
 fi
 
-echo "設定預設 Shell 為 Zsh..."
+echo "Setting default shell to Zsh..."
 if [ "$IS_MAC" = true ]; then
-    # macOS 已預設 zsh，但確保設定正確
+    # macOS defaults to zsh, but ensure it's set correctly
     chsh -s /bin/zsh
 else
     sudo chsh -s $(which zsh) $(whoami)
 fi
 
 echo "================================================="
-echo "✅ 安裝完成！請登出並重新登入，或執行 'exec zsh' 來啟動設定。"
-echo "進入 Zsh 後，Powerlevel10k 設定精靈會自動啟動。"
+echo "Setup complete! Please log out and log back in, or run 'exec zsh' to apply."
+echo "Powerlevel10k configuration wizard will start automatically on first Zsh launch."
 echo "================================================="
