@@ -8,13 +8,20 @@
   },
   "model": "opus[1m]",
   "enabledPlugins": {
-    "rust-analyzer-lsp@claude-plugins-official": true
+    "rust-analyzer-lsp@claude-plugins-official": true,
+    "github@claude-plugins-official": true,
+    "superpowers@claude-plugins-official": true,
+    "code-review@claude-plugins-official": true,
+    "code-simplifier@claude-plugins-official": true,
+    "feature-dev@claude-plugins-official": true,
+    "skill-creator@claude-plugins-official": true,
+    "typescript-lsp@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "claude-plugins-official": {
       "source": {
-        "source": "git",
-        "url": "https://github.com/anthropics/claude-plugins-official.git"
+        "source": "github",
+        "repo": "anthropics/claude-plugins-official"
       }
     },
     "anthropic-agent-skills": {
