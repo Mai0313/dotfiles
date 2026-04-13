@@ -1,11 +1,16 @@
 {{- $isWork := false -}}
+{{- $isCloudtop := false -}}
 {{- $isCodespace := false -}}
 {{- if eq (env "CODESPACES") "true" -}}
 {{-   $isCodespace = true -}}
 {{- else if hasSuffix ".c.googlers.com" .chezmoi.fqdnHostname -}}
 {{-   $isWork = true -}}
+{{-   $isCloudtop = true -}}
+{{- else if hasSuffix ".roam.internal" .chezmoi.fqdnHostname -}}
+{{-   $isWork = true -}}
 {{- end -}}
 
 [data]
     is_work = {{ $isWork }}
+    is_cloudtop = {{ $isCloudtop }}
     is_codespace = {{ $isCodespace }}

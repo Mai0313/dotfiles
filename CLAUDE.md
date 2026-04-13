@@ -33,7 +33,8 @@ Template variables set based on hostname/env:
 
 | Variable | Condition | Use |
 |---|---|---|
-| `is_work` | hostname `*.c.googlers.com` | ADB keys, Gemini CLI, work aliases |
+| `is_work` | hostname `*.c.googlers.com` or `*.roam.internal` | ADB keys, work aliases |
+| `is_cloudtop` | hostname `*.c.googlers.com` | Gemini CLI alias (Cloudtop only) |
 | `is_codespace` | env `CODESPACES=true` | Codespaces-specific config |
 
 Used in templates as `{{- if .is_work }}...{{- end }}`.

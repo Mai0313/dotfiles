@@ -122,8 +122,10 @@ alias cc='claude'
 
 {{- if .is_work }}
 
-# Work-specific settings (Cloudtop)
+# Work-specific settings
+{{- if .is_cloudtop }}
 alias gemini='/google/bin/releases/gemini-cli/tools/gemini'
+{{- end }}
 
 # Dynamically load ADB vendor keys
 if [ -d "$HOME/adb-keys/security/adb" ]; then
