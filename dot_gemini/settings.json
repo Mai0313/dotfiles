@@ -37,7 +37,8 @@
     "maxAttempts": 10,
     "vimMode": false,
     "plan": {
-      "modelRouting": true
+      "modelRouting": true,
+      "enabled": true
     },
     "debugKeystrokeLogging": false
   },
@@ -98,7 +99,6 @@
       "enabled": true
     },
     "modelSteering": true,
-    "plan": true,
     "directWebFetch": true,
     "enableAgents": true,
     "useOSC52Paste": false,
