@@ -35,8 +35,7 @@
     }
   },
   "language": "zh-TW",
-  "effortLevel": "xhigh",
-  "autoUpdatesChannel": "stable",
+  "autoUpdatesChannel": "latest",
   "autoDreamEnabled": true,
   "skipDangerousModePermissionPrompt": true,
   "useAutoModeDuringPlan": true
