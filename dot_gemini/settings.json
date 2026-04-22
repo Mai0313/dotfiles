@@ -66,7 +66,7 @@
     "showCitations": true,
     "showModelInfoInChat": true,
     "showLineNumbers": false,
-    "hideBanner": false,
+    "hideBanner": true,
     "inlineThinkingMode": "off",
     "loadingPhrases": "all",
     "autoThemeSwitching": true,
@@ -79,10 +79,11 @@
     "useBackgroundColor": true,
     "showSpinner": true,
     "terminalBackgroundPollingInterval": 60,
-    "useAlternateBuffer": false,
-    "incrementalRendering": false,
+    "useAlternateBuffer": true,
+    "incrementalRendering": true,
     "theme": "GitHub",
-    "escapePastedAtSymbols": true
+    "escapePastedAtSymbols": true,
+    "terminalBuffer": true
   },
   "tools": {
     "shell": {
@@ -101,14 +102,17 @@
     "modelSteering": true,
     "directWebFetch": true,
     "enableAgents": true,
-    "useOSC52Paste": false,
-    "useOSC52Copy": false,
+    "useOSC52Paste": true,
+    "useOSC52Copy": true,
     "gemmaModelRouter": {
       "enabled": false
     },
     "worktrees": true,
     "memoryManager": true,
-    "topicUpdateNarration": true
+    "topicUpdateNarration": true,
+    "autoMemory": true,
+    "generalistProfile": true,
+    "contextManagement": true
   },
   "advanced": {
     "autoConfigureMemory": true
