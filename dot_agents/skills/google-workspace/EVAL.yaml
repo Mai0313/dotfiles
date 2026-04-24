@@ -1,0 +1,52 @@
+suite_name: google_workspace
+timeout_seconds: 300
+max_tool_calls: 50
+
+cases:
+  - name: tool_selection
+    prompt: >
+      I need to find some content that might be in my Gmail,
+      Drive, or Calendar. I'm not sure where exactly it is.
+      Which tool should I use to search across all of them?
+    skills: [google_workspace]
+    rubric: |
+      The agent must:
+      - Recommend the CSA CLI for cross-corpus semantic search
+      - Explain it can search across Gmail, Calendar, Drive, Chat, and Keep
+      - Mention that corpora should be run combined for best results
+    expect_keywords_any:
+      - "CSA"
+      - "semantic"
+      - "corpora"
+
+  - name: workspace_routing
+    prompt: >
+      I want to read a Google Doc, create a spreadsheet, and
+      download a file from Drive. What tools handle each of
+      these tasks?
+    skills: [google_workspace]
+    rubric: |
+      The agent must:
+      - Map gdocs CLI for reading Google Docs
+      - Map gsheets CLI for creating spreadsheets
+      - Map gdrive CLI for downloading Drive files
+      - Mention the dedicated skill for each product has full documentation
+    expect_keywords_any:
+      - "gdocs"
+      - "gsheets"
+      - "gdrive"
+
+  - name: download_images
+    prompt: >
+      I'm reading a Google Doc and it contains images. How do
+      I download those images to a local directory?
+    skills: [google_workspace]
+    rubric: |
+      The agent must:
+      - Explain using gdocs read to extract image URLs
+      - Show using curl to download images from the URLs
+      - Mention saving to /tmp/agent_artifacts/ directory
+    expect_keywords_any:
+      - "curl"
+      - "Image"
+      - "download"

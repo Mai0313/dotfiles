@@ -1,0 +1,93 @@
+# proto-file: learning/gemini/agents/evaluation/evalin/proto/eval_suite.proto
+# proto-message: EvalSuite
+# txtpbfmt: wrap_strings_after_newlines
+
+suite_name: "gdocs"
+timeout_seconds: 300
+
+cases {
+  name: "explain_markdown_import"
+  prompt: "How do I convert a local markdown file into a Google Doc with proper formatting? What markdown elements are supported?"
+  expectations: "The agent shows the import-md command with a file path"
+  expectations: "The agent lists supported markdown elements (headings, bold, italic, links, lists)"
+  expectations: "The agent mentions the --title flag for naming the document"
+}
+
+cases {
+  name: "explain_template_creation"
+  prompt: "How do I create a new Google Doc from a template with variable substitution?"
+  expectations: "The agent shows the create-from-template command"
+  expectations: "The agent explains the --var flag syntax (NAME=value)"
+  expectations: "The agent notes that a TEMPLATE_ID is required"
+}
+
+cases {
+  name: "explain_revision_comparison"
+  prompt: "How can I compare two revisions of a Google Doc to see what changed between them?"
+  expectations: "The agent shows the diff-revisions command with DOC_ID and revision numbers"
+  expectations: "The agent mentions the list-revisions command for finding revision numbers"
+}
+
+cases {
+  name: "troubleshoot_delete_safety"
+  prompt: "What precautions should I take when using the delete command in Google Docs? Is it reversible?"
+  expectations: "The agent warns that delete permanently removes content"
+  expectations: "The agent notes that --confirm flag is required"
+  expectations: "The agent recommends never using destructive commands without user permission"
+}
+
+cases {
+  name: "execute_resolve_comment_with_reply"
+  prompt: "Create a Google Doc. Add a comment to it. Then reply to that comment and resolve it."
+  expectations: "The agent uses resolve-comment with the doc ID and comment ID"
+}
+
+cases {
+  name: "execute_sync_table_edit"
+  setup {
+    commands: "mkdir -p /tmp/scratch"
+    commands: "echo '| Col 1 | Col 2 |' > /tmp/scratch/table_edit.md"
+    commands: "echo '|---|---|' >> /tmp/scratch/table_edit.md"
+    commands: "echo '| Edit | Value |' >> /tmp/scratch/table_edit.md"
+  }
+  prompt: "Create a new Google Doc. Then push the changes from the local markdown file `/tmp/scratch/table_edit.md` to it."
+  expectations: "The agent uses gdocs sync command"
+  expectations: "The agent verifies success (no Invalid deletion range error)"
+}
+
+cases {
+  name: "execute_sync_list_nesting"
+  setup {
+    commands: "mkdir -p /tmp/scratch"
+    commands: "echo '- Item 1' > /tmp/scratch/nested_list.md"
+    commands: "echo '  - Item 1.1' >> /tmp/scratch/nested_list.md"
+  }
+  prompt: "Create a new Google Doc. Then push the changes from the local markdown file `/tmp/scratch/nested_list.md` to it."
+  expectations: "The agent uses gdocs sync command"
+  expectations: "The agent verifies that nesting levels are preserved (structural)"
+}
+
+cases {
+  name: "execute_sync_non_conflicting_merge"
+  setup {
+    commands: "mkdir -p /tmp/scratch"
+    commands: "echo '# Section A' > /tmp/scratch/merge.md"
+    commands: "echo 'Local edit' >> /tmp/scratch/merge.md"
+    commands: "echo '# Section B' >> /tmp/scratch/merge.md"
+    commands: "echo 'Remote edit' >> /tmp/scratch/merge.md"
+  }
+  prompt: "Create a new Google Doc. Push the local file `/tmp/scratch/merge.md` to it to initialize it, then simulate a remote edit on Section B using gdocs tools, then push local Section A changes to it."
+  expectations: "The agent uses gdocs sync command"
+  expectations: "The agent verifies both changes are present (no false conflicts)"
+}
+
+cases {
+  name: "default_use_batch_for_pasting"
+  prompt:
+    "I have a list of items: \n"
+    "- Item 1\n"
+    "- Item 2\n"
+    "Paste this into a new Google Doc named 'My List'."
+  expectations: "The agent must use the batch command to create a styled document with a bulleted list"
+  expectations: "The agent must NOT use the write or append command with raw markdown text unless explicitly asked"
+}
