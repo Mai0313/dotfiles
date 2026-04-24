@@ -2,3 +2,6 @@ install.sh
 README.md
 README.zh-TW.md
 CLAUDE.md
+{{ if not .is_cloudtop }}
+.agents
+{{ end }}
