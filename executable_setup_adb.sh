@@ -1,5 +1,12 @@
-{{- if .is_work -}}
 #!/bin/bash
+
+# Only run on work machines (Cloudtop / Roam). Matches the is_work detection
+# in .chezmoi.toml.tmpl so behavior stays consistent with the old template.
+fqdn=$(hostname -f 2>/dev/null || hostname)
+case "$fqdn" in
+  *.c.googlers.com|*.roam.internal) ;;
+  *) echo "Not a work machine, skipping ADB setup."; exit 0 ;;
+esac
 
 # Exit on error
 set -e
@@ -53,8 +60,3 @@ fi
 echo "---"
 echo "Done!"
 echo "Run 'source ~/.zshrc' (or restart your terminal) to apply the changes."
-{{- else -}}
-#!/bin/bash
-# Not a work machine, skip ADB setup
-exit 0
-{{- end }}

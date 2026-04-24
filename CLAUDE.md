@@ -47,8 +47,8 @@ Used in templates as `{{- if .is_work }}...{{- end }}`.
 - `dot_claude/settings.json` - Claude Code settings
 - `dot_gemini/settings.json` - Google Gemini settings
 - `executable_setup.sh` - main setup script (oh-my-zsh, p10k, neovim, fonts)
-- `executable_setup_adb.sh.tmpl` - work-only ADB vendor key setup (no-op on personal machines)
-- `executable_install_skills.sh.tmpl` - work/Cloudtop-only Agent Skills installer from google3 (no-op on personal machines)
+- `executable_setup_adb.sh` - ADB vendor key setup; self-gates at runtime via FQDN check (work-only; no-op elsewhere). Kept as plain script (not `.tmpl`) so `chezmoi re-add` works after local edits.
+- `executable_install_skills.sh` - Agent Skills installer from google3; self-gates at runtime via FQDN check (work/Cloudtop-only). Same `.tmpl`-free rationale as above.
 - `executable_cleanup.sh` - removes temp/cache dirs, preserves key config files
 - `.chezmoiignore` - prevents `install.sh` and READMEs from being deployed to `$HOME`
 

@@ -1,10 +1,17 @@
-{{- if or .is_work .is_cloudtop -}}
 #!/usr/bin/env bash
 #
 # Copy Agent Skills from the shared google3 source tree into ./skills/.
 # The source tree is read-only, so plain `cp -r` would preserve those
 # permissions and leave the local copy uneditable. This script resets
 # permissions to writable and skips google3-only metadata (BUILD, OWNERS).
+
+# Only run on work/Cloudtop machines. Matches is_work / is_cloudtop detection
+# in .chezmoi.toml.tmpl so behavior stays consistent with the old template.
+fqdn=$(hostname -f 2>/dev/null || hostname)
+case "$fqdn" in
+  *.c.googlers.com|*.roam.internal) ;;
+  *) echo "Not a work/Cloudtop machine, skipping Agent Skills install."; exit 0 ;;
+esac
 
 set -euo pipefail
 
@@ -89,8 +96,3 @@ fi
 for skill in "${skills[@]}"; do
   install_skill "${skill}" "${force}"
 done
-{{- else -}}
-#!/bin/bash
-# Not a work/Cloudtop machine, skip Agent Skills install
-exit 0
-{{- end }}
