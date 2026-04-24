@@ -15,20 +15,20 @@ rm -rf $HOME/.cache
 #         -exec rm -rf {} +
 # fi
 
-# --- Codex ---
-# Remove everything except config.toml and auth.json
-if [ -d "$HOME/.codex" ]; then
-    find "$HOME/.codex" -mindepth 1 -maxdepth 1 ! -name "config.toml" ! -name "auth.json" -exec rm -rf {} +
-fi
+# # --- Codex ---
+# # Remove everything except config.toml and auth.json
+# if [ -d "$HOME/.codex" ]; then
+#     find "$HOME/.codex" -mindepth 1 -maxdepth 1 ! -name "config.toml" ! -name "auth.json" -exec rm -rf {} +
+# fi
 
-# --- Gemini ---
-if [ -d "$HOME/.gemini/.git" ]; then
-    echo "Cleaning .gemini using Git..."
-    cd "$HOME/.gemini"
-    # Make sure the files you want to keep are tracked by git
-    # git add .  <-- skip if you've already added them manually
-    git clean -fdx
-    cd - > /dev/null
-fi
+# # --- Gemini ---
+# if [ -d "$HOME/.gemini/.git" ]; then
+#     echo "Cleaning .gemini using Git..."
+#     cd "$HOME/.gemini"
+#     # Make sure the files you want to keep are tracked by git
+#     # git add .  <-- skip if you've already added them manually
+#     git clean -fdx
+#     cd - > /dev/null
+# fi
 
 zsh
