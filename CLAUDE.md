@@ -39,7 +39,7 @@ After editing templates, validate with `chezmoi execute-template < file.tmpl` or
 | `is_cloudtop` | FQDN ends with `.c.googlers.com` |
 | `is_codespace` | env `CODESPACES=true` |
 
-**Current consumers:** `.chezmoiignore` (templated by chezmoi automatically) gates whole files/directories at deploy time — `dot_agents/` and `executable_install_skills.sh` on `is_cloudtop`, `executable_setup_adb.sh` on `is_work`. The variables remain available for any future per-environment branching (e.g. a per-environment `settings.json`). Inspect current values with `chezmoi data | grep is_`.
+**Current consumers:** `.chezmoiignore` (templated by chezmoi automatically) gates whole files/directories at deploy time — `executable_install_skills.sh` on `is_cloudtop`, `executable_setup_adb.sh` on `is_work`. The variables remain available for any future per-environment branching (e.g. a per-environment `settings.json`). Inspect current values with `chezmoi data | grep is_`.
 
 **Layer 2 — runtime shell gating (actual behavior).** Shell configs (`dot_zshrc`, `dot_bashrc`) do their own `case "$(hostname -f)"` match on the same FQDN patterns to toggle env-specific blocks (aliases, env vars). **All live gating for these mixed-content files happens here, not in chezmoi templates.**
 
@@ -62,8 +62,7 @@ After editing templates, validate with `chezmoi execute-template < file.tmpl` or
 - `executable_setup_adb.sh` - ADB vendor key setup. Work-only (`is_work`) via `.chezmoiignore`; not deployed on personal machines. Plain bash (no `.tmpl`) so `chezmoi re-add` works after local edits on work machines.
 - `executable_install_skills.sh` - Agent Skills installer from google3. Cloudtop-only (`is_cloudtop`) via `.chezmoiignore`. Same `.tmpl`-free rationale.
 - `executable_cleanup.sh` - removes temp/cache dirs, preserves key config files
-- `dot_agents/` - Agent Skills directory; deployed to `~/.agents`. Cloudtop-only via `.chezmoiignore` (gated on `is_cloudtop`). Whole directories cannot use the `.tmpl` suffix, so gating happens in `.chezmoiignore` instead.
-- `.chezmoiignore` - prevents `install.sh`, READMEs, and `CLAUDE.md` from being deployed to `$HOME`. Also gates env-specific files via templated conditionals: `dot_agents/` and `install_skills.sh` on `is_cloudtop`, `setup_adb.sh` on `is_work`. Chezmoi treats `.chezmoiignore` as a template by default.
+- `.chezmoiignore` - prevents `install.sh`, READMEs, and `CLAUDE.md` from being deployed to `$HOME`. Also gates env-specific files via templated conditionals: `install_skills.sh` on `is_cloudtop`, `setup_adb.sh` on `is_work`. Chezmoi treats `.chezmoiignore` as a template by default.
 
 ### Shell Config Structure
 

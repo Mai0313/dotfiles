@@ -6,6 +6,5 @@ CLAUDE.md
 setup_adb.sh
 {{ end }}
 {{ if not .is_cloudtop }}
-.agents
 install_skills.sh
 {{ end }}
