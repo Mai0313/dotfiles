@@ -42,7 +42,7 @@ Used in templates as `{{- if .is_work }}...{{- end }}`.
 ### Key Files
 
 - `.chezmoi.toml.tmpl` - chezmoi config, defines template variables
-- `dot_zshrc.tmpl` / `dot_bashrc.tmpl` - shell configs (Zsh primary, Bash mirror)
+- `dot_zshrc` / `dot_bashrc` - shell configs (Zsh primary, Bash mirror). Environment-specific blocks gate themselves at runtime via `case "$(hostname -f)"`, so the files stay plain (non-template) and `chezmoi re-add` works after local edits.
 - `dot_p10k.zsh` - Powerlevel10k prompt theme (lean style, NerdFont)
 - `dot_claude/settings.json` - Claude Code settings
 - `dot_gemini/settings.json` - Google Gemini settings
@@ -54,11 +54,11 @@ Used in templates as `{{- if .is_work }}...{{- end }}`.
 
 ### Shell Config Structure
 
-Both `dot_zshrc.tmpl` and `dot_bashrc.tmpl` share the same pattern:
+Both `dot_zshrc` and `dot_bashrc` share the same pattern:
 1. PATH extensions (Go, Rust, Cargo, Miniconda, Neovim)
 2. NVM lazy loading
 3. Common aliases (`cc='claude'`)
-4. Conditional work block (Gemini alias, ADB_VENDOR_KEYS)
+4. Runtime-gated environment block — FQDN `case` matching `*.c.googlers.com|*.roam.internal` (work: ADB_VENDOR_KEYS) and `*.c.googlers.com` (Cloudtop: `gemini`, `jetski-cli` aliases). No-op on personal machines.
 5. Editor selection (vim over SSH, nvim locally)
 
 ### Setup Scripts
