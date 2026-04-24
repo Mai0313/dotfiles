@@ -29,7 +29,7 @@ list_skills() {
     echo "error: source not accessible: ${SOURCE_ROOT}" >&2
     exit 1
   fi
-  find "${SOURCE_ROOT}" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort
+  ls ${SOURCE_ROOT}
 }
 
 preview_skill() {
