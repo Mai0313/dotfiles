@@ -22,22 +22,32 @@ After editing templates, validate with `chezmoi execute-template < file.tmpl` or
 
 ### Chezmoi Naming Conventions
 
-- `dot_*` -> files with leading `.` (e.g., `dot_zshrc.tmpl` -> `~/.zshrc`)
+- `dot_*` -> files with leading `.` (e.g., `dot_zshrc` -> `~/.zshrc`)
 - `executable_*` -> deployed with execute permission (e.g., `executable_setup.sh` -> `~/setup.sh`)
 - `empty_*` -> creates empty files (e.g., `empty_dot_zshenv` -> `~/.zshenv`)
 - `.tmpl` suffix -> processed as Go templates with chezmoi data
 
-### Environment Detection (`.chezmoi.toml.tmpl`)
+### Environment Detection
 
-Template variables set based on hostname/env:
+**This repo detects the environment in two layers for two different purposes. Do not consolidate them without understanding why.**
 
-| Variable | Condition | Use |
-|---|---|---|
-| `is_work` | hostname `*.c.googlers.com` or `*.roam.internal` | ADB keys, work aliases |
-| `is_cloudtop` | hostname `*.c.googlers.com` | Gemini CLI alias (Cloudtop only) |
-| `is_codespace` | env `CODESPACES=true` | Codespaces-specific config |
+**Layer 1 — chezmoi data (`.chezmoi.toml.tmpl`).** Defines three variables at `chezmoi apply` time:
 
-Used in templates as `{{- if .is_work }}...{{- end }}`.
+| Variable | Condition |
+|---|---|
+| `is_work` | FQDN ends with `.c.googlers.com` or `.roam.internal` |
+| `is_cloudtop` | FQDN ends with `.c.googlers.com` |
+| `is_codespace` | env `CODESPACES=true` |
+
+**Currently no `.tmpl` file consumes these variables.** They are kept as a reserved hook so that if a future config file needs to branch at template-render time (e.g. a per-environment `settings.json`), `{{ if .is_work }}` will just work without rebuilding detection logic. You can inspect the current values with `chezmoi data | grep is_`.
+
+**Layer 2 — runtime shell gating (actual behavior).** Shell configs (`dot_zshrc`, `dot_bashrc`) and setup scripts (`executable_setup_adb.sh`, `executable_install_skills.sh`) each do their own `case "$(hostname -f)"` match on the same FQDN patterns. **All live gating happens here, not in chezmoi templates.**
+
+**Why runtime, not template?** `chezmoi re-add` cannot reverse-merge local edits back into Go template syntax. Keeping these four files as plain (non-`.tmpl`) scripts means the user can edit them in `$HOME` and sync back with `chezmoi re-add ~/.zshrc` (etc.) without hand-patching the source tree.
+
+**Future-agent guidance: do NOT "refactor" the runtime `case` blocks back into `{{ if .is_work }}` templates.** This conversion was made deliberately; reversing it would break the `re-add` workflow. If you think a `.tmpl` would be cleaner, you are missing the workflow constraint — read this section again.
+
+**Known duplication.** The FQDN pattern `*.c.googlers.com|*.roam.internal` appears in `.chezmoi.toml.tmpl` (Layer 1) plus the four shell files (Layer 2). If the pattern ever changes, grep for both `c.googlers.com` and `roam.internal` to find every occurrence.
 
 ### Key Files
 
