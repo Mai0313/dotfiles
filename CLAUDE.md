@@ -48,6 +48,7 @@ Used in templates as `{{- if .is_work }}...{{- end }}`.
 - `dot_gemini/settings.json` - Google Gemini settings
 - `executable_setup.sh` - main setup script (oh-my-zsh, p10k, neovim, fonts)
 - `executable_setup_adb.sh.tmpl` - work-only ADB vendor key setup (no-op on personal machines)
+- `executable_install_skills.sh.tmpl` - work/Cloudtop-only Agent Skills installer from google3 (no-op on personal machines)
 - `executable_cleanup.sh` - removes temp/cache dirs, preserves key config files
 - `.chezmoiignore` - prevents `install.sh` and READMEs from being deployed to `$HOME`
 
@@ -62,4 +63,4 @@ Both `dot_zshrc.tmpl` and `dot_bashrc.tmpl` share the same pattern:
 
 ### Setup Scripts
 
-Scripts are deployed as `~/setup.sh`, `~/setup_adb.sh`, `~/cleanup.sh`. They are **not** chezmoi hooks - they must be run manually after `chezmoi apply` on first-time setup. `setup.sh` handles both macOS (brew) and Linux (apt).
+Scripts are deployed as `~/setup.sh`, `~/setup_adb.sh`, `~/install_skills.sh`, `~/cleanup.sh`. They are **not** chezmoi hooks - they must be run manually after `chezmoi apply` on first-time setup. `setup.sh` handles both macOS (brew) and Linux (apt).
