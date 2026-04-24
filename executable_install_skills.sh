@@ -5,14 +5,6 @@
 # permissions and leave the local copy uneditable. This script resets
 # permissions to writable and skips google3-only metadata (BUILD, OWNERS).
 
-# Only run on work/Cloudtop machines. Matches is_work / is_cloudtop detection
-# in .chezmoi.toml.tmpl so behavior stays consistent with the old template.
-fqdn=$(hostname -f 2>/dev/null || hostname)
-case "$fqdn" in
-  *.c.googlers.com|*.roam.internal) ;;
-  *) echo "Not a work/Cloudtop machine, skipping Agent Skills install."; exit 0 ;;
-esac
-
 set -euo pipefail
 
 SOURCE_ROOT="/google/src/files/head/depot/google3/learning/gemini/agents/skills"
@@ -20,14 +12,15 @@ DEST_ROOT="${HOME}/.agents/skills"
 
 usage() {
   cat <<EOF
-Usage: $(basename "$0") [-f] [-l] <skill> [<skill> ...]
+Usage: $(basename "$0") [-f] [-l] [-p] <skill> [<skill> ...]
 
 Copy one or more skills from ${SOURCE_ROOT} into ${DEST_ROOT}/.
 
 Options:
-  -f, --force   Overwrite an existing skill directory.
-  -l, --list    List skills available at the source and exit.
-  -h, --help    Show this help.
+  -f, --force     Overwrite an existing skill directory.
+  -l, --list      List skills available at the source and exit.
+  -p, --preview   Print SKILL.md for each given skill and exit (no install).
+  -h, --help      Show this help.
 EOF
 }
 
@@ -37,6 +30,27 @@ list_skills() {
     exit 1
   fi
   find "${SOURCE_ROOT}" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort
+}
+
+preview_skill() {
+  local name="$1"
+  local src="${SOURCE_ROOT}/${name}"
+
+  if [[ ! -d "${src}" ]]; then
+    echo "error: skill not found at source: ${name}" >&2
+    return 1
+  fi
+
+  local skill_md="${src}/SKILL.md"
+  if [[ ! -f "${skill_md}" ]]; then
+    echo "warning: ${name}/SKILL.md not found, listing directory instead:" >&2
+    ls -la "${src}"
+    return 0
+  fi
+
+  printf '===== %s/SKILL.md =====\n' "${name}"
+  cat "${skill_md}"
+  printf '\n'
 }
 
 install_skill() {
@@ -75,22 +89,42 @@ install_skill() {
 }
 
 force=0
+preview=0
 skills=()
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    -f|--force) force=1; shift ;;
-    -l|--list)  list_skills; exit 0 ;;
-    -h|--help)  usage; exit 0 ;;
-    --)         shift; skills+=("$@"); break ;;
-    -*)         echo "error: unknown option: $1" >&2; usage; exit 1 ;;
-    *)          skills+=("$1"); shift ;;
+    -f|--force)   force=1; shift ;;
+    -l|--list)    list_skills; exit 0 ;;
+    -p|--preview) preview=1; shift ;;
+    -h|--help)    usage; exit 0 ;;
+    --)           shift; skills+=("$@"); break ;;
+    -*)           echo "error: unknown option: $1" >&2; usage; exit 1 ;;
+    *)            skills+=("$1"); shift ;;
   esac
 done
 
 if [[ ${#skills[@]} -eq 0 ]]; then
   usage
   exit 1
+fi
+
+if [[ "${preview}" == "1" ]]; then
+  if [[ ! -d "${SOURCE_ROOT}" ]]; then
+    echo "error: source not accessible: ${SOURCE_ROOT}" >&2
+    exit 1
+  fi
+  # Pipe through a pager when stdout is a TTY so long SKILL.md files are readable.
+  if [[ -t 1 ]] && command -v less >/dev/null 2>&1; then
+    for skill in "${skills[@]}"; do
+      preview_skill "${skill}"
+    done | less -R
+  else
+    for skill in "${skills[@]}"; do
+      preview_skill "${skill}"
+    done
+  fi
+  exit 0
 fi
 
 for skill in "${skills[@]}"; do

@@ -1,13 +1,5 @@
 #!/bin/bash
 
-# Only run on work machines (Cloudtop / Roam). Matches the is_work detection
-# in .chezmoi.toml.tmpl so behavior stays consistent with the old template.
-fqdn=$(hostname -f 2>/dev/null || hostname)
-case "$fqdn" in
-  *.c.googlers.com|*.roam.internal) ;;
-  *) echo "Not a work machine, skipping ADB setup."; exit 0 ;;
-esac
-
 # Exit on error
 set -e
 

@@ -2,6 +2,10 @@ install.sh
 README.md
 README.zh-TW.md
 CLAUDE.md
+{{ if not .is_work }}
+setup_adb.sh
+{{ end }}
 {{ if not .is_cloudtop }}
 .agents
+install_skills.sh
 {{ end }}
