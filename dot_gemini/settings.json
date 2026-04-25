@@ -18,7 +18,10 @@
     "folderTrust": {
       "enabled": true
     },
-    "enablePermanentToolApproval": true
+    "enablePermanentToolApproval": true,
+    "auth": {
+      "selectedType": "gemini-api-key"
+    }
   },
   "general": {
     "previewFeatures": true,
