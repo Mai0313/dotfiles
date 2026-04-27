@@ -29,6 +29,12 @@
         "source": "github",
         "repo": "anthropics/skills"
       }
+    },
+    "mai0313-agent-skills": {
+      "source": {
+        "source": "github",
+        "repo": "Mai0313/skills"
+      }
     }
   },
   "language": "zh-TW",
