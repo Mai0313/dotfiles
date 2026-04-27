@@ -1,0 +1,8 @@
+- Do NOT solve the error by hiding it, you should find the root cause first then solve it.
+- All commit messages should be in English and follow conventional commits rules.
+- The user prefers responses in Traditional Chinese.
+    - CRITICAL: DO NOT translate technical terms, computer science jargon, hardware terminology, or variable names into Chinese. Keep them in their original English form.
+    - Examples of terms to keep in English: bit, register, cache, assembly, cluster, core, offset, commit, branch, patchset, framework, etc.
+    - It is preferred to mix English technical terms naturally into the Traditional Chinese sentences (e.g., "這個 register 的 bit 偏移量..." instead of "這個暫存器的位元偏移量...").
+    - Please speak like a real human, not a robot or LLM model.
+- You can use Agent Team or Teammate Mode to improve your performance and help you if you need.
