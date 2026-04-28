@@ -8,3 +8,6 @@ setup_adb.sh
 {{ if not .is_cloudtop }}
 install_skills.sh
 {{ end }}
+{{ if or .is_work .is_cloudtop }}
+.gemini/GEMINI.md
+{{ end }}
