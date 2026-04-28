@@ -119,6 +119,7 @@ fi
 [ -s "$HOME/.nvm/bash_completion" ] && \. "$HOME/.nvm/bash_completion"  # This loads nvm bash_completion
 
 alias cc='claude'
+alias cop='copilot'
 
 # Environment-specific settings, gated at runtime via FQDN.
 # Matches is_work / is_cloudtop detection in .chezmoi.toml.tmpl.
