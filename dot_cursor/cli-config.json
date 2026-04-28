@@ -15,8 +15,45 @@
     "showStatusIndicators": true
   },
   "channel": "prod",
+  "model": {
+    "modelId": "claude-opus-4-7-thinking-max",
+    "displayModelId": "claude-opus-4-7-thinking-max",
+    "displayName": "Opus 4.7 1M Max Thinking",
+    "displayNameShort": "Opus 4.7 1M Max Thinking",
+    "aliases": [],
+    "maxMode": true
+  },
   "hasChangedDefaultModel": true,
   "maxMode": true,
+  "modelParameters": {
+    "default": [],
+    "claude-opus-4-7-thinking-max": []
+  },
+  "selectedModel": {
+    "modelId": "claude-opus-4-7-thinking-max",
+    "parameters": []
+  },
+  "privacyCache": {
+    "ghostMode": true,
+    "privacyMode": 2,
+    "updatedAt": 1777388934672
+  },
+  "serverConfigCache": {
+    "backendUrl": "https://api2.cursor.sh",
+    "authCacheKey": "auth:github|user_01JJM5X33W6FS45QNVQRHRBEC5",
+    "agentUrlConfig": {
+      "agentUrl": "https://agentn.global.api5.cursor.sh",
+      "agentnUrl": "https://agentn.global.api5.cursor.sh"
+    },
+    "cliSandboxDefaultEnabled": false,
+    "updatedAt": 1777388897801
+  },
+  "authInfo": {
+    "email": "weichenglee0313@gmail.com",
+    "displayName": "Wei Lee",
+    "userId": 157797844,
+    "authId": "github|user_01JJM5X33W6FS45QNVQRHRBEC5"
+  },
   "network": {
     "useHttp1ForAgent": false
   },
