@@ -1,9 +1,15 @@
 model = "gpt-5.4"
-model_reasoning_effort = "medium"
+model_reasoning_effort = "high"
 personality = "pragmatic"
+approvals_reviewer = "guardian_subagent"
+
+[model_providers.aoai]
+name = "Azure OpenAI"
+base_url = "https://aideopenaieastus2.openai.azure.com/openai/v1"
+env_key = "OPENAI_API_KEY"
+wire_api = "responses"
 
 [features]
-external_migration = false
 js_repl = true
 memories = true
 prevent_idle_sleep = true
@@ -13,11 +19,7 @@ generate_memories = true
 use_memories = true
 
 [tui]
-status_line = [
-    "model-with-reasoning",
-    "current-dir",
-    "five-hour-limit",
-    "weekly-limit",
-    "fast-mode",
-    "task-progress",
-]
+status_line = ["model-with-reasoning", "current-dir", "five-hour-limit", "weekly-limit", "fast-mode", "task-progress", "used-tokens"]
+
+[analytics]
+enabled = false
