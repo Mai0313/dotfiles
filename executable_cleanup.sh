@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # --- Basic Clean ---
-# Remove unnecessary hidden configs and temp files
-rm -rf $HOME/.ipython $HOME/.astropy $HOME/.dbclient $HOME/.gnupg $HOME/.dotnet $HOME/.rpmdb $HOME/.w3m $HOME/.pki
+# Remove unnecessary hidden configs and temp files.
+# Intentionally NOT touching: .gnupg (GPG keys), .cache (p10k cache regenerates slowly).
+rm -rf $HOME/.ipython $HOME/.astropy $HOME/.dbclient $HOME/.dotnet $HOME/.rpmdb $HOME/.w3m $HOME/.pki
 rm -rf $HOME/tmp $HOME/.claude.json.backup
-rm -rf $HOME/.cache
 
 # # --- Claude ---
 # # Keep config.json and all settings*.json files
@@ -30,5 +30,3 @@ rm -rf $HOME/.cache
 #     git clean -fdx
 #     cd - > /dev/null
 # fi
-
-zsh

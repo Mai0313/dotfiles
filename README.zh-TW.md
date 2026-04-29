@@ -22,11 +22,12 @@ sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply https://github.com/mai0313/
 
 config template 會自動偵測目前的環境：
 
-| 環境 | 偵測方式 | `is_work` | `is_codespace` |
-|---|---|---|---|
-| Cloudtop | `*.c.googlers.com` | `true` | `false` |
-| GitHub Codespaces | `CODESPACES=true` | `false` | `true` |
-| 個人環境 | 預設值 | `false` | `false` |
+| 環境 | 偵測方式 | `is_work` | `is_cloudtop` | `is_codespace` |
+|---|---|---|---|---|
+| Cloudtop | `*.c.googlers.com` | `true` | `true` | `false` |
+| Roam (work) | `*.roam.internal` | `true` | `false` | `false` |
+| GitHub Codespaces | `CODESPACES=true` | `false` | `false` | `true` |
+| 個人環境 | 預設值 | `false` | `false` | `false` |
 
 ## 日常使用
 
@@ -44,5 +45,6 @@ chezmoi update        # 從 remote 拉取並套用（適用於其他機器）
 
 ```bash
 ~/setup.sh          # 安裝 zsh、oh-my-zsh、powerlevel10k、字型
-~/setup_adb.sh      # （僅限 Cloudtop）Clone ADB vendor keys
+~/setup_adb.sh      # （Work：Cloudtop + Roam）Clone ADB vendor keys
+~/install_skills.sh # （僅限 Cloudtop）從 google3 安裝 Agent Skills
 ```

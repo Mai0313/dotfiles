@@ -70,7 +70,7 @@ Both `dot_zshrc` and `dot_bashrc` share the same pattern:
 1. PATH extensions (Go, Rust, Cargo, Miniconda, Neovim)
 2. NVM lazy loading
 3. Common aliases (`cc='claude'`)
-4. Runtime-gated environment block — FQDN `case` matching `*.c.googlers.com|*.roam.internal` (work: ADB_VENDOR_KEYS) and `*.c.googlers.com` (Cloudtop: `gemini`, `jetski-cli` aliases). No-op on personal machines.
+4. Runtime-gated environment block — FQDN `case` matching `*.c.googlers.com|*.roam.internal` (work: ADB_VENDOR_KEYS) and `*.c.googlers.com` (Cloudtop: `gemini`, `jetski-cli`, `flash`, `recovery`, `listd` aliases). No-op on personal machines.
 5. Editor selection (vim over SSH, nvim locally)
 
 ### Setup Scripts

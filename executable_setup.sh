@@ -76,12 +76,20 @@ else
     sudo apt-get install -y ripgrep fd-find
     # lazygit needs to be installed from GitHub release
     if ! command -v lazygit &>/dev/null; then
-        LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "v\K[^"]*')
-        curl -Lo /tmp/lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
-        tar xf /tmp/lazygit.tar.gz -C /tmp lazygit
-        mkdir -p "$HOME/.local/bin"
-        install /tmp/lazygit "$HOME/.local/bin"
-        rm -f /tmp/lazygit /tmp/lazygit.tar.gz
+        case "$(uname -m)" in
+            x86_64)  LAZYGIT_ARCH=x86_64 ;;
+            aarch64) LAZYGIT_ARCH=arm64 ;;
+            armv7l)  LAZYGIT_ARCH=armv6 ;;
+            *) echo "Unsupported arch for lazygit: $(uname -m)"; LAZYGIT_ARCH= ;;
+        esac
+        if [ -n "$LAZYGIT_ARCH" ]; then
+            LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "v\K[^"]*')
+            curl -Lo /tmp/lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_${LAZYGIT_ARCH}.tar.gz"
+            tar xf /tmp/lazygit.tar.gz -C /tmp lazygit
+            mkdir -p "$HOME/.local/bin"
+            install /tmp/lazygit "$HOME/.local/bin"
+            rm -f /tmp/lazygit /tmp/lazygit.tar.gz
+        fi
     fi
 fi
 

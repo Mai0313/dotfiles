@@ -22,11 +22,12 @@ New codespaces will be configured automatically.
 
 The config template automatically detects the environment:
 
-| Environment | Detection | `is_work` | `is_codespace` |
-|---|---|---|---|
-| Cloudtop | `*.c.googlers.com` | `true` | `false` |
-| GitHub Codespaces | `CODESPACES=true` | `false` | `true` |
-| Personal | default | `false` | `false` |
+| Environment | Detection | `is_work` | `is_cloudtop` | `is_codespace` |
+|---|---|---|---|---|
+| Cloudtop | `*.c.googlers.com` | `true` | `true` | `false` |
+| Roam (work) | `*.roam.internal` | `true` | `false` | `false` |
+| GitHub Codespaces | `CODESPACES=true` | `false` | `false` | `true` |
+| Personal | default | `false` | `false` | `false` |
 
 ## Daily Usage
 
@@ -44,5 +45,6 @@ After `chezmoi apply` deploys the dotfiles, run the setup scripts manually:
 
 ```bash
 ~/setup.sh          # Install zsh, oh-my-zsh, powerlevel10k, fonts
-~/setup_adb.sh      # (Cloudtop only) Clone ADB vendor keys
+~/setup_adb.sh      # (Work: Cloudtop + Roam) Clone ADB vendor keys
+~/install_skills.sh # (Cloudtop only) Install Agent Skills from google3
 ```
