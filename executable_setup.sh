@@ -55,22 +55,6 @@ ZSH_CUSTOM="$HOME/.oh-my-zsh/custom"
 [ ! -d "$ZSH_CUSTOM/themes/powerlevel10k" ] && git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$ZSH_CUSTOM/themes/powerlevel10k"
 [ ! -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ] && git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions "$ZSH_CUSTOM/plugins/zsh-autosuggestions"
 [ ! -d "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" ] && git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting.git "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting"
-[ ! -d "$ZSH_CUSTOM/plugins/zsh-z" ] && git clone --depth=1 https://github.com/agkozak/zsh-z "$ZSH_CUSTOM/plugins/zsh-z"
-
-echo "Configuring .zshrc..."
-if [ "$IS_MAC" = true ]; then
-    sed -i '' 's|^ZSH_THEME=.*$|ZSH_THEME="powerlevel10k/powerlevel10k"|' "$HOME/.zshrc"
-    sed -i '' 's|^plugins=(.*)$|plugins=(git zsh-autosuggestions zsh-syntax-highlighting zsh-z)|' "$HOME/.zshrc"
-    sed -i '' 's|^# ZSH_CUSTOM=.*$|ZSH_CUSTOM=$HOME/.oh-my-zsh/custom|' "$HOME/.zshrc"
-else
-    sed -i 's|^ZSH_THEME=.*$|ZSH_THEME="powerlevel10k/powerlevel10k"|' "$HOME/.zshrc"
-    sed -i 's|^plugins=(.*)$|plugins=(git zsh-autosuggestions zsh-syntax-highlighting zsh-z)|' "$HOME/.zshrc"
-    sed -i 's|^# ZSH_CUSTOM=.*$|ZSH_CUSTOM=$HOME/.oh-my-zsh/custom|' "$HOME/.zshrc"
-fi
-
-if ! grep -q "export PATH=\$HOME/bin:\$HOME/.local/bin:/usr/local/bin:\$PATH" "$HOME/.zshrc"; then
-    echo 'export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH' >> "$HOME/.zshrc"
-fi
 
 echo "Installing Neovim..."
 if ! command -v nvim &>/dev/null; then
