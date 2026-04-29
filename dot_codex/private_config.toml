@@ -1,18 +1,29 @@
 #:schema https://developers.openai.com/codex/config-schema.json
 model = "gpt-5.4"
-model_reasoning_effort = "high"
-plan_mode_reasoning_effort = "high"
+personality = "pragmatic"
 approval_policy = "untrusted"
 model_reasoning_summary = "auto"
-hide_agent_reasoning = true
-personality = "pragmatic"
+model_reasoning_effort = "high"
+plan_mode_reasoning_effort = "high"
+
 approvals_reviewer = "guardian_subagent"
+hide_agent_reasoning = true
+oss_provider = "oai"
 
 [model_providers.oai]
 name = "OpenAI"
 base_url = "https://api.mai0313.com"
 env_key = "OPENAI_API_KEY"
 wire_api = "responses"
+
+[profiles.default]
+model = "azure/gpt-5.5"
+model_provider = "oai"
+personality = "pragmatic"
+approval_policy = "untrusted"
+model_reasoning_summary = "auto"
+model_reasoning_effort = "high"
+plan_mode_reasoning_effort = "high"
 
 # [profiles.default]
 # model = "gpt-5.4"
@@ -43,9 +54,6 @@ generate_memories = true
 use_memories = true
 disable_on_external_context = false
 
-[tui]
-status_line = ["model-with-reasoning", "current-dir", "five-hour-limit", "weekly-limit", "fast-mode", "task-progress", "used-tokens"]
-
 [analytics]
 enabled = false
 
@@ -56,3 +64,6 @@ max_threads = 6
 max_depth = 1
 # Default timeout per worker for spawn_agents_on_csv jobs. When unset, the tool defaults to 1800 seconds.
 job_max_runtime_seconds = 1800
+
+[tui]
+status_line = ["model-with-reasoning", "current-dir", "five-hour-limit", "weekly-limit", "fast-mode", "task-progress", "used-tokens"]
