@@ -11,12 +11,12 @@ hide_agent_reasoning = true
 oss_provider = "oai"
 
 [model_providers.oai]
-name = "OpenAI"
+name = "oai"
 base_url = "https://api.mai0313.com"
 env_key = "OPENAI_API_KEY"
 wire_api = "responses"
 
-[profiles.default]
+[profiles.azure]
 model = "azure/gpt-5.5"
 model_provider = "oai"
 personality = "pragmatic"
