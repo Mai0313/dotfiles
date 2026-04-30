@@ -43,12 +43,21 @@ chezmoi update        # Pull from remote + apply (for other machines)
 
 `chezmoi apply` handles everything: it deploys dotfiles, clones external
 dependencies (oh-my-zsh, powerlevel10k, plugins, ADB keys on work), and
-runs the scripts in `.chezmoiscripts/` to install OS packages, set zsh as
-default shell, and bootstrap LazyVim. No manual setup script needed.
+runs the bootstrap script in `.chezmoiscripts/` to install OS packages,
+set zsh as default shell, and seed LazyVim.
 
 The one-liner above (`chezmoi init --apply`) covers fresh machines and
 Codespaces. Already-initialized machines pick up future changes via
 `chezmoi update`.
+
+After the first successful bootstrap you can flip `is_setup = true` in
+`~/.config/chezmoi/chezmoi.toml` (under `[data]`) to skip the auto bootstrap
+on subsequent applies. Flip back to `false` when you add a package to
+`.chezmoidata/packages.yaml` and want it installed.
+
+`~/setup.sh` is also deployed (Linux/macOS only) as a manual entry point —
+identical body to the chezmoi-driven script, no `is_setup` gate. Run it
+yourself when you want to bootstrap without invoking chezmoi.
 
 ### Cleanup
 

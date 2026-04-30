@@ -43,11 +43,20 @@ chezmoi update        # 從 remote 拉取並套用（適用於其他機器）
 
 `chezmoi apply` 會一條龍處理:部署 dotfiles、clone external 相依套件
 (oh-my-zsh、powerlevel10k、plugins,以及 work 環境的 ADB keys),並執行
-`.chezmoiscripts/` 內的 script 安裝 OS 套件、把 zsh 設為預設 shell、
-bootstrap LazyVim。不需要再手動跑任何 setup script。
+`.chezmoiscripts/` 內的 bootstrap script 安裝 OS 套件、把 zsh 設為預設
+shell、bootstrap LazyVim。
 
 上面那一行指令 (`chezmoi init --apply`) 對新機器跟 Codespaces 都適用。
 已經初始化過的機器之後用 `chezmoi update` 拉取更新。
+
+第一次 bootstrap 跑完之後,可以在 `~/.config/chezmoi/chezmoi.toml` 的
+`[data]` 區塊把 `is_setup = true`,後續 apply 就會跳過自動 bootstrap。
+之後如果在 `.chezmoidata/packages.yaml` 加新套件想重跑,把 flag 改回
+`false` 跑一次,再改回 `true` 即可。
+
+`~/setup.sh` 也會被部署 (僅限 Linux/macOS),作為手動執行的入口點 —
+跟 chezmoi-driven 的 script 共用同一份 body,沒有 `is_setup` gate。
+想單獨 bootstrap 不透過 chezmoi 時可以直接跑這支。
 
 ### Cleanup
 
