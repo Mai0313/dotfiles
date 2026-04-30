@@ -79,7 +79,7 @@
     "useBackgroundColor": true,
     "showSpinner": true,
     "terminalBackgroundPollingInterval": 60,
-    "useAlternateBuffer": true,
+    "useAlternateBuffer": false,
     "incrementalRendering": true,
     "theme": "GitHub",
     "escapePastedAtSymbols": true,
