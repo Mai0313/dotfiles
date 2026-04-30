@@ -2,12 +2,15 @@ install.sh
 README.md
 README.zh-TW.md
 CLAUDE.md
-{{ if not .is_work }}
-setup_adb.sh
-{{ end }}
-{{ if not .is_cloudtop }}
-install_skills.sh
-{{ end }}
-{{ if or .is_work .is_cloudtop }}
+
+{{ if eq .chezmoi.os "windows" -}}
+.zshrc
+.bashrc
+.p10k.zsh
+cleanup.sh
+setup.sh
+{{- end }}
+
+{{ if or .is_work .is_cloudtop -}}
 .gemini/GEMINI.md
-{{ end }}
+{{- end }}

@@ -1,0 +1,17 @@
+{{- /*
+chezmoi-driven bootstrap. Auto-runs during `chezmoi apply` when this
+rendered content changes (e.g., editing .chezmoidata/packages.yaml or
+toggling work/codespace env).
+
+Skipped when either:
+  - .chezmoi.os == "windows" (no bash environment)
+  - .is_setup == true (flip in ~/.config/chezmoi/chezmoi.toml after first
+    successful bootstrap to skip on subsequent applies; flip back to
+    false to re-run after package changes)
+
+Body shared with executable_setup.sh.tmpl via .chezmoitemplates/setup-body.sh
+so the chezmoi-driven path and the manual ~/setup.sh stay byte-identical.
+*/ -}}
+{{- if and (ne .chezmoi.os "windows") (not (index . "is_setup")) -}}
+{{ template "setup-body.sh" . }}
+{{- end -}}

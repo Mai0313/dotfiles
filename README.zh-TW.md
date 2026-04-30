@@ -41,10 +41,15 @@ chezmoi update        # 從 remote 拉取並套用（適用於其他機器）
 
 ### 新機器首次設定
 
-`chezmoi apply` 部署完 dotfiles 後，手動執行 setup script：
+`chezmoi apply` 會一條龍處理:部署 dotfiles、clone external 相依套件
+(oh-my-zsh、powerlevel10k、plugins,以及 work 環境的 ADB keys),並執行
+`.chezmoiscripts/` 內的 script 安裝 OS 套件、把 zsh 設為預設 shell、
+bootstrap LazyVim。不需要再手動跑任何 setup script。
 
-```bash
-~/setup.sh          # 安裝 zsh、oh-my-zsh、powerlevel10k、字型
-~/setup_adb.sh      # （Work：Cloudtop + Roam）Clone ADB vendor keys
-~/install_skills.sh # （僅限 Cloudtop）從 google3 安裝 Agent Skills
-```
+上面那一行指令 (`chezmoi init --apply`) 對新機器跟 Codespaces 都適用。
+已經初始化過的機器之後用 `chezmoi update` 拉取更新。
+
+### Cleanup
+
+`~/cleanup.sh` 是 ad-hoc 工具 (不會自動執行),用來清理 `.ipython`、
+`.dotnet`、`.pki` 等散落的 hidden cache。要用再執行。

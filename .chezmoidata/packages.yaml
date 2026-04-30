@@ -1,0 +1,20 @@
+packages:
+  darwin:
+    - zsh
+    - vim
+    - wget
+    - git
+    - curl
+    - neovim
+    - ripgrep
+    - fd
+    - lazygit
+  linux:
+    - zsh
+    - vim
+    - wget
+    - fontconfig
+    - git
+    - curl
+    - ripgrep
+    - fd-find

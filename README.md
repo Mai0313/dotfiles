@@ -41,10 +41,16 @@ chezmoi update        # Pull from remote + apply (for other machines)
 
 ### First-time setup on a new machine
 
-After `chezmoi apply` deploys the dotfiles, run the setup scripts manually:
+`chezmoi apply` handles everything: it deploys dotfiles, clones external
+dependencies (oh-my-zsh, powerlevel10k, plugins, ADB keys on work), and
+runs the scripts in `.chezmoiscripts/` to install OS packages, set zsh as
+default shell, and bootstrap LazyVim. No manual setup script needed.
 
-```bash
-~/setup.sh          # Install zsh, oh-my-zsh, powerlevel10k, fonts
-~/setup_adb.sh      # (Work: Cloudtop + Roam) Clone ADB vendor keys
-~/install_skills.sh # (Cloudtop only) Install Agent Skills from google3
-```
+The one-liner above (`chezmoi init --apply`) covers fresh machines and
+Codespaces. Already-initialized machines pick up future changes via
+`chezmoi update`.
+
+### Cleanup
+
+`~/cleanup.sh` is an ad-hoc utility (not run automatically) for clearing
+stray hidden caches like `.ipython`, `.dotnet`, `.pki`. Use as needed.

@@ -3,9 +3,47 @@
     url = "https://github.com/Mai0313/skills.git"
     refreshPeriod = "12h"
 
-{{ if or .is_work .is_cloudtop }}
+{{ if ne .chezmoi.os "windows" -}}
+[".oh-my-zsh"]
+    type = "git-repo"
+    url = "https://github.com/ohmyzsh/ohmyzsh.git"
+    refreshPeriod = "12h"
+    [".oh-my-zsh".clone]
+        args = ["--depth=1"]
+    [".oh-my-zsh".pull]
+        args = ["--ff-only"]
+
+[".oh-my-zsh/custom/themes/powerlevel10k"]
+    type = "git-repo"
+    url = "https://github.com/romkatv/powerlevel10k.git"
+    refreshPeriod = "12h"
+    [".oh-my-zsh/custom/themes/powerlevel10k".clone]
+        args = ["--depth=1"]
+    [".oh-my-zsh/custom/themes/powerlevel10k".pull]
+        args = ["--ff-only"]
+
+[".oh-my-zsh/custom/plugins/zsh-autosuggestions"]
+    type = "git-repo"
+    url = "https://github.com/zsh-users/zsh-autosuggestions.git"
+    refreshPeriod = "12h"
+    [".oh-my-zsh/custom/plugins/zsh-autosuggestions".clone]
+        args = ["--depth=1"]
+    [".oh-my-zsh/custom/plugins/zsh-autosuggestions".pull]
+        args = ["--ff-only"]
+
+[".oh-my-zsh/custom/plugins/zsh-syntax-highlighting"]
+    type = "git-repo"
+    url = "https://github.com/zsh-users/zsh-syntax-highlighting.git"
+    refreshPeriod = "12h"
+    [".oh-my-zsh/custom/plugins/zsh-syntax-highlighting".clone]
+        args = ["--depth=1"]
+    [".oh-my-zsh/custom/plugins/zsh-syntax-highlighting".pull]
+        args = ["--ff-only"]
+{{- end }}
+
+{{ if or .is_work .is_cloudtop -}}
 ["adb-keys/security"]
     type = "git-repo"
     url = "sso://googleplex-android/platform/vendor/google/security"
     refreshPeriod = "12h"
-{{ end }}
+{{- end }}

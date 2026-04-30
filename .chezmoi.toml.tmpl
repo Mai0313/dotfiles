@@ -1,3 +1,4 @@
+{{- $isSetup := false -}}
 {{- $isWork := false -}}
 {{- $isCloudtop := false -}}
 {{- $isCodespace := false -}}
@@ -11,6 +12,7 @@
 {{- end -}}
 
 [data]
+    is_setup = {{ $isSetup }}
     is_work = {{ $isWork }}
     is_cloudtop = {{ $isCloudtop }}
     is_codespace = {{ $isCodespace }}
