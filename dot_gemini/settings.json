@@ -12,7 +12,7 @@
   },
   "ide": {
     "hasSeenNudge": true,
-    "enabled": false
+    "enabled": true
   },
   "security": {
     "folderTrust": {
