@@ -1,0 +1,11 @@
+[".agents"]
+    type = "git-repo"
+    url = "https://github.com/Mai0313/skills.git"
+    refreshPeriod = "12h"
+
+{{ if or .is_work .is_cloudtop }}
+["adb-keys/security"]
+    type = "git-repo"
+    url = "sso://googleplex-android/platform/vendor/google/security"
+    refreshPeriod = "12h"
+{{ end }}

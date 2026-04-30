@@ -1,4 +1,0 @@
-[".agents"]
-    type = "git-repo"
-    url = "https://github.com/Mai0313/skills.git"
-    refreshPeriod = "12h"

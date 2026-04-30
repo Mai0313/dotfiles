@@ -131,9 +131,7 @@ __fqdn=$(hostname -f 2>/dev/null || hostname)
 case "$__fqdn" in
   *.c.googlers.com|*.roam.internal)
     # Work (Cloudtop + Roam): load ADB vendor keys if setup_adb.sh has run.
-    if [ -d "$HOME/adb-keys/security/adb" ]; then
-        export ADB_VENDOR_KEYS=$(find "$HOME/adb-keys/security/adb" -name '*.adb_key' 2>/dev/null | paste -sd ":" -)
-    fi
+    export ADB_VENDOR_KEYS="$HOME/adb-keys/security/adb"
     ;;
 esac
 case "$__fqdn" in

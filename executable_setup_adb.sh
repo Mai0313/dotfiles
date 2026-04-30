@@ -6,6 +6,7 @@ set -e
 # Define variables
 BASE_DIR="$HOME/adb-keys"
 SECURITY_DIR="$BASE_DIR/security"
+KEYS_DIR="$SECURITY_DIR/adb"
 REPO_URL="sso://googleplex-android/platform/vendor/google/security"
 
 # Detect macOS
@@ -21,24 +22,21 @@ else
     git -C "$SECURITY_DIR" pull
 fi
 
-echo "=> 2. Finding and setting ADB_VENDOR_KEYS..."
+echo "=> 2. Setting ADB_VENDOR_KEYS to keys directory..."
 
-# Fix paste compatibility across platforms
-KEY_PATHS=$(find "$SECURITY_DIR/adb" -name '*.adb_key' 2>/dev/null | paste -sd ":" - || true)
-
-if [ -z "$KEY_PATHS" ]; then
-    echo "Warning: No .adb_key files found in $SECURITY_DIR/adb!"
-else
-    # Export for the current script environment
-    export ADB_VENDOR_KEYS="$KEY_PATHS"
-    echo "=> ADB_VENDOR_KEYS set successfully"
+if [ ! -d "$KEYS_DIR" ]; then
+    echo "Warning: $KEYS_DIR does not exist!"
+    exit 1
 fi
+
+export ADB_VENDOR_KEYS="$KEYS_DIR"
+echo "=> ADB_VENDOR_KEYS=$ADB_VENDOR_KEYS"
 
 # Only run Pontis/systemd logic on Linux (not macOS)
 if [ "$IS_MAC" = false ]; then
     echo "=> 3. Detected Linux, configuring systemd/pontisd..."
     if command -v systemctl >/dev/null 2>&1; then
-        systemctl --user set-environment ADB_VENDOR_KEYS="$KEY_PATHS"
+        systemctl --user set-environment ADB_VENDOR_KEYS="$KEYS_DIR"
         systemctl --user daemon-reload
         systemctl --user restart pontisd
         echo "=> pontisd restarted successfully"
