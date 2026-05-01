@@ -6,8 +6,15 @@
 {{- $os := .chezmoi.os -}}
 {{- $fqdn := .chezmoi.fqdnHostname -}}
 
-{{- /* User-controlled gate; flip to true in ~/.config/chezmoi/chezmoi.toml after first bootstrap. */ -}}
+{{- /* Bootstrap completion gate. setup-body.sh touches a sentinel file at the */ -}}
+{{- /* end of a successful run; this template flips $isSetup to true whenever */ -}}
+{{- /* the sentinel exists. Means: re-running `chezmoi init --force` no longer */ -}}
+{{- /* resets the flag. To force-rerun the bootstrap: delete the sentinel,    */ -}}
+{{- /* then `chezmoi init --force && chezmoi apply`.                          */ -}}
 {{- $isSetup := false -}}
+{{- if stat (joinPath .chezmoi.cacheDir "bootstrap-done") -}}
+{{-   $isSetup = true -}}
+{{- end -}}
 
 {{- /* Work / Cloudtop classification by FQDN suffix. */ -}}
 {{- $isWork := false -}}

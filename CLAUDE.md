@@ -44,7 +44,7 @@ Top-level booleans + identifiers under `[data]`:
 
 | Variable | Default | Condition / Use |
 |---|---|---|
-| `is_setup` | `false` | User-controlled. Set to `true` in `~/.config/chezmoi/chezmoi.toml` after first successful bootstrap to skip the chezmoi-driven setup script on subsequent applies. Flip back to `false` to re-run (e.g., after editing `.chezmoidata/packages.yaml`). |
+| `is_setup` | `false` | Auto-managed via sentinel file. `setup-body.sh` touches `{{ .chezmoi.cacheDir }}/bootstrap-done` after a successful run; the template flips `is_setup` to `true` whenever the sentinel exists. To force a re-run: delete the sentinel, then `chezmoi init --force && chezmoi apply`. No manual `chezmoi.toml` edits required in normal flow. |
 | `is_work` | `false` | FQDN ends with `.c.googlers.com` or `.roam.internal` |
 | `is_cloudtop` | `false` | FQDN ends with `.c.googlers.com` |
 | `is_codespace` | `false` | env `CODESPACES=true` |
@@ -87,7 +87,7 @@ Inspect current values with `chezmoi data | grep -E 'is_|"os"'`.
 
 - `.chezmoi.toml.tmpl` — chezmoi config, defines top-level flags (`is_setup` / `is_work` / `is_cloudtop` / `is_codespace` / `is_devcontainer` / `is_container` / `is_wsl` / `is_ssh` / `is_ci`), identifiers (`osid`, `chassis`), and nested `[data.cpu]` / `[data.linux]` / `[data.darwin]` / `[data.windows]` sections. See Layer 1 table above for the full schema.
 - `.chezmoiexternal.toml.tmpl` — declarative external dependencies (oh-my-zsh, p10k, zsh plugins, `.agents` skills repo, work-only ADB security repo). All `type = "git-repo"` with `--depth=1` and `--ff-only` pull.
-- `.chezmoidata/packages.yaml` — declarative OS package lists (darwin / linux), consumed by `.chezmoitemplates/setup-body.sh`. Adding a package = edit YAML and `chezmoi apply` (after flipping `is_setup` back to `false`).
+- `.chezmoidata/packages.yaml` — declarative OS package lists (darwin / linux), consumed by `.chezmoitemplates/setup-body.sh`. Adding a package: edit YAML, delete the bootstrap sentinel (`rm ~/.cache/chezmoi/bootstrap-done`), `chezmoi init --force`, then `chezmoi apply`. Setup re-runs and recreates the sentinel.
 - `.chezmoitemplates/setup-body.sh` — shared bash body used by both bootstrap entry points. Contains: OS packages, font cache refresh, chsh, LazyVim install, work-only ADB pontisd setup. Each section is internally idempotent.
 - `.chezmoiscripts/run_onchange_after_setup.sh.tmpl` — chezmoi-driven entry. Thin wrapper around `setup-body.sh`, gated by `is_setup` and OS. Runs at `chezmoi apply` when rendered content changes.
 - `executable_setup.sh.tmpl` — manual entry, deployed to `~/setup.sh`. Same body, no gates (user runs it intentionally). Not deployed on Windows (`.chezmoiignore`).
@@ -143,16 +143,16 @@ diff <(chezmoi execute-template < .chezmoiscripts/run_onchange_after_setup.sh.tm
 # Expected: no output (identical) when is_setup is false/missing on non-Windows
 ```
 
-#### `is_setup` flag workflow
+#### `is_setup` sentinel workflow
 
-1. First-time apply: `is_setup` missing or `false` → setup runs, installs everything.
-2. After successful bootstrap, edit `~/.config/chezmoi/chezmoi.toml`:
-   ```toml
-   [data]
-       is_setup = true
-   ```
-3. Subsequent `chezmoi apply` skips the chezmoi-driven setup. `~/setup.sh` is still deployed and can be run manually.
-4. To re-run after adding a package: flip `is_setup = false`, `chezmoi apply`, flip back to `true`.
+`is_setup` is auto-managed via a sentinel file. The source of truth is the existence of `{{ .chezmoi.cacheDir }}/bootstrap-done` (resolves to `~/.cache/chezmoi/bootstrap-done` on Linux/macOS).
+
+1. **First-time apply on a fresh machine**: no sentinel → `is_setup = false` → `run_onchange_after_setup.sh.tmpl` renders the full body and runs. The last line of `setup-body.sh` (section 6) `touch`es the sentinel.
+2. **Subsequent `chezmoi apply` on the same machine**: sentinel still present → `is_setup` would render `true` if you `chezmoi init --force`, but on plain `apply` the saved `chezmoi.toml` is reused as-is and the script body's hash is unchanged → no rerun. Either way, no spurious bootstrap.
+3. **`chezmoi init --force` after editing `.chezmoi.toml.tmpl` / adding new data keys**: sentinel exists → `is_setup = true` is preserved automatically. **No manual flip required** (this is the whole reason the sentinel design exists).
+4. **Force re-run** (e.g., after adding a package to `.chezmoidata/packages.yaml`): `rm "$(chezmoi cache-path 2>/dev/null || echo $HOME/.cache/chezmoi)/bootstrap-done" && chezmoi init --force && chezmoi apply`. Setup re-runs, recreates the sentinel automatically.
+
+Trade-off: if `~/.cache/` is wiped (some users do this aggressively), the next `chezmoi init` would set `is_setup = false` and the next `apply` would re-run the bootstrap. Each section of `setup-body.sh` is idempotent so this is harmless, just slow once.
 
 #### Shebang trim caveat
 

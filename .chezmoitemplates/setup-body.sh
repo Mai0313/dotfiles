@@ -90,3 +90,10 @@ if [ -d "$KEYS_DIR" ] && command -v systemctl >/dev/null 2>&1; then
     systemctl --user restart pontisd 2>/dev/null || true
 fi
 {{- end }}
+
+# ---------- 6. Mark bootstrap as complete ----------
+# Read by .chezmoi.toml.tmpl on subsequent `chezmoi init --force` so is_setup
+# stays true without manual intervention. Delete this file to force re-run.
+SENTINEL="{{ joinPath .chezmoi.cacheDir "bootstrap-done" }}"
+mkdir -p "$(dirname "$SENTINEL")"
+touch "$SENTINEL"
