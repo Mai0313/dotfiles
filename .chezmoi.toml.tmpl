@@ -1,14 +1,128 @@
+{{- /* ============================================================ */ -}}
+{{- /* environment + OS detection (run once at `chezmoi init` time)   */ -}}
+{{- /* See CLAUDE.md "Layer 1 — chezmoi data" for consumers.          */ -}}
+{{- /* ============================================================ */ -}}
+
+{{- $os := .chezmoi.os -}}
+{{- $fqdn := .chezmoi.fqdnHostname -}}
+
+{{- /* User-controlled gate; flip to true in ~/.config/chezmoi/chezmoi.toml after first bootstrap. */ -}}
 {{- $isSetup := false -}}
+
+{{- /* Work / Cloudtop classification by FQDN suffix. */ -}}
 {{- $isWork := false -}}
 {{- $isCloudtop := false -}}
-{{- $isCodespace := false -}}
-{{- if eq (env "CODESPACES") "true" -}}
-{{-   $isCodespace = true -}}
-{{- else if hasSuffix ".c.googlers.com" .chezmoi.fqdnHostname -}}
+{{- if hasSuffix ".c.googlers.com" $fqdn -}}
 {{-   $isWork = true -}}
 {{-   $isCloudtop = true -}}
-{{- else if hasSuffix ".roam.internal" .chezmoi.fqdnHostname -}}
+{{- else if hasSuffix ".roam.internal" $fqdn -}}
 {{-   $isWork = true -}}
+{{- end -}}
+
+{{- /* Container / managed-shell environments. */ -}}
+{{- $isCodespace := eq (env "CODESPACES") "true" -}}
+{{- $isDevcontainer := or (ne (env "REMOTE_CONTAINERS") "") (ne (env "DEVCONTAINER") "") -}}
+{{- $isContainer := false -}}
+{{- if or (stat "/.dockerenv") (stat "/run/.containerenv") -}}
+{{-   $isContainer = true -}}
+{{- end -}}
+{{- $isSSH := or (ne (env "SSH_CONNECTION") "") (or (ne (env "SSH_CLIENT") "") (ne (env "SSH_TTY") "")) -}}
+{{- $isCI := or (eq (env "CI") "true") (ne (env "GITHUB_ACTIONS") "") -}}
+
+{{- /* WSL: Linux kernel string contains "microsoft". */ -}}
+{{- $isWsl := false -}}
+{{- if and (eq $os "linux") (hasKey .chezmoi.kernel "osrelease") -}}
+{{-   if contains "microsoft" (lower .chezmoi.kernel.osrelease) -}}
+{{-     $isWsl = true -}}
+{{-   end -}}
+{{- end -}}
+
+{{- /* Combined identifier: "linux-ubuntu", "linux-debian", "darwin", "windows". */ -}}
+{{- $osid := $os -}}
+{{- if and (eq $os "linux") (hasKey .chezmoi.osRelease "id") -}}
+{{-   $osid = printf "%s-%s" $os .chezmoi.osRelease.id -}}
+{{- end -}}
+
+{{- /* Chassis: laptop / desktop / vm / container / server / unknown. */ -}}
+{{- $chassis := "unknown" -}}
+{{- if eq $os "linux" -}}
+{{-   if ne (lookPath "hostnamectl") "" -}}
+{{-     $chassis = output "sh" "-c" "hostnamectl chassis 2>/dev/null || echo unknown" | trim -}}
+{{-     if eq $chassis "" -}}{{- $chassis = "unknown" -}}{{- end -}}
+{{-   end -}}
+{{- else if eq $os "darwin" -}}
+{{-   if ne (lookPath "sysctl") "" -}}
+{{-     $macModel := output "sysctl" "-n" "hw.model" | trim -}}
+{{-     if hasPrefix $macModel "MacBook" -}}{{- $chassis = "laptop" -}}
+{{-     else if hasPrefix $macModel "Mac" -}}{{- $chassis = "desktop" -}}
+{{-     end -}}
+{{-   end -}}
+{{- end -}}
+{{- if $isContainer -}}{{- $chassis = "container" -}}{{- end -}}
+{{- if $isWsl -}}{{- $chassis = "vm" -}}{{- end -}}
+
+{{- /* Linux distro / kernel fields (empty strings on other OSes). */ -}}
+{{- $distroID := "" -}}
+{{- $distroIDLike := "" -}}
+{{- $distroVersionID := "" -}}
+{{- $distroVersionCodename := "" -}}
+{{- $distroPrettyName := "" -}}
+{{- $kernelRelease := "" -}}
+{{- $kernelOSType := "" -}}
+{{- if eq $os "linux" -}}
+{{-   if hasKey .chezmoi.osRelease "id" -}}{{- $distroID = .chezmoi.osRelease.id -}}{{- end -}}
+{{-   if hasKey .chezmoi.osRelease "idLike" -}}{{- $distroIDLike = .chezmoi.osRelease.idLike -}}{{- end -}}
+{{-   if hasKey .chezmoi.osRelease "versionID" -}}{{- $distroVersionID = .chezmoi.osRelease.versionID -}}{{- end -}}
+{{-   if hasKey .chezmoi.osRelease "versionCodename" -}}{{- $distroVersionCodename = .chezmoi.osRelease.versionCodename -}}{{- end -}}
+{{-   if hasKey .chezmoi.osRelease "prettyName" -}}{{- $distroPrettyName = .chezmoi.osRelease.prettyName -}}{{- end -}}
+{{-   if hasKey .chezmoi.kernel "osrelease" -}}{{- $kernelRelease = .chezmoi.kernel.osrelease -}}{{- end -}}
+{{-   if hasKey .chezmoi.kernel "ostype" -}}{{- $kernelOSType = .chezmoi.kernel.ostype -}}{{- end -}}
+{{- end -}}
+
+{{- /* macOS fields (empty strings on other OSes). */ -}}
+{{- $macComputerName := "" -}}
+{{- $macBuildVersion := "" -}}
+{{- $macProductVersion := "" -}}
+{{- $macModelID := "" -}}
+{{- if eq $os "darwin" -}}
+{{-   if ne (lookPath "scutil") "" -}}
+{{-     $macComputerName = output "scutil" "--get" "ComputerName" | trim -}}
+{{-   end -}}
+{{-   if ne (lookPath "sw_vers") "" -}}
+{{-     $macBuildVersion = output "sw_vers" "--buildVersion" | trim -}}
+{{-     $macProductVersion = output "sw_vers" "--productVersion" | trim -}}
+{{-   end -}}
+{{-   if ne (lookPath "sysctl") "" -}}
+{{-     $macModelID = output "sysctl" "-n" "hw.model" | trim -}}
+{{-   end -}}
+{{- end -}}
+
+{{- /* Windows registry fields (empty strings on other OSes). */ -}}
+{{- $winProductName := "" -}}
+{{- $winDisplayVersion := "" -}}
+{{- $winCurrentBuild := "" -}}
+{{- $winEditionID := "" -}}
+{{- if eq $os "windows" -}}
+{{-   if hasKey .chezmoi.windowsVersion "productName" -}}{{- $winProductName = .chezmoi.windowsVersion.productName -}}{{- end -}}
+{{-   if hasKey .chezmoi.windowsVersion "displayVersion" -}}{{- $winDisplayVersion = .chezmoi.windowsVersion.displayVersion -}}{{- end -}}
+{{-   if hasKey .chezmoi.windowsVersion "currentBuild" -}}{{- $winCurrentBuild = .chezmoi.windowsVersion.currentBuild -}}{{- end -}}
+{{-   if hasKey .chezmoi.windowsVersion "editionID" -}}{{- $winEditionID = .chezmoi.windowsVersion.editionID -}}{{- end -}}
+{{- end -}}
+
+{{- /* CPU cores / threads. Linux exposes only logical count via nproc; */ -}}
+{{- /* cores is set equal to threads as a placeholder for future refinement. */ -}}
+{{- $cpuCores := 0 -}}
+{{- $cpuThreads := 0 -}}
+{{- if eq $os "darwin" -}}
+{{-   if ne (lookPath "sysctl") "" -}}
+{{-     $cpuCores = atoi (output "sysctl" "-n" "hw.physicalcpu" | trim) -}}
+{{-     $cpuThreads = atoi (output "sysctl" "-n" "hw.logicalcpu" | trim) -}}
+{{-   end -}}
+{{- else if eq $os "linux" -}}
+{{-   if ne (lookPath "nproc") "" -}}
+{{-     $cpuThreads = atoi (output "nproc" | trim) -}}
+{{-     $cpuCores = $cpuThreads -}}
+{{-   end -}}
 {{- end -}}
 
 [data]
@@ -16,3 +130,35 @@
     is_work = {{ $isWork }}
     is_cloudtop = {{ $isCloudtop }}
     is_codespace = {{ $isCodespace }}
+    is_devcontainer = {{ $isDevcontainer }}
+    is_container = {{ $isContainer }}
+    is_wsl = {{ $isWsl }}
+    is_ssh = {{ $isSSH }}
+    is_ci = {{ $isCI }}
+    osid = {{ $osid | quote }}
+    chassis = {{ $chassis | quote }}
+
+[data.cpu]
+    cores = {{ $cpuCores }}
+    threads = {{ $cpuThreads }}
+
+[data.linux]
+    distro_id = {{ $distroID | quote }}
+    distro_id_like = {{ $distroIDLike | quote }}
+    distro_version_id = {{ $distroVersionID | quote }}
+    distro_version_codename = {{ $distroVersionCodename | quote }}
+    distro_pretty_name = {{ $distroPrettyName | quote }}
+    kernel_release = {{ $kernelRelease | quote }}
+    kernel_ostype = {{ $kernelOSType | quote }}
+
+[data.darwin]
+    computer_name = {{ $macComputerName | quote }}
+    build_version = {{ $macBuildVersion | quote }}
+    product_version = {{ $macProductVersion | quote }}
+    model = {{ $macModelID | quote }}
+
+[data.windows]
+    product_name = {{ $winProductName | quote }}
+    display_version = {{ $winDisplayVersion | quote }}
+    current_build = {{ $winCurrentBuild | quote }}
+    edition_id = {{ $winEditionID | quote }}

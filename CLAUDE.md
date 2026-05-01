@@ -38,18 +38,34 @@ After editing templates, validate with `chezmoi execute-template < file.tmpl` or
 
 **This repo detects the environment in two layers for two different purposes. Do not consolidate them without understanding why.**
 
-**Layer 1 — chezmoi data (`.chezmoi.toml.tmpl`).** Defines four variables at `chezmoi init` time:
+**Layer 1 — chezmoi data (`.chezmoi.toml.tmpl`).** Computed at `chezmoi init` time and emitted to `~/.config/chezmoi/chezmoi.toml`. The template intentionally pre-computes a wide superset (CPU, chassis, distro / kernel / macOS / Windows fields) so future templates can reference any of them without forcing a re-init — even if today only a handful are consumed.
+
+Top-level booleans + identifiers under `[data]`:
 
 | Variable | Default | Condition / Use |
 |---|---|---|
+| `is_setup` | `false` | User-controlled. Set to `true` in `~/.config/chezmoi/chezmoi.toml` after first successful bootstrap to skip the chezmoi-driven setup script on subsequent applies. Flip back to `false` to re-run (e.g., after editing `.chezmoidata/packages.yaml`). |
 | `is_work` | `false` | FQDN ends with `.c.googlers.com` or `.roam.internal` |
 | `is_cloudtop` | `false` | FQDN ends with `.c.googlers.com` |
 | `is_codespace` | `false` | env `CODESPACES=true` |
-| `is_setup` | `false` | User-controlled. Set to `true` in `~/.config/chezmoi/chezmoi.toml` after first successful bootstrap to skip the chezmoi-driven setup script on subsequent applies. Flip back to `false` to re-run (e.g., after editing `.chezmoidata/packages.yaml`). |
+| `is_devcontainer` | `false` | env `REMOTE_CONTAINERS` or `DEVCONTAINER` set (VS Code Dev Containers) |
+| `is_container` | `false` | `/.dockerenv` or `/run/.containerenv` exists (generic Docker / Podman) |
+| `is_wsl` | `false` | Linux + `/proc/sys/kernel/osrelease` contains `microsoft` |
+| `is_ssh` | `false` | env `SSH_CONNECTION` / `SSH_CLIENT` / `SSH_TTY` set |
+| `is_ci` | `false` | env `CI=true` or `GITHUB_ACTIONS` set |
+| `osid` | `"linux-<id>"` / `"darwin"` / `"windows"` | Combined OS+distro identifier (e.g. `linux-ubuntu`, `linux-debian`) for clean `eq` comparisons |
+| `chassis` | `"unknown"` | `hostnamectl chassis` on Linux; `sysctl hw.model` heuristic on darwin; overridden to `"container"` / `"vm"` when `is_container` / `is_wsl` are true |
 
-OS detection comes from chezmoi built-ins: `eq .chezmoi.os "linux"` / `"darwin"` / `"windows"`.
+Nested namespaces (always emitted, with empty strings / zero on irrelevant OSes — safe to reference unconditionally):
 
-**Note**: `.chezmoi.toml.tmpl` runs at `chezmoi init`, not at every `chezmoi apply`. Adding a new data key (like `is_setup`) requires `chezmoi init --force` once to regenerate `~/.config/chezmoi/chezmoi.toml`. Templates that read `is_setup` use `index . "is_setup"` (rather than `.is_setup`) so missing keys default to nil → `not nil` → treated as `false` → setup runs. This keeps the change backward-compatible without forcing a re-init.
+- `[data.cpu]` — `cores`, `threads` (darwin: `sysctl hw.physicalcpu` / `hw.logicalcpu`; linux: `nproc` for both — physical-core detection on Linux is left as a placeholder)
+- `[data.linux]` — `distro_id`, `distro_id_like`, `distro_version_id`, `distro_version_codename`, `distro_pretty_name`, `kernel_release`, `kernel_ostype` (sourced from `.chezmoi.osRelease` and `.chezmoi.kernel`)
+- `[data.darwin]` — `computer_name` (`scutil --get ComputerName`), `build_version` / `product_version` (`sw_vers`), `model` (`sysctl hw.model`)
+- `[data.windows]` — `product_name`, `display_version`, `current_build`, `edition_id` (sourced from `.chezmoi.windowsVersion` registry data)
+
+OS detection comes from chezmoi built-ins: `eq .chezmoi.os "linux"` / `"darwin"` / `"windows"`. For Linux distro variants prefer `eq .osid "linux-debian"` over chained `hasKey` checks.
+
+**Note**: `.chezmoi.toml.tmpl` runs at `chezmoi init`, not at every `chezmoi apply`. Adding a new data key (like `is_setup`) requires `chezmoi init --force` once to regenerate `~/.config/chezmoi/chezmoi.toml`. Templates that read `is_setup` use `index . "is_setup"` (rather than `.is_setup`) so missing keys default to nil → `not nil` → treated as `false` → setup runs. This keeps the change backward-compatible without forcing a re-init. New keys added later should use the same `index . "<key>"` pattern when used by a template that may run before the user re-inits.
 
 **Current consumers of Layer 1 vars:**
 - `.chezmoiignore` — gates `.gemini/GEMINI.md` on `is_work || is_cloudtop`. Also gates Linux-only files (`.zshrc`, `.bashrc`, `.p10k.zsh`, `cleanup.sh`, `setup.sh`) when `chezmoi.os == "windows"`.
@@ -69,7 +85,7 @@ Inspect current values with `chezmoi data | grep -E 'is_|"os"'`.
 
 ### Key Files
 
-- `.chezmoi.toml.tmpl` — chezmoi config, defines `is_setup` / `is_work` / `is_cloudtop` / `is_codespace`.
+- `.chezmoi.toml.tmpl` — chezmoi config, defines top-level flags (`is_setup` / `is_work` / `is_cloudtop` / `is_codespace` / `is_devcontainer` / `is_container` / `is_wsl` / `is_ssh` / `is_ci`), identifiers (`osid`, `chassis`), and nested `[data.cpu]` / `[data.linux]` / `[data.darwin]` / `[data.windows]` sections. See Layer 1 table above for the full schema.
 - `.chezmoiexternal.toml.tmpl` — declarative external dependencies (oh-my-zsh, p10k, zsh plugins, `.agents` skills repo, work-only ADB security repo). All `type = "git-repo"` with `--depth=1` and `--ff-only` pull.
 - `.chezmoidata/packages.yaml` — declarative OS package lists (darwin / linux), consumed by `.chezmoitemplates/setup-body.sh`. Adding a package = edit YAML and `chezmoi apply` (after flipping `is_setup` back to `false`).
 - `.chezmoitemplates/setup-body.sh` — shared bash body used by both bootstrap entry points. Contains: OS packages, font cache refresh, chsh, LazyVim install, work-only ADB pontisd setup. Each section is internally idempotent.
