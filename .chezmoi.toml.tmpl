@@ -129,6 +129,12 @@
 {{-   $cpuThreads = output "pwsh.exe" "-NoProfile" "-NonInteractive" "-Command" "(Get-CimInstance -ClassName 'Win32_Processor').NumberOfLogicalProcessors" | trim | atoi -}}
 {{- end -}}
 
+{{- /* Pin sourceDir to whatever was used at `chezmoi init` time. Recommended */ -}}
+{{- /* by https://www.chezmoi.io/user-guide/machines/containers-and-vms/ so the */ -}}
+{{- /* config survives a `chezmoi init --source=$HOME/dotfiles` invocation (e.g. */ -}}
+{{- /* GitHub Codespaces auto-clones to ~/dotfiles, not chezmoi's default). */ -}}
+sourceDir = {{ .chezmoi.sourceDir | quote }}
+
 [data]
     is_setup = {{ $isSetup }}
     is_work = {{ $isWork }}
