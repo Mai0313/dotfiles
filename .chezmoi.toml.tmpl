@@ -83,22 +83,18 @@
 {{-   if hasKey .chezmoi.kernel "ostype" -}}{{- $kernelOSType = .chezmoi.kernel.ostype -}}{{- end -}}
 {{- end -}}
 
-{{- /* macOS fields (empty strings on other OSes). */ -}}
+{{- /* macOS fields (empty strings on other OSes). scutil / sw_vers / sysctl */ -}}
+{{- /* are core macOS utilities — guaranteed to exist on darwin, no guard needed. */ -}}
+{{- /* scutil pattern from https://www.chezmoi.io/user-guide/machines/macos/ */ -}}
 {{- $macComputerName := "" -}}
 {{- $macBuildVersion := "" -}}
 {{- $macProductVersion := "" -}}
 {{- $macModelID := "" -}}
 {{- if eq $os "darwin" -}}
-{{-   if ne (lookPath "scutil") "" -}}
-{{-     $macComputerName = output "scutil" "--get" "ComputerName" | trim -}}
-{{-   end -}}
-{{-   if ne (lookPath "sw_vers") "" -}}
-{{-     $macBuildVersion = output "sw_vers" "--buildVersion" | trim -}}
-{{-     $macProductVersion = output "sw_vers" "--productVersion" | trim -}}
-{{-   end -}}
-{{-   if ne (lookPath "sysctl") "" -}}
-{{-     $macModelID = output "sysctl" "-n" "hw.model" | trim -}}
-{{-   end -}}
+{{-   $macComputerName = output "scutil" "--get" "ComputerName" | trim -}}
+{{-   $macBuildVersion = output "sw_vers" "--buildVersion" | trim -}}
+{{-   $macProductVersion = output "sw_vers" "--productVersion" | trim -}}
+{{-   $macModelID = output "sysctl" "-n" "hw.model" | trim -}}
 {{- end -}}
 
 {{- /* Windows registry fields (empty strings on other OSes). */ -}}
