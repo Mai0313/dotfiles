@@ -54,11 +54,11 @@ Top-level booleans + identifiers under `[data]`:
 | `is_ssh` | `false` | env `SSH_CONNECTION` / `SSH_CLIENT` / `SSH_TTY` set |
 | `is_ci` | `false` | env `CI=true` or `GITHUB_ACTIONS` set |
 | `osid` | `"linux-<id>"` / `"darwin"` / `"windows"` | Combined OS+distro identifier (e.g. `linux-ubuntu`, `linux-debian`) for clean `eq` comparisons |
-| `chassis` | `"unknown"` | `hostnamectl chassis` on Linux; `sysctl hw.model` heuristic on darwin; overridden to `"container"` / `"vm"` when `is_container` / `is_wsl` are true |
+| `chassis` | `"desktop"` | `hostnamectl --json=short \| mustFromJson` on Linux; `system_profiler SPHardwareDataType` on darwin (presence of `MacBook` → laptop); `Get-CimInstance Win32_Battery` count via `pwsh.exe` on Windows. Overridden to `"container"` / `"vm"` when `is_container` / `is_wsl` are true. Tracks [chezmoi general docs](https://www.chezmoi.io/user-guide/machines/general/). |
 
 Nested namespaces (always emitted, with empty strings / zero on irrelevant OSes — safe to reference unconditionally):
 
-- `[data.cpu]` — `cores`, `threads` (darwin: `sysctl hw.physicalcpu` / `hw.logicalcpu`; linux: `nproc` for both — physical-core detection on Linux is left as a placeholder)
+- `[data.cpu]` — `cores` (physical) / `threads` (logical). darwin: `sysctl hw.physicalcpu_max` / `hw.logicalcpu_max`. linux: `lscpu --online --parse` (deduped by socket+core for physical, raw row count for logical), with `nproc` fallback if `lscpu` is missing. windows: `Get-CimInstance Win32_Processor` via `pwsh.exe`. Implementation tracks the patterns in [chezmoi general docs](https://www.chezmoi.io/user-guide/machines/general/).
 - `[data.linux]` — `distro_id`, `distro_id_like`, `distro_version_id`, `distro_version_codename`, `distro_pretty_name`, `kernel_release`, `kernel_ostype` (sourced from `.chezmoi.osRelease` and `.chezmoi.kernel`)
 - `[data.darwin]` — `computer_name` (`scutil --get ComputerName`), `build_version` / `product_version` (`sw_vers`), `model` (`sysctl hw.model`)
 - `[data.windows]` — `product_name`, `display_version`, `current_build`, `edition_id` (sourced from `.chezmoi.windowsVersion` registry data)
