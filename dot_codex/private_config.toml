@@ -66,4 +66,4 @@ max_depth = 1
 job_max_runtime_seconds = 1800
 
 [tui]
-status_line = ["model-with-reasoning", "current-dir", "five-hour-limit", "weekly-limit", "fast-mode", "task-progress", "used-tokens"]
+status_line = ["model-with-reasoning", "current-dir", "five-hour-limit", "weekly-limit", "fast-mode", "task-progress", "used-tokens", "run-state"]
