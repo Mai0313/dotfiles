@@ -38,6 +38,8 @@
 {{- end -}}
 
 {{- /* Combined identifier: "linux-ubuntu", "linux-debian", "darwin", "windows". */ -}}
+{{- /* Pattern from https://www.chezmoi.io/user-guide/machines/linux/ — kept the */ -}}
+{{- /* explicit `eq $os "linux"` guard for consistency with the OS branches below. */ -}}
 {{- $osid := $os -}}
 {{- if and (eq $os "linux") (hasKey .chezmoi.osRelease "id") -}}
 {{-   $osid = printf "%s-%s" $os .chezmoi.osRelease.id -}}
