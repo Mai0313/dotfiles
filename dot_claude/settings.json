@@ -47,5 +47,17 @@
   "autoUpdatesChannel": "latest",
   "autoMemoryEnabled": true,
   "skipDangerousModePermissionPrompt": true,
+  "theme": "dark",
+  "editorMode": "normal",
+  "verbose": false,
+  "preferredNotifChannel": "auto",
+  "autoCompactEnabled": true,
+  "autoScrollEnabled": true,
+  "fileCheckpointingEnabled": true,
+  "showTurnDuration": true,
+  "terminalProgressBarEnabled": true,
+  "teammateMode": "auto",
+  "inputNeededNotifEnabled": false,
+  "agentPushNotifEnabled": false,
   "useAutoModeDuringPlan": true
 }
