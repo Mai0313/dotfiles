@@ -138,6 +138,7 @@ case "$__fqdn" in
     alias flash='/google/bin/releases/android/flashstation/cl_flashstation'
     alias recovery='/google/bin/releases/android/flashstation/cl_rom_recovery'
     alias listd='/google/bin/releases/android/flashstation/list_devices'
+    alias fetch='/google/data/ro/projects/android/fetch_artifact'
     alias duckie='/google/bin/releases/gemini-agents-duckie/duckie_cli.par'
     ;;
 esac
