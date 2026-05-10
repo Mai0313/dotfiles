@@ -27,6 +27,13 @@ model_reasoning_summary = "auto"
 model_reasoning_effort = "high"
 plan_mode_reasoning_effort = "high"
 
+[profiles.azure.features]
+terminal_resize_reflow = true
+memories = true
+external_migration = false
+goals = true
+prevent_idle_sleep = true
+
 # [profiles.default]
 # model = "gpt-5.5"
 # model_provider = "openai"
@@ -50,9 +57,8 @@ plan_mode_reasoning_effort = "high"
 terminal_resize_reflow = true
 js_repl = true
 memories = true
-external_migration = false
-goals = true
 prevent_idle_sleep = true
+goals = true
 
 [memories]
 generate_memories = true
