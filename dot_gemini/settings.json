@@ -6,7 +6,8 @@
     "loadMemoryFromIncludeDirectories": true,
     "fileName": [
       "GEMINI.md",
-      "copilot-instructions.md"
+      "CLAUDE.md",
+      "AGENTS.md"
     ],
     "discoveryMaxDirs": 200
   },
