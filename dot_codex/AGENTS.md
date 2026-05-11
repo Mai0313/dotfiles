@@ -11,5 +11,6 @@
 - Commit messages must be in English.
 - If you really need to run a Python script, you can use uv as a package management tool.
 - Do not create or update any comment on internal site or external site only if you got the permission.
+- Update all the documents if needed.
 - You can use `rg` instead of `grep` for better performance, this package is a rusted grep.
 - You can use `subagent` or `Agent Team` to run multiple tasks in the same time if you need for speeding up.
