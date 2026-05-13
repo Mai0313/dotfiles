@@ -10,6 +10,8 @@ model_reasoning_summary = "auto"
 model_verbosity = "medium"
 model_supports_reasoning_summaries = true
 project_doc_fallback_filenames = ["CLAUDE.md", "GEMINI.md"]
+web_search = "live"
+suppress_unstable_features_warning = true
 
 approvals_reviewer = "guardian_subagent"
 hide_agent_reasoning = false
@@ -72,7 +74,7 @@ enabled = false
 
 [agents]
 # Maximum concurrently open agent threads. Default: 6
-max_threads = 20
+max_threads = 6
 # Maximum nested spawn depth. Root session starts at depth 0. Default: 1
 max_depth = 1
 # Default timeout per worker for spawn_agents_on_csv jobs. When unset, the tool defaults to 1800 seconds.
