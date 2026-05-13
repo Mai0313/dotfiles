@@ -4,9 +4,11 @@
 model = "gpt-5.5"
 personality = "pragmatic"
 approval_policy = "untrusted"
-model_reasoning_summary = "auto"
 model_reasoning_effort = "xhigh"
 plan_mode_reasoning_effort = "xhigh"
+model_reasoning_summary = "auto"
+model_verbosity = "medium"
+model_supports_reasoning_summaries = true
 project_doc_fallback_filenames = ["CLAUDE.md", "GEMINI.md"]
 
 approvals_reviewer = "guardian_subagent"
@@ -24,46 +26,30 @@ model = "azure/gpt-5.5"
 model_provider = "oai"
 personality = "pragmatic"
 approval_policy = "untrusted"
-model_reasoning_summary = "auto"
 model_reasoning_effort = "medium"
 plan_mode_reasoning_effort = "medium"
+model_reasoning_summary = "auto"
+model_verbosity = "medium"
 
 [profiles.hard]
 model = "azure/gpt-5.5"
 model_provider = "oai"
 personality = "pragmatic"
 approval_policy = "untrusted"
-model_reasoning_summary = "auto"
 model_reasoning_effort = "xhigh"
 plan_mode_reasoning_effort = "xhigh"
+model_reasoning_summary = "auto"
+model_verbosity = "medium"
 
 [profiles.azure]
 model = "azure/gpt-5.5"
 model_provider = "oai"
 personality = "pragmatic"
 approval_policy = "untrusted"
-model_reasoning_summary = "auto"
 model_reasoning_effort = "xhigh"
 plan_mode_reasoning_effort = "xhigh"
-
-# [profiles.default]
-# model = "gpt-5.5"
-# model_provider = "openai"
-# approval_policy = "on-request"
-# sandbox_mode = "read-only"
-# service_tier = "flex"
-# oss_provider = "ollama"
-# model_reasoning_effort = "medium"
-# plan_mode_reasoning_effort = "xhigh"
-# model_reasoning_summary = "auto"
-# model_verbosity = "medium"
-# personality = "pragmatic" # or "friendly" or "none"
-# chatgpt_base_url = "https://chatgpt.com/backend-api/"
-# model_catalog_json = "./models.json"
-# model_instructions_file = "/absolute/or/relative/path/to/instructions.txt"
-# experimental_compact_prompt_file = "./compact_prompt.txt"
-# tools_view_image = true
-# features = { unified_exec = false }
+model_reasoning_summary = "auto"
+model_verbosity = "medium"
 
 [features]
 terminal_resize_reflow = true
