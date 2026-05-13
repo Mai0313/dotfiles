@@ -67,7 +67,7 @@ goals = true
 [memories]
 generate_memories = true
 use_memories = true
-disable_on_external_context = false
+disable_on_external_context = true
 
 [analytics]
 enabled = false
@@ -75,24 +75,7 @@ enabled = false
 [feedback]
 enabled = false
 
-[agents]
-# Maximum concurrently open agent threads. Default: 6
-max_threads = 6
-# Maximum nested spawn depth. Root session starts at depth 0. Default: 1
-max_depth = 1
-# Default timeout per worker for spawn_agents_on_csv jobs. When unset, the tool defaults to 1800 seconds.
-job_max_runtime_seconds = 1800
-
-[history]
-persistence = "save-all"
-
 [tui]
 notifications = true
-notification_method = "auto"
-notification_condition = "unfocused"
-animations = true
-show_tooltips = true
-alternate_screen = "auto"
-terminal_title = ["spinner", "project"]
 status_line = ["model-with-reasoning", "current-dir", "five-hour-limit", "fast-mode", "task-progress", "used-tokens", "run-state", "git-branch", "pull-request-number"]
 status_line_use_colors = true
