@@ -72,6 +72,9 @@ disable_on_external_context = false
 [analytics]
 enabled = false
 
+[feedback]
+enabled = false
+
 [agents]
 # Maximum concurrently open agent threads. Default: 6
 max_threads = 6
