@@ -6,6 +6,9 @@
   "permissions": {
     "defaultMode": "bypassPermissions"
   },
+  "worktree": {
+    "baseRef": "fresh"
+  },
   "enabledPlugins": {
     "rust-analyzer-lsp@claude-plugins-official": true,
     "typescript-lsp@claude-plugins-official": true,
@@ -55,7 +58,9 @@
   "showTurnDuration": true,
   "terminalProgressBarEnabled": true,
   "teammateMode": "auto",
+  "remoteControlAtStartup": true,
   "inputNeededNotifEnabled": false,
   "agentPushNotifEnabled": false,
+  "skipAutoPermissionPrompt": true,
   "useAutoModeDuringPlan": true
 }
