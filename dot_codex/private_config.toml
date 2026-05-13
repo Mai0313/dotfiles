@@ -63,6 +63,7 @@ js_repl = true
 memories = true
 prevent_idle_sleep = true
 goals = true
+collaboration_modes = true
 
 [memories]
 generate_memories = true
