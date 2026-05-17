@@ -76,6 +76,14 @@ enabled = false
 [feedback]
 enabled = false
 
+[agents]
+# Maximum concurrently open agent threads. Default: 6
+max_threads = 10
+# Maximum nested spawn depth. Root session starts at depth 0. Default: 1
+max_depth = 3
+# Default timeout per worker for spawn_agents_on_csv jobs. When unset, the tool defaults to 1800 seconds.
+job_max_runtime_seconds = 1800
+
 [tui]
 notifications = true
 status_line = ["model-with-reasoning", "current-dir", "five-hour-limit", "fast-mode", "task-progress", "used-tokens", "run-state", "git-branch", "pull-request-number"]
