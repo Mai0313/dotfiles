@@ -58,6 +58,13 @@ plan_mode_reasoning_effort = "xhigh"
 model_reasoning_summary = "auto"
 model_verbosity = "medium"
 
+[profiles.azure.features]
+terminal_resize_reflow = true
+memories = true
+external_migration = false
+goals = true
+prevent_idle_sleep = true
+
 [features]
 shell_tool = true
 codex_git_commit = true
