@@ -16,7 +16,7 @@ commit_attribution = "Codex <noreply@openai.com>"
 
 approvals_reviewer = "guardian_subagent"
 sandbox_mode = "danger-full-access"
-hide_agent_reasoning = false
+hide_agent_reasoning = true
 show_raw_agent_reasoning = false
 disable_paste_burst = false
 windows_wsl_setup_acknowledged = false
