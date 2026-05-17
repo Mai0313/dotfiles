@@ -58,6 +58,13 @@ model_reasoning_summary = "auto"
 model_verbosity = "medium"
 
 [features]
+shell_tool = true
+codex_git_commit = true
+shell_snapshot = true
+multi_agent = true
+personality = true
+enable_request_compression = true
+skill_mcp_dependency_install = true
 terminal_resize_reflow = true
 js_repl = true
 memories = true
