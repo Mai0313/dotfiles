@@ -3,7 +3,7 @@
 
 model = "gpt-5.5"
 personality = "pragmatic"
-approval_policy = "untrusted"
+approval_policy = "never"
 model_reasoning_effort = "xhigh"
 plan_mode_reasoning_effort = "xhigh"
 model_reasoning_summary = "auto"
