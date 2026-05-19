@@ -78,6 +78,7 @@ memories = true
 prevent_idle_sleep = true
 goals = true
 collaboration_modes = true
+mentions_v2 = true
 
 [memories]
 generate_memories = true
