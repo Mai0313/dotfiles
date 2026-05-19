@@ -27,26 +27,6 @@ base_url = "https://api.mai0313.com"
 env_key = "OPENAI_API_KEY"
 wire_api = "responses"
 
-[profiles.easy]
-model = "azure/gpt-5.5"
-model_provider = "oai"
-personality = "pragmatic"
-approval_policy = "untrusted"
-model_reasoning_effort = "medium"
-plan_mode_reasoning_effort = "medium"
-model_reasoning_summary = "auto"
-model_verbosity = "medium"
-
-[profiles.hard]
-model = "azure/gpt-5.5"
-model_provider = "oai"
-personality = "pragmatic"
-approval_policy = "untrusted"
-model_reasoning_effort = "xhigh"
-plan_mode_reasoning_effort = "xhigh"
-model_reasoning_summary = "auto"
-model_verbosity = "medium"
-
 [profiles.azure]
 model = "azure/gpt-5.5"
 model_provider = "oai"
