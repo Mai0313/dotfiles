@@ -132,6 +132,8 @@ case "$__fqdn" in
   *.c.googlers.com|*.roam.internal)
     # Work (Cloudtop + Roam): load ADB vendor keys if setup_adb.sh has run.
     export ADB_VENDOR_KEYS="$HOME/adb-keys/security/adb"
+    # https://yaqs.corp.google.com/eng/q/2346264355185623040
+    export CORP_SSH_HELPER_OVERRIDES="relay=sup-ssh-relay.corp.google.com"
     ;;
 esac
 case "$__fqdn" in
