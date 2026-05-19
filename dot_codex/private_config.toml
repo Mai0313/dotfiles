@@ -12,14 +12,12 @@ model_supports_reasoning_summaries = true
 project_doc_fallback_filenames = ["CLAUDE.md", "GEMINI.md"]
 web_search = "live"
 suppress_unstable_features_warning = true
-commit_attribution = "Codex <noreply@openai.com>"
 
 approvals_reviewer = "guardian_subagent"
 sandbox_mode = "danger-full-access"
 hide_agent_reasoning = true
 show_raw_agent_reasoning = false
 disable_paste_burst = false
-windows_wsl_setup_acknowledged = false
 check_for_update_on_startup = true
 oss_provider = "oai"
 
