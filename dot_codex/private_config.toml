@@ -82,5 +82,5 @@ job_max_runtime_seconds = 1800
 
 [tui]
 notifications = true
-status_line = ["current-dir", "model-with-reasoning", "git-branch", "pull-request-number", "context-used", "context-window-size", "used-tokens", "task-progress", "run-state"]
+status_line = ["current-dir", "model-with-reasoning", "git-branch", "pull-request-number", "context-used", "used-tokens", "task-progress", "permissions", "run-state"]
 status_line_use_colors = true
