@@ -14,3 +14,10 @@
 - Update all the documents if needed.
 - You can use `rg` instead of `grep` for better performance, this package is a rusted grep.
 - You can use `subagent` or `Agent Team` to run multiple tasks in the same time if you need for speeding up.
+
+## Text formatting
+
+- Do not reflow human-written prose.
+- Do not hard-wrap Markdown or documentation text to 72, 80, or 100 columns. IDEs and editors should handle visual wrapping.
+- When modifying documents, make the smallest textual diff possible and preserve the surrounding line structure.
+- A paragraph should usually stay as one logical line unless the existing file consistently uses manual wrapping.
