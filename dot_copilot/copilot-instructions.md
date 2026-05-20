@@ -2,6 +2,7 @@
 
 - Do NOT solve the error by hiding it, you should find the root cause first then solve it.
 - All commit messages should be in English and follow conventional commits rules.
+    - The commit message should be short, DO NOT INCLUADE ANY IMPLEMENT DETAILS.
 - The user prefers responses in Traditional Chinese.
     - CRITICAL: DO NOT translate technical terms, computer science jargon, hardware terminology, or variable names into Chinese. Keep them in their original English form.
     - Examples of terms to keep in English: bit, register, cache, assembly, cluster, core, offset, commit, branch, patchset, framework, etc.
