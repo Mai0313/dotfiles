@@ -162,11 +162,11 @@ The chezmoi-driven script gate uses `{{- if ... -}}` (with both `-`) so the body
 
 | Path | URL | Refresh | Condition |
 |---|---|---|---|
-| `.agents` | `Mai0313/skills` (GitHub) | 12h | always |
-| `.oh-my-zsh` | `ohmyzsh/ohmyzsh` (GitHub) | 12h | non-Windows |
-| `.oh-my-zsh/custom/themes/powerlevel10k` | `romkatv/powerlevel10k` | 12h | non-Windows |
-| `.oh-my-zsh/custom/plugins/zsh-autosuggestions` | `zsh-users/zsh-autosuggestions` | 12h | non-Windows |
-| `.oh-my-zsh/custom/plugins/zsh-syntax-highlighting` | `zsh-users/zsh-syntax-highlighting` | 12h | non-Windows |
-| `adb-keys/security` | `sso://googleplex-android/.../security` | 12h | `is_work \|\| is_cloudtop` |
+| `.agents` | `Mai0313/skills` (GitHub) | 1h | always |
+| `.oh-my-zsh` | `ohmyzsh/ohmyzsh` (GitHub) | 1h | non-Windows |
+| `.oh-my-zsh/custom/themes/powerlevel10k` | `romkatv/powerlevel10k` | 1h | non-Windows |
+| `.oh-my-zsh/custom/plugins/zsh-autosuggestions` | `zsh-users/zsh-autosuggestions` | 1h | non-Windows |
+| `.oh-my-zsh/custom/plugins/zsh-syntax-highlighting` | `zsh-users/zsh-syntax-highlighting` | 1h | non-Windows |
+| `adb-keys/security` | `sso://googleplex-android/.../security` | 1h | `is_work \|\| is_cloudtop` |
 
 All use `type = "git-repo"` with `--depth=1` and `--ff-only`. Pulling on chezmoi's schedule is compatible with oh-my-zsh's own `git pull`-based self-update — no need to disable oh-my-zsh auto-update. Externals refresh independently of the setup script's `run_onchange_` hash.
