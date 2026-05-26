@@ -69,6 +69,7 @@ generate_memories = true
 use_memories = true
 disable_on_external_context = true
 extract_model = "gpt-5.5"
+consolidation_model = "gpt-5.5"
 
 [analytics]
 enabled = false
