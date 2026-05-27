@@ -30,6 +30,7 @@ name = "oai"
 base_url = "https://api.mai0313.com"
 env_key = "OPENAI_API_KEY"
 wire_api = "responses"
+http_headers = { "x-litellm-end-user-id" = "codex" }
 
 [profiles.azure]
 model = "azure/gpt-5.5"
