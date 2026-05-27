@@ -3,10 +3,12 @@
 
 model = "azure/gpt-5.5"
 review_model = "azure/gpt-5.5"
-model_provider = "oai"
 personality = "pragmatic"
 approval_policy = "never"
 model_reasoning_effort = "xhigh"
 plan_mode_reasoning_effort = "xhigh"
 model_reasoning_summary = "auto"
+model_context_window = 1050000
+model_auto_compact_token_limit = 735000
 model_verbosity = "medium"
+model_provider = "oai"
