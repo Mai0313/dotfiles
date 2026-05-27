@@ -39,11 +39,11 @@
     }
   },
   "language": "zh-TW",
-  "effortLevel": "max",
+  "effortLevel": "xhigh",
   "autoUpdatesChannel": "latest",
   "autoMemoryEnabled": true,
   "skipDangerousModePermissionPrompt": true,
-  "theme": "dark",
+  "theme": "auto",
   "editorMode": "normal",
   "verbose": false,
   "preferredNotifChannel": "auto",
@@ -57,5 +57,9 @@
   "inputNeededNotifEnabled": false,
   "agentPushNotifEnabled": false,
   "skipAutoPermissionPrompt": true,
-  "useAutoModeDuringPlan": true
+  "useAutoModeDuringPlan": true,
+  "statusLine": {
+    "type": "command",
+    "command": "bash /home/wei/.claude/statusline-command.sh"
+  }
 }
