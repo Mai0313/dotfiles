@@ -32,23 +32,6 @@ env_key = "OPENAI_API_KEY"
 wire_api = "responses"
 http_headers = { "x-litellm-end-user-id" = "codex" }
 
-[profiles.azure]
-model = "azure/gpt-5.5"
-model_provider = "oai"
-personality = "pragmatic"
-approval_policy = "never"
-model_reasoning_effort = "xhigh"
-plan_mode_reasoning_effort = "xhigh"
-model_reasoning_summary = "auto"
-model_verbosity = "medium"
-
-[profiles.azure.features]
-terminal_resize_reflow = true
-memories = true
-external_migration = false
-goals = true
-prevent_idle_sleep = true
-
 [features]
 shell_tool = true
 codex_git_commit = true
