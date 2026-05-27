@@ -1,45 +1,44 @@
-#!/usr/bin/env bash
-# Claude Code statusLine command
-# Mirrors the Powerlevel10k lean prompt style: user@host  dir  model  context%
-
+#!/bin/bash
+# Read JSON data that Claude Code sends to stdin
 input=$(cat)
 
-user=$(whoami)
-host=$(hostname -s)
-cwd=$(echo "$input" | jq -r '.workspace.current_dir // .cwd // empty')
-model=$(echo "$input" | jq -r '.model.display_name // empty')
-used=$(echo "$input" | jq -r '.context_window.used_percentage // empty')
+# Directory: shorten $HOME to ~
+DIR=$(echo "$input" | jq -r '.workspace.current_dir')
+SHORT_DIR=$(echo "$DIR" | sed "s|^$HOME|~|")
 
-# Shorten home directory to ~
-home="$HOME"
-if [ -n "$cwd" ]; then
-  short_cwd="${cwd/#$home/~}"
+# Model identifier (API model id, e.g. "claude-opus-4-7[1m]")
+MODEL=$(echo "$input" | jq -r '.model.id')
+
+# Reasoning effort level (only present when the model supports it)
+EFFORT=$(echo "$input" | jq -r '.effort.level // empty')
+
+# Git branch from git worktree field, fallback to git CLI
+BRANCH=$(echo "$input" | jq -r '.workspace.git_worktree // empty')
+if [ -z "$BRANCH" ]; then
+    BRANCH=$(git -C "$DIR" rev-parse --abbrev-ref HEAD 2>/dev/null || true)
+fi
+
+# Context used percentage
+PCT_RAW=$(echo "$input" | jq -r '.context_window.used_percentage // empty')
+if [ -n "$PCT_RAW" ]; then
+    CTX_PART="$(printf '%.0f' "$PCT_RAW")% used"
 else
-  short_cwd="~"
+    CTX_PART=""
 fi
 
-# Build parts
-parts=""
-
-# user@host in cyan
-parts+=$(printf '\033[36m%s@%s\033[0m' "$user" "$host")
-
-# separator + dir in yellow
-parts+=$(printf '  \033[33m%s\033[0m' "$short_cwd")
-
-# model in magenta
-if [ -n "$model" ]; then
-  parts+=$(printf '  \033[35m%s\033[0m' "$model")
+# Total session cost in USD
+COST_RAW=$(echo "$input" | jq -r '.cost.total_cost_usd // empty')
+if [ -n "$COST_RAW" ]; then
+    COST_PART=$(printf '$%.2f' "$COST_RAW")
+else
+    COST_PART=""
 fi
 
-# context usage in green/red depending on remaining
-if [ -n "$used" ]; then
-  used_int=$(printf '%.0f' "$used")
-  if [ "$used_int" -ge 80 ]; then
-    parts+=$(printf '  \033[31mctx:%s%%\033[0m' "$used_int")
-  else
-    parts+=$(printf '  \033[32mctx:%s%%\033[0m' "$used_int")
-  fi
-fi
+# Assemble the status line
+LINE="${SHORT_DIR} · ${MODEL}"
+[ -n "$EFFORT" ]    && LINE="${LINE} · ${EFFORT}"
+[ -n "$BRANCH" ]    && LINE="${LINE} · ${BRANCH}"
+[ -n "$CTX_PART" ]  && LINE="${LINE} · ${CTX_PART}"
+[ -n "$COST_PART" ] && LINE="${LINE} · ${COST_PART}"
 
-printf '%s' "$parts"
+echo "$LINE"
