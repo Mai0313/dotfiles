@@ -124,6 +124,7 @@ export PATH=$HOME/.local/bin:$HOME/go/bin:$HOME/.cargo/bin:/usr/local/go/bin:/op
 
 alias cc='claude'
 alias cop='copilot'
+alias cod='codex'
 
 # Environment-specific settings, gated at runtime via FQDN.
 # Matches is_work / is_cloudtop detection in .chezmoi.toml.tmpl.

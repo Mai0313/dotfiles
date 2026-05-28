@@ -122,6 +122,7 @@ zstyle ':omz:plugins:nvm' lazy yes
 
 alias cc='claude'
 alias cop='copilot'
+alias cod='codex'
 
 # Environment-specific settings, gated at runtime via FQDN.
 # Matches is_work / is_cloudtop detection in .chezmoi.toml.tmpl.
