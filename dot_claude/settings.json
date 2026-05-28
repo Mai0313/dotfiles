@@ -7,8 +7,13 @@
   "permissions": {
     "defaultMode": "bypassPermissions"
   },
+  "model": "opus[1m]",
   "worktree": {
     "baseRef": "fresh"
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "bash /home/wei/.claude/statusline-command.sh"
   },
   "enabledPlugins": {
     "rust-analyzer-lsp@claude-plugins-official": true,
@@ -57,9 +62,5 @@
   "inputNeededNotifEnabled": false,
   "agentPushNotifEnabled": false,
   "skipAutoPermissionPrompt": true,
-  "useAutoModeDuringPlan": true,
-  "statusLine": {
-    "type": "command",
-    "command": "bash /home/wei/.claude/statusline-command.sh"
-  }
+  "useAutoModeDuringPlan": true
 }
