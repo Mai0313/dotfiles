@@ -15,6 +15,9 @@
 - Update all the documents if needed.
 - You can use `rg` instead of `grep` for better performance, this package is a rusted grep.
 - You can use `subagent` or `Agent Team` to run multiple tasks in the same time if you need for speeding up.
+- When building a plan to develop a project hosted on GitHub, do not forget to include linting, formatting, and testing steps before draft a PR in the plan.
+- Do not forget to create a draft PR as part of the plan; the PR body must be written in English.
+- Feel free to add or adjust additional information in the plan when needed.
 
 ## Text formatting
 
