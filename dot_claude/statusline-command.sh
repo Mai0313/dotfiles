@@ -59,11 +59,42 @@ else
     COST_PART=""
 fi
 
+# 5-hour rate limit usage + time until reset
+FIVE_PCT=$(echo "$input" | jq -r '.rate_limits.five_hour.used_percentage // empty')
+FIVE_RESET=$(echo "$input" | jq -r '.rate_limits.five_hour.resets_at // empty')
+RATE_PART=""
+if [ -n "$FIVE_PCT" ]; then
+    FIVE_INT=$(printf '%.0f' "$FIVE_PCT")
+    if   [ "$FIVE_INT" -ge 90 ]; then RATE_C="$BR_RED"
+    elif [ "$FIVE_INT" -ge 70 ]; then RATE_C="$BR_YELLOW"
+    else                               RATE_C="$GREEN"
+    fi
+
+    RATE_PART="${RATE_C}5h: ${FIVE_INT}%${RESET}"
+
+    if [ -n "$FIVE_RESET" ]; then
+        NOW=$(date +%s)
+        SECS_LEFT=$(( FIVE_RESET - NOW ))
+        if [ "$SECS_LEFT" -gt 0 ]; then
+            MINS=$(( SECS_LEFT / 60 ))
+            HRS=$(( MINS / 60 ))
+            MINS=$(( MINS % 60 ))
+            if [ "$HRS" -gt 0 ]; then
+                RESET_STR="${HRS}h${MINS}m"
+            else
+                RESET_STR="${MINS}m"
+            fi
+            RATE_PART="${RATE_PART} ${DIM}(resets in ${RESET_STR})${RESET}"
+        fi
+    fi
+fi
+
 # Assemble the status line
 LINE="${CYAN}${SHORT_DIR}${RESET}${SEP}${MODEL_C}${MODEL}${RESET}"
 [ -n "$EFFORT" ]    && LINE="${LINE}${SEP}${EFFORT_C}${EFFORT}${RESET}"
 [ -n "$BRANCH" ]    && LINE="${LINE}${SEP}${GREEN}${BRANCH}${RESET}"
 [ -n "$CTX_PART" ]  && LINE="${LINE}${SEP}${CTX_PART}"
 [ -n "$COST_PART" ] && LINE="${LINE}${SEP}${COST_PART}"
+[ -n "$RATE_PART" ] && LINE="${LINE}${SEP}${RATE_PART}"
 
 printf '%b\n' "$LINE"
