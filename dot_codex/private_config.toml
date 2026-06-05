@@ -12,7 +12,7 @@ model_context_window = 1050000
 model_auto_compact_token_limit = 735000
 model_verbosity = "medium"
 model_supports_reasoning_summaries = true
-project_doc_fallback_filenames = ["CLAUDE.md", "GEMINI.md"]
+project_doc_fallback_filenames = ["AGENTS.md", "CLAUDE.md", "GEMINI.md", "copilot-instructions.md"]
 web_search = "live"
 suppress_unstable_features_warning = true
 
