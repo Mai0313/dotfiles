@@ -14,6 +14,45 @@ BR_YELLOW='\033[93m'
 BR_RED='\033[91m'
 SEP=" ${DIM}·${RESET} "
 
+# Build a 5-segment mini bar, e.g. ▰▰▱▱▱ (ceil: any usage shows a block)
+mini_bar() {
+    local pct=$1 filled i bar=""
+    filled=$(( (pct + 19) / 20 ))
+    (( filled > 5 )) && filled=5
+    for (( i = 0; i < 5; i++ )); do
+        if (( i < filled )); then bar+="▰"; else bar+="▱"; fi
+    done
+    printf '%s' "$bar"
+}
+
+# Humanize seconds left: 3d4h / 2h13m / 45m
+fmt_left() {
+    local secs=$1 mins hrs days
+    mins=$(( secs / 60 )); hrs=$(( mins / 60 )); days=$(( hrs / 24 ))
+    mins=$(( mins % 60 )); hrs=$(( hrs % 24 ))
+    if   (( days > 0 )); then printf '%dd%dh' "$days" "$hrs"
+    elif (( hrs > 0 ));  then printf '%dh%dm' "$hrs" "$mins"
+    else                      printf '%dm' "$mins"
+    fi
+}
+
+# Render one rate-limit window: "5h ▰▰▱▱▱ 34% ↻2h13m"
+rate_part() {
+    local label=$1 pct_raw=$2 resets_at=$3 pct color part
+    [ -z "$pct_raw" ] && return
+    pct=$(printf '%.0f' "$pct_raw")
+    if   (( pct >= 90 )); then color="$BR_RED"
+    elif (( pct >= 70 )); then color="$BR_YELLOW"
+    else                       color="$GREEN"
+    fi
+    part="${DIM}${label}${RESET} ${color}$(mini_bar "$pct") ${pct}%${RESET}"
+    if [ -n "$resets_at" ]; then
+        local secs_left=$(( resets_at - $(date +%s) ))
+        (( secs_left > 0 )) && part="${part} ${DIM}↻$(fmt_left "$secs_left")${RESET}"
+    fi
+    printf '%s' "$part"
+}
+
 # Directory: shorten $HOME to ~
 DIR=$(echo "$input" | jq -r '.workspace.current_dir')
 SHORT_DIR="${DIR/#"$HOME"/\~}"
@@ -59,42 +98,21 @@ else
     COST_PART=""
 fi
 
-# 5-hour rate limit usage + time until reset
-FIVE_PCT=$(echo "$input" | jq -r '.rate_limits.five_hour.used_percentage // empty')
-FIVE_RESET=$(echo "$input" | jq -r '.rate_limits.five_hour.resets_at // empty')
-RATE_PART=""
-if [ -n "$FIVE_PCT" ]; then
-    FIVE_INT=$(printf '%.0f' "$FIVE_PCT")
-    if   [ "$FIVE_INT" -ge 90 ]; then RATE_C="$BR_RED"
-    elif [ "$FIVE_INT" -ge 70 ]; then RATE_C="$BR_YELLOW"
-    else                               RATE_C="$GREEN"
-    fi
-
-    RATE_PART="${RATE_C}5h: ${FIVE_INT}%${RESET}"
-
-    if [ -n "$FIVE_RESET" ]; then
-        NOW=$(date +%s)
-        SECS_LEFT=$(( FIVE_RESET - NOW ))
-        if [ "$SECS_LEFT" -gt 0 ]; then
-            MINS=$(( SECS_LEFT / 60 ))
-            HRS=$(( MINS / 60 ))
-            MINS=$(( MINS % 60 ))
-            if [ "$HRS" -gt 0 ]; then
-                RESET_STR="${HRS}h${MINS}m"
-            else
-                RESET_STR="${MINS}m"
-            fi
-            RATE_PART="${RATE_PART} ${DIM}(resets in ${RESET_STR})${RESET}"
-        fi
-    fi
-fi
+# Rate limit windows: 5-hour and 7-day usage + time until reset
+FIVE_PART=$(rate_part "5h" \
+    "$(echo "$input" | jq -r '.rate_limits.five_hour.used_percentage // empty')" \
+    "$(echo "$input" | jq -r '.rate_limits.five_hour.resets_at // empty')")
+SEVEN_PART=$(rate_part "7d" \
+    "$(echo "$input" | jq -r '.rate_limits.seven_day.used_percentage // empty')" \
+    "$(echo "$input" | jq -r '.rate_limits.seven_day.resets_at // empty')")
 
 # Assemble the status line
 LINE="${CYAN}${SHORT_DIR}${RESET}${SEP}${MODEL_C}${MODEL}${RESET}"
-[ -n "$EFFORT" ]    && LINE="${LINE}${SEP}${EFFORT_C}${EFFORT}${RESET}"
-[ -n "$BRANCH" ]    && LINE="${LINE}${SEP}${GREEN}${BRANCH}${RESET}"
-[ -n "$CTX_PART" ]  && LINE="${LINE}${SEP}${CTX_PART}"
-[ -n "$COST_PART" ] && LINE="${LINE}${SEP}${COST_PART}"
-[ -n "$RATE_PART" ] && LINE="${LINE}${SEP}${RATE_PART}"
+[ -n "$EFFORT" ]     && LINE="${LINE}${SEP}${EFFORT_C}${EFFORT}${RESET}"
+[ -n "$BRANCH" ]     && LINE="${LINE}${SEP}${GREEN}${BRANCH}${RESET}"
+[ -n "$CTX_PART" ]   && LINE="${LINE}${SEP}${CTX_PART}"
+[ -n "$COST_PART" ]  && LINE="${LINE}${SEP}${COST_PART}"
+[ -n "$FIVE_PART" ]  && LINE="${LINE}${SEP}${FIVE_PART}"
+[ -n "$SEVEN_PART" ] && LINE="${LINE}${SEP}${SEVEN_PART}"
 
 printf '%b\n' "$LINE"

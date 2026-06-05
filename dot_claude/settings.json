@@ -50,6 +50,7 @@
   "theme": "auto",
   "editorMode": "normal",
   "verbose": false,
+  "spinnerTipsEnabled": true,
   "preferredNotifChannel": "auto",
   "autoCompactEnabled": true,
   "autoScrollEnabled": true,
