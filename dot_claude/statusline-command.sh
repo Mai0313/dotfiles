@@ -16,7 +16,7 @@ SEP=" ${DIM}·${RESET} "
 
 # Directory: shorten $HOME to ~
 DIR=$(echo "$input" | jq -r '.workspace.current_dir')
-SHORT_DIR=$(echo "$DIR" | sed "s|^$HOME|~|")
+SHORT_DIR="${DIR/#"$HOME"/\~}"
 
 # Model identifier (API model id, e.g. "claude-opus-4-7[1m]")
 MODEL=$(echo "$input" | jq -r '.model.id')
