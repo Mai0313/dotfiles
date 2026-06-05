@@ -1,0 +1,37 @@
+{
+    "$schema": "https://charm.land/crush.json",
+    "providers": {
+        "deepseek": {
+            "base_url": "${OPENAI_BASE_URL:-https://api.openai.com/v1}",
+            "api_key": "${OPENAI_API_KEY}",
+            "extra_headers": {
+                "x-litellm-end-user-id": "crush-cli"
+            }
+        },
+        "openai": {
+            "base_url": "${OPENAI_BASE_URL:-https://api.deepseek.com/v1}",
+            "api_key": "${OPENAI_API_KEY}",
+            "extra_headers": {
+                "x-litellm-end-user-id": "crush-cli"
+            }
+        },
+        "gemini": {
+            "api_key": "${GEMINI_API_KEY}",
+            "extra_headers": {
+                "x-litellm-end-user-id": "crush-cli"
+            }
+        },
+        "anthropic": {
+            "base_url": "${OPENAI_BASE_URL:-https://api.anthropic.com/v1}",
+            "api_key": "${OPENAI_API_KEY}",
+            "extra_headers": {
+                "x-litellm-end-user-id": "crush-cli"
+            }
+        }
+    },
+    "options": {
+        "tui": {
+            "transparent": true
+        }
+    }
+}

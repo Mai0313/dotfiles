@@ -9,19 +9,34 @@
     "openrouter",
     "xai",
     "azure",
-    "higgingface",
+    "huggingface",
     "litellm"
   ],
   "provider": {
-    "litellm": {
-      "npm": "@ai-sdk/openai-compatible",
-      "name": "LiteLLM",
+    "openai": {
       "options": {
-        "baseURL": "https://api.mai0313.com/v1",
-      },
-      "models": {
-        "azure/gpt-5.5": {
-          "name": "gpt-5.5"
+        "baseURL": "{env:OPENAI_BASE_URL}",
+        "apiKey": "{env:OPENAI_API_KEY}",
+        "headers": {
+          "x-litellm-end-user-id": "opencode-cli"
+        }
+      }
+    },
+    "deepseek": {
+      "options": {
+        "baseURL": "{env:OPENAI_BASE_URL}",
+        "apiKey": "{env:OPENAI_API_KEY}",
+        "headers": {
+          "x-litellm-end-user-id": "opencode-cli"
+        }
+      }
+    },
+    "google": {
+      "options": {
+        "baseURL": "{env:OPENAI_BASE_URL}",
+        "apiKey": "{env:OPENAI_API_KEY}",
+        "headers": {
+          "x-litellm-end-user-id": "opencode-cli"
         }
       }
     }
