@@ -43,6 +43,7 @@
     }
   },
   "language": "zh-TW",
+  "spinnerTipsEnabled": true,
   "effortLevel": "xhigh",
   "autoUpdatesChannel": "latest",
   "autoMemoryEnabled": true,
@@ -50,7 +51,6 @@
   "theme": "auto",
   "editorMode": "normal",
   "verbose": false,
-  "spinnerTipsEnabled": true,
   "preferredNotifChannel": "auto",
   "autoCompactEnabled": true,
   "autoScrollEnabled": true,
