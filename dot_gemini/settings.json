@@ -142,7 +142,7 @@
     }
   },
   "model": {
-    "name": "auto-gemini-3",
+    "name": "auto",
     "maxSessionTurns": -1,
     "skipNextSpeakerCheck": true,
     "compressionThreshold": 0.6
