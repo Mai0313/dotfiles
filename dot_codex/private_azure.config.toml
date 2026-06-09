@@ -1,5 +1,6 @@
 #:schema https://developers.openai.com/codex/config-schema.json
 # Example: https://developers.openai.com/codex/config-sample
+# Profile Example: https://developers.openai.com/codex/config-advanced#profiles
 
 model = "azure/gpt-5.5"
 review_model = "azure/gpt-5.5"
@@ -12,3 +13,7 @@ model_context_window = 1050000
 model_auto_compact_token_limit = 735000
 model_verbosity = "medium"
 model_provider = "oai"
+
+[memories]
+extract_model = "gpt-5.5"
+consolidation_model = "gpt-5.5"
