@@ -74,3 +74,6 @@ notifications = ["agent-turn-complete", "approval-requested"]
 alternate_screen = "always"
 status_line = ["current-dir", "model-with-reasoning", "git-branch", "pull-request-number", "context-used", "used-tokens", "task-progress", "permissions", "run-state"]
 status_line_use_colors = true
+
+[plugins."superpowers@openai-curated"]
+enabled = true
