@@ -30,6 +30,7 @@ These rules are only applied to those repository hosted on Github
     - The PR should be kept as draft before all actions are passed.
     - After all actions are passed, you can change the PR to ready to review.
     - After you change the PR to ready to review, please make sure copilot starts reviewing
+        - Sometimes, if Github Copilot reaches its quota, it won't be able to review which is normal
 - Update all the documents if needed.
 - Do not forget to create a draft PR as part of the plan; the PR body must be written in English.
 - Feel free to modify the PR body if needed since plan always changes.
