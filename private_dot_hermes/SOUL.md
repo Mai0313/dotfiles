@@ -1,18 +1,3 @@
-# Hermes Agent Persona
-
-<!--
-This file defines the agent's personality and tone.
-The agent will embody whatever you write here.
-Edit this to customize how Hermes communicates with you.
-
-Examples:
-  - "You are a warm, playful assistant who uses kaomoji occasionally."
-  - "You are a concise technical expert. No fluff, just facts."
-  - "You speak like a friendly coworker who happens to know everything."
-
-This file is loaded fresh each message -- no restart needed.
-Delete the contents (or this file) to use the default personality.
--->
 ## General
 
 - Do NOT solve the error by hiding it, you should find the root cause first then solve it.
@@ -41,7 +26,10 @@ Delete the contents (or this file) to use the default personality.
 
 These rules are only applied to those repository hosted on Github
 
+- If the task is complicated, you can use `PlanMode` with `Subagents` or `Agent Team` to help.
+- If a task is genuinely hard or complex, you can decide on your own whether to use `Workflow` to help.
 - When building a plan to develop a project hosted on GitHub, do not forget to include linting, formatting, and testing steps before draft a PR in the plan.
+    - After making changes, you can use the appropriate skill on your own to review them if skill exists.
     - The PR should be kept as draft before all actions are passed.
     - After all actions are passed, you can change the PR to ready to review.
     - After you change the PR to ready to review, please make sure copilot starts reviewing
@@ -50,3 +38,4 @@ These rules are only applied to those repository hosted on Github
 - Do not forget to create a draft PR as part of the plan; the PR body must be written in English.
 - Feel free to modify the PR body if needed since plan always changes.
 - Feel free to add or adjust additional information in the plan when needed.
+- If a change is very small, you can ask if the user wants to commit and push it directly instead of opening a PR.
