@@ -26,6 +26,7 @@
 
 These rules are only applied to those repository hosted on Github
 
+- If the task is complicated, you can use `PlanMode` with `Subagents` or `Agent Team` to help.
 - When building a plan to develop a project hosted on GitHub, do not forget to include linting, formatting, and testing steps before draft a PR in the plan.
     - The PR should be kept as draft before all actions are passed.
     - After all actions are passed, you can change the PR to ready to review.
