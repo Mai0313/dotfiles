@@ -26,8 +26,6 @@
 
 These rules are only applied to those repository hosted on Github
 
-- If the task is complicated, you can use `PlanMode` with `Subagents` or `Agent Team` to help.
-- If a task is genuinely hard or complex, you can decide on your own whether to use `Workflow` to help.
 - When building a plan to develop a project hosted on GitHub, do not forget to include linting, formatting, and testing steps before draft a PR in the plan.
     - After making changes, you can use the appropriate skill on your own to review them if skill exists.
     - The PR should be kept as draft before all actions are passed.
