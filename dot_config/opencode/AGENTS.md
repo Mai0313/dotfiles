@@ -12,7 +12,7 @@
 - If you really need to run a Python script, you can use uv as a package management tool.
 - Do not create or update any comment on internal site or external site only if you got the permission.
 - You can use `rg` instead of `grep` for better performance, this package is a rusted grep.
-- You can create/use `Subagents` or `Agent Team` to run multiple tasks in the same time if you need for better performance.
+- You can create/use `Subagents` / `Agent Team` / `Workflow` to run multiple tasks in the same time if you need for better performance.
 
 ## Text formatting
 
@@ -29,9 +29,7 @@ These rules are only applied to those repository hosted on Github
 - When building a plan to develop a project hosted on GitHub, do not forget to include linting, formatting, and testing steps before draft a PR in the plan.
     - After making changes, you can use the appropriate skill on your own to review them if skill exists.
     - The PR should be kept as draft before all actions are passed.
-    - After all actions are passed, you can change the PR to ready to review.
-    - After you change the PR to ready to review, please make sure copilot starts reviewing
-        - Sometimes, if Github Copilot reaches its quota, it won't be able to review which is normal
+    - After all actions are passed, you can ask if user wants to change the PR to ready for review.
 - Update all the documents if needed.
 - Do not forget to create a draft PR as part of the plan; the PR body must be written in English.
 - Feel free to modify the PR body if needed since plan always changes.
