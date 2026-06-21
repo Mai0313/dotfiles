@@ -64,3 +64,25 @@ notifications = ["agent-turn-complete", "approval-requested"]
 alternate_screen = "always"
 status_line = ["current-dir", "model-with-reasoning", "git-branch", "pull-request-number", "context-used", "used-tokens", "task-progress", "permissions", "run-state"]
 status_line_use_colors = true
+
+[plugins."computer-use@openai-bundled"]
+enabled = true
+
+[plugins."documents@openai-primary-runtime"]
+enabled = true
+
+[plugins."pdf@openai-primary-runtime"]
+enabled = true
+
+[plugins."spreadsheets@openai-primary-runtime"]
+enabled = true
+
+[plugins."presentations@openai-primary-runtime"]
+enabled = true
+
+[desktop]
+show-context-window-usage = true
+followUpQueueMode = "steer"
+hotkey-window-projectless-default-enabled = true
+git-show-sidebar-pr-icons = true
+git-pull-request-merge-method = "squash"
