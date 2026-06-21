@@ -12,3 +12,10 @@ default = "grok"
 
 [marketplace]
 official_marketplace_auto_installed = true
+
+[ui]
+max_thoughts_width = 120
+fork_secondary_model = "grok"
+yolo = false
+compact_mode = true
+permission_mode = "always-approve"
