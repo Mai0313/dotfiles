@@ -1,0 +1,14 @@
+[cli]
+installer = "internal"
+
+[model.grok]
+model = "x-ai/grok-build-0.1"
+base_url = "https://api.mai0313.com"
+name = "grok-build-0.1"
+env_key = "OPENAI_API_KEY"
+
+[models]
+default = "grok"
+
+[marketplace]
+official_marketplace_auto_installed = true
