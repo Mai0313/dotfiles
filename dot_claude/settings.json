@@ -64,5 +64,5 @@
   "agentPushNotifEnabled": false,
   "skipAutoPermissionPrompt": true,
   "useAutoModeDuringPlan": true,
-  "showClearContextOnPlanAccept": true
+  "showClearContextOnPlanAccept": false
 }
