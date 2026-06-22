@@ -43,6 +43,10 @@
       }
     }
   },
+  "attribution": {
+    "sessionUrl": false,
+    "pr": ""
+  },
   "language": "zh-TW",
   "spinnerTipsEnabled": true,
   "effortLevel": "xhigh",
