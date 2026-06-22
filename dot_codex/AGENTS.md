@@ -34,4 +34,4 @@ These rules are only applied to those repository hosted on Github
 - Do not forget to create a draft PR as part of the plan; the PR body must be written in English.
 - Feel free to modify the PR body if needed since plan always changes.
 - Feel free to add or adjust additional information in the plan when needed.
-- If a change is very small, you can ask if the user wants to commit and push it directly instead of opening a PR.
+- If a change is very small, you can ask if the user wants to commit and push it directly to default branch instead of opening a PR.
