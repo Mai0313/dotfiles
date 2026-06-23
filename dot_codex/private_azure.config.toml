@@ -12,15 +12,9 @@ model_reasoning_summary = "auto"
 model_context_window = 1050000
 model_auto_compact_token_limit = 735000
 model_verbosity = "medium"
+
 model_provider = "oai"
 
 [memories]
 extract_model = "gpt-5.5"
 consolidation_model = "gpt-5.5"
-
-[model_providers.oai]
-name = "oai"
-base_url = "https://api.mai0313.com"
-env_key = "OPENAI_API_KEY"
-wire_api = "responses"
-http_headers = { "x-litellm-end-user-id" = "codex" }

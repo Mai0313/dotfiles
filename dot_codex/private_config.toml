@@ -24,6 +24,13 @@ show_raw_agent_reasoning = false
 disable_paste_burst = false
 check_for_update_on_startup = true
 
+[model_providers.oai]
+name = "oai"
+base_url = "https://api.mai0313.com"
+env_key = "OPENAI_API_KEY"
+wire_api = "responses"
+http_headers = { "x-litellm-end-user-id" = "codex" }
+
 [features]
 shell_tool = true
 codex_git_commit = true
