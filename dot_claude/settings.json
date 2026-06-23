@@ -4,6 +4,10 @@
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
     "CLAUDE_CODE_NO_FLICKER": "1"
   },
+  "attribution": {
+    "pr": "",
+    "sessionUrl": false
+  },
   "permissions": {
     "defaultMode": "bypassPermissions"
   },
@@ -43,10 +47,6 @@
       }
     }
   },
-  "attribution": {
-    "sessionUrl": false,
-    "pr": ""
-  },
   "language": "zh-TW",
   "spinnerTipsEnabled": true,
   "effortLevel": "xhigh",
@@ -68,5 +68,6 @@
   "inputNeededNotifEnabled": false,
   "agentPushNotifEnabled": false,
   "skipAutoPermissionPrompt": true,
-  "useAutoModeDuringPlan": true
+  "useAutoModeDuringPlan": true,
+  "advisorModel": "opus"
 }
