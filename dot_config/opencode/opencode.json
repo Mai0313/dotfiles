@@ -11,7 +11,7 @@
     "xai",
     "azure",
     "huggingface",
-    "litellm"
+    "opencode"
   ],
   "provider": {
     "openai": {
