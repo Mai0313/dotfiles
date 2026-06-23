@@ -140,6 +140,7 @@ esac
 case "$__fqdn" in
   *.c.googlers.com)
     # Cloudtop-only aliases.
+    source /etc/bash_completion.d/g4d
     alias gemini='/google/bin/releases/gemini-cli/tools/gemini'
     alias agy='/google/bin/releases/jetski-devs/tools/cli'
     alias jetski='/google/bin/releases/jetski-devs/tools/cli'
