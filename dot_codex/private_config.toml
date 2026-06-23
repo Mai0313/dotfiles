@@ -86,3 +86,6 @@ followUpQueueMode = "steer"
 hotkey-window-projectless-default-enabled = true
 git-show-sidebar-pr-icons = true
 git-pull-request-merge-method = "squash"
+
+[windows]
+sandbox = "elevated"
