@@ -13,6 +13,7 @@
 - Do not create or update any comment on internal site or external site only if you got the permission.
 - You can use `rg` instead of `grep` for better performance, this package is a rusted grep.
 - You can create/use `Workflow` / `Subagents` / `Agent Team` to run multiple tasks in the same time if you need for better performance.
+    - `Workflow` is better than `Subagents` on multi-tasks
 
 ## Text formatting
 
