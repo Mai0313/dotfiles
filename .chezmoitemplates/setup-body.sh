@@ -91,7 +91,14 @@ if [ -d "$KEYS_DIR" ] && command -v systemctl >/dev/null 2>&1; then
 fi
 {{- end }}
 
-# ---------- 6. Mark bootstrap as complete ----------
+# ---------- 6. Input method: IBus (Chinese) ----------
+{{ if eq .chezmoi.os "linux" -}}
+sudo apt-get update
+sudo apt-get install -y ibus ibus-gtk ibus-gtk3 ibus-chewing pinyin-database
+echo "run_im ibus" > "$HOME/.xinputrc"
+{{- end }}
+
+# ---------- 7. Mark bootstrap as complete ----------
 # Read by .chezmoi.toml.tmpl on subsequent `chezmoi init --force` so is_setup
 # stays true without manual intervention. Delete this file to force re-run.
 SENTINEL="{{ joinPath .chezmoi.cacheDir "bootstrap-done" }}"
