@@ -28,7 +28,8 @@
 
 These rules are only applied to those repository hosted on Github
 
-- When building a plan to develop a project hosted on GitHub, do not forget to include linting, formatting, and testing steps before draft a PR in the plan.
+- When building a plan to develop a project hosted on GitHub
+    - Do not forget to include linting, formatting, and testing steps before draft a PR in the plan.
     - After making changes, you can use the appropriate skill on your own to review them if skill exists.
     - The PR should be kept as draft before all actions are passed.
     - After all actions are passed, you can ask if user wants to change the PR to ready for review.
@@ -36,4 +37,5 @@ These rules are only applied to those repository hosted on Github
 - Do not forget to create a draft PR as part of the plan; the PR body must be written in English.
 - Feel free to modify the PR body if needed since plan always changes.
 - Feel free to add or adjust additional information in the plan when needed.
-- If a change is very small, you can ask if the user wants to commit and push it directly to default branch instead of opening a PR.
+- If a change is small, you can ask if the user wants to commit and push it directly to default branch instead of opening a PR.
+    - linting, formatting, and testing steps are still required even if the change is small.
