@@ -68,6 +68,5 @@
   "inputNeededNotifEnabled": false,
   "agentPushNotifEnabled": false,
   "skipAutoPermissionPrompt": true,
-  "useAutoModeDuringPlan": true,
-  "advisorModel": "opus"
+  "useAutoModeDuringPlan": true
 }
