@@ -49,9 +49,9 @@
   "language": "zh-TW",
   "spinnerTipsEnabled": true,
   "effortLevel": "xhigh",
-  "advisorModel": "opus",
   "showClearContextOnPlanAccept": false,
   "autoUpdatesChannel": "latest",
+  "tui": "fullscreen",
   "autoMemoryEnabled": true,
   "skipDangerousModePermissionPrompt": true,
   "theme": "auto",
@@ -68,6 +68,5 @@
   "inputNeededNotifEnabled": false,
   "agentPushNotifEnabled": false,
   "skipAutoPermissionPrompt": true,
-  "useAutoModeDuringPlan": true,
-  "tui": "fullscreen"
+  "useAutoModeDuringPlan": true
 }
