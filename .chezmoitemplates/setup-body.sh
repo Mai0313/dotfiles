@@ -81,7 +81,23 @@ if [ ! -d "$NVIM_DIR" ]; then
     rm -rf "$NVIM_DIR/.git"
 fi
 
-# ---------- 5. Work-only: ADB systemd environment + pontisd ----------
+# ---------- 5. Node version manager (nvm) + default LTS ----------
+# Shell configs already source ~/.nvm; install it here if missing.
+export NVM_DIR="$HOME/.nvm"
+if [ ! -s "$NVM_DIR/nvm.sh" ]; then
+    NVM_VERSION=$(curl -s "https://api.github.com/repos/nvm-sh/nvm/releases/latest" | grep -Po '"tag_name": "\K[^"]*')
+    # PROFILE=/dev/null tells nvm's installer NOT to touch chezmoi-managed
+    # ~/.zshrc / ~/.bashrc (otherwise it appends source lines and causes drift).
+    curl -fsSL "https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_VERSION}/install.sh" | PROFILE=/dev/null bash
+fi
+# Load nvm into this non-interactive shell, then ensure latest LTS is default.
+set +u
+\. "$NVM_DIR/nvm.sh"
+nvm install --lts
+nvm alias default 'lts/*'
+set -u
+
+# ---------- 6. Work-only: ADB systemd environment + pontisd ----------
 {{ if and .is_work (eq .chezmoi.os "linux") -}}
 KEYS_DIR="$HOME/adb-keys/security/adb"
 if [ -d "$KEYS_DIR" ] && command -v systemctl >/dev/null 2>&1; then
@@ -91,14 +107,14 @@ if [ -d "$KEYS_DIR" ] && command -v systemctl >/dev/null 2>&1; then
 fi
 {{- end }}
 
-# ---------- 6. Input method: IBus (Chinese) ----------
+# ---------- 7. Input method: IBus (Chinese) ----------
 {{ if eq .chezmoi.os "linux" -}}
 sudo apt-get update
 sudo apt-get install -y ibus ibus-gtk ibus-gtk3 ibus-chewing pinyin-database
 echo "run_im ibus" > "$HOME/.xinputrc"
 {{- end }}
 
-# ---------- 7. Mark bootstrap as complete ----------
+# ---------- 8. Mark bootstrap as complete ----------
 # Read by .chezmoi.toml.tmpl on subsequent `chezmoi init --force` so is_setup
 # stays true without manual intervention. Delete this file to force re-run.
 SENTINEL="{{ joinPath .chezmoi.cacheDir "bootstrap-done" }}"
