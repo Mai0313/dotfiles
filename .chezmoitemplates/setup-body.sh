@@ -29,11 +29,19 @@ VSCODE
     sudo apt-get update
 fi
 
-# Default Ubuntu nvim is too old for LazyVim, install from PPA.
-if ! command -v nvim >/dev/null 2>&1; then
-    sudo add-apt-repository -y ppa:neovim-ppa/unstable
-    sudo apt-get update
-    sudo apt-get install -y neovim
+# Distro nvim is often too old (or absent) for LazyVim, and the neovim PPA is
+# Ubuntu-only (breaks on Debian/glinux). Install the official release tarball to
+# /opt so it matches the nvim PATH entry in dot_zshrc/dot_bashrc.
+case "$(uname -m)" in
+    x86_64)  NVIM_ARCH=x86_64 ;;
+    aarch64) NVIM_ARCH=arm64 ;;
+    *) echo "Unsupported arch for neovim: $(uname -m), skipping"; NVIM_ARCH= ;;
+esac
+if [ -n "$NVIM_ARCH" ] && ! command -v nvim >/dev/null 2>&1 && [ ! -x "/opt/nvim-linux-${NVIM_ARCH}/bin/nvim" ]; then
+    curl -Lo /tmp/nvim.tar.gz "https://github.com/neovim/neovim/releases/latest/download/nvim-linux-${NVIM_ARCH}.tar.gz"
+    sudo rm -rf "/opt/nvim-linux-${NVIM_ARCH}"
+    sudo tar -C /opt -xzf /tmp/nvim.tar.gz
+    rm -f /tmp/nvim.tar.gz
 fi
 
 # lazygit has no apt package on Debian/Ubuntu, fetch from GitHub release.
