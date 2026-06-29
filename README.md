@@ -7,7 +7,7 @@ Managed with [chezmoi](https://www.chezmoi.io/).
 One-liner to set up a new machine:
 
 ```bash
-sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply https://github.com/mai0313/dotfiles.git
+sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin" init --apply https://github.com/mai0313/dotfiles.git
 ```
 
 ### GitHub Codespaces

@@ -7,7 +7,7 @@
 一行指令設定新機器：
 
 ```bash
-sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply https://github.com/mai0313/dotfiles.git
+sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin" init --apply https://github.com/mai0313/dotfiles.git
 ```
 
 ### GitHub Codespaces
