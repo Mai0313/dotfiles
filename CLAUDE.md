@@ -45,8 +45,8 @@ Top-level booleans + identifiers under `[data]`:
 | Variable | Default | Condition / Use |
 |---|---|---|
 | `is_setup` | `false` | Auto-managed via sentinel file. `setup-body.sh` touches `{{ .chezmoi.cacheDir }}/bootstrap-done` after a successful run; the template flips `is_setup` to `true` whenever the sentinel exists. To force a re-run: delete the sentinel, then `chezmoi init --force && chezmoi apply`. No manual `chezmoi.toml` edits required in normal flow. |
-| `is_work` | `false` | FQDN ends with `.c.googlers.com` or `.roam.internal` |
-| `is_cloudtop` | `false` | FQDN ends with `.c.googlers.com` |
+| `is_work` | `false` | FQDN ends with `.c.googlers.com`, `.corp.google.com`, or `.roam.internal` |
+| `is_cloudtop` | `false` | FQDN ends with `.c.googlers.com` or `.corp.google.com` |
 | `is_codespace` | `false` | env `CODESPACES=true` |
 | `is_devcontainer` | `false` | env `REMOTE_CONTAINERS` or `DEVCONTAINER` set (VS Code Dev Containers) |
 | `is_container` | `false` | `/.dockerenv` or `/run/.containerenv` exists (generic Docker / Podman) |
@@ -81,7 +81,7 @@ Inspect current values with `chezmoi data | grep -E 'is_|"os"'`.
 
 **Future-agent guidance: do NOT "refactor" the `dot_zshrc` / `dot_bashrc` runtime `case` blocks into `{{ if .is_work }}` templates.** This conversion was made deliberately; reversing it would break the `re-add` workflow. If you think a `.tmpl` would be cleaner, you are missing the workflow constraint — read this section again.
 
-**Known duplication.** The FQDN pattern `*.c.googlers.com|*.roam.internal` appears in `.chezmoi.toml.tmpl` (Layer 1) plus `dot_zshrc` and `dot_bashrc` (Layer 2). If the pattern ever changes, grep for both `c.googlers.com` and `roam.internal` to find every occurrence.
+**Known duplication.** The FQDN pattern `*.c.googlers.com|*.corp.google.com|*.roam.internal` appears in `.chezmoi.toml.tmpl` (Layer 1) plus `dot_zshrc` and `dot_bashrc` (Layer 2). If the pattern ever changes, grep for `c.googlers.com`, `corp.google.com`, and `roam.internal` to find every occurrence.
 
 ### Key Files
 
@@ -104,7 +104,7 @@ Both `dot_zshrc` and `dot_bashrc` share the same pattern:
 1. PATH extensions (Go, Rust, Cargo, Miniconda, Neovim)
 2. NVM lazy loading
 3. Common aliases (`cc='claude'`, `cop='copilot'`)
-4. Runtime-gated environment block — FQDN `case` matching `*.c.googlers.com|*.roam.internal` (work: `ADB_VENDOR_KEYS`) and `*.c.googlers.com` (Cloudtop: `gemini`, `jetski-cli`, `flash`, `recovery`, `listd` aliases). No-op on personal machines.
+4. Runtime-gated environment block — FQDN `case` matching `*.c.googlers.com|*.corp.google.com|*.roam.internal` (work: `ADB_VENDOR_KEYS`) and `*.c.googlers.com|*.corp.google.com` (Cloudtop: `gemini`, `jetski-cli`, `flash`, `recovery`, `listd` aliases). No-op on personal machines.
 5. Editor selection (vim over SSH, nvim locally)
 
 ### Bootstrap Architecture

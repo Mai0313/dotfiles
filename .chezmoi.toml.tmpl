@@ -19,7 +19,7 @@
 {{- /* Work / Cloudtop classification by FQDN suffix. */ -}}
 {{- $isWork := false -}}
 {{- $isCloudtop := false -}}
-{{- if hasSuffix ".c.googlers.com" $fqdn -}}
+{{- if or (hasSuffix ".c.googlers.com" $fqdn) (hasSuffix ".corp.google.com" $fqdn) -}}
 {{-   $isWork = true -}}
 {{-   $isCloudtop = true -}}
 {{- else if hasSuffix ".roam.internal" $fqdn -}}

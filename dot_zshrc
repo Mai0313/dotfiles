@@ -128,7 +128,7 @@ alias cod='codex'
 # Matches is_work / is_cloudtop detection in .chezmoi.toml.tmpl.
 __fqdn=$(hostname -f 2>/dev/null || hostname)
 case "$__fqdn" in
-  *.c.googlers.com|*.roam.internal)
+  *.c.googlers.com|*.corp.google.com|*.roam.internal)
     # Work (Cloudtop + Roam): load ADB vendor keys if setup_adb.sh has run.
     export ADB_VENDOR_KEYS="$HOME/adb-keys/security/adb"
     # https://yaqs.corp.google.com/eng/q/2346264355185623040
@@ -136,7 +136,7 @@ case "$__fqdn" in
     ;;
 esac
 case "$__fqdn" in
-  *.c.googlers.com)
+  *.c.googlers.com|*.corp.google.com)
     # Cloudtop-only aliases.
     source /etc/bash_completion.d/g4d
     alias gemini='/google/bin/releases/gemini-cli/tools/gemini'
