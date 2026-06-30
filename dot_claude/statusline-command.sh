@@ -2,6 +2,8 @@
 # Read JSON data that Claude Code sends to stdin
 input=$(cat)
 
+vct statusline ingest
+
 # ANSI color codes
 RESET='\033[0m'
 DIM='\033[2;37m'           # dim gray for separators
