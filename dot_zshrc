@@ -129,6 +129,7 @@ alias cod='codex'
 __fqdn=$(hostname -f 2>/dev/null || hostname)
 case "$__fqdn" in
   *.c.googlers.com|*.corp.google.com|*.roam.internal)
+    alias sshping='/google/src/files/head/depot/google3/experimental/users/jdpaul/bin/sshping'
     # Work (Cloudtop + Roam): load ADB vendor keys if setup_adb.sh has run.
     export ADB_VENDOR_KEYS="$HOME/adb-keys/security/adb"
     # https://yaqs.corp.google.com/eng/q/2346264355185623040
