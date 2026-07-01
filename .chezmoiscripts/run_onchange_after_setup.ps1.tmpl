@@ -1,0 +1,34 @@
+{{- /*
+chezmoi-driven Windows bootstrap. Auto-runs during `chezmoi apply` when this
+rendered content changes (e.g., editing .chezmoidata/packages.yaml).
+
+Windows has no bash, so it cannot share .chezmoitemplates/setup-body.sh. This
+script only installs the global npm CLIs and touches the same bootstrap-done
+sentinel the toml reads, keeping is_setup in sync with the *nix path.
+
+node/npm are assumed to be installed already (nvm-windows / winget / manual);
+the npm block is skipped with a message when npm is absent.
+
+Skipped when either:
+  - .chezmoi.os != "windows"
+  - .is_setup == true (sentinel already present)
+*/ -}}
+{{- if and (eq .chezmoi.os "windows") (not (index . "is_setup")) -}}
+$ErrorActionPreference = 'Stop'
+
+# ---------- Global npm CLIs ----------
+if (Get-Command npm -ErrorAction SilentlyContinue) {
+    npm install -g {{ range .packages.npm_global }}{{ . }} {{ end }}
+} else {
+    Write-Host 'npm not found on PATH, skipping global npm CLI install.'
+}
+
+# ---------- Mark bootstrap as complete ----------
+# Same sentinel path .chezmoi.toml.tmpl reads via `joinPath .chezmoi.cacheDir`.
+$sentinel = '{{ joinPath .chezmoi.cacheDir "bootstrap-done" }}'
+$sentinelDir = Split-Path -Parent $sentinel
+if (-not (Test-Path -LiteralPath $sentinelDir)) {
+    New-Item -ItemType Directory -Path $sentinelDir -Force | Out-Null
+}
+New-Item -ItemType File -Path $sentinel -Force | Out-Null
+{{- end -}}

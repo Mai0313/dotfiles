@@ -11,6 +11,8 @@ Bootstrap has two entry points that share the same body via `.chezmoitemplates/s
 - **chezmoi-driven** (`.chezmoiscripts/run_onchange_after_setup.sh.tmpl`) — runs automatically as part of `chezmoi apply`, gated by `is_setup` flag and OS.
 - **manual** (`executable_setup.sh.tmpl` → `~/setup.sh`) — deployed to home for opt-in manual execution; not deployed on Windows.
 
+Windows has no bash, so it does not share this body. A separate `.chezmoiscripts/run_onchange_after_setup.ps1.tmpl` runs on Windows only: it installs the global npm CLIs and touches the same sentinel, but skips the *nix-only setup.
+
 ## Common Commands
 
 ```bash
@@ -71,6 +73,7 @@ OS detection comes from chezmoi built-ins: `eq .chezmoi.os "linux"` / `"darwin"`
 - `.chezmoiignore` — gates `.gemini/GEMINI.md` on `is_work || is_cloudtop`. Also gates Linux-only files (`.zshrc`, `.bashrc`, `.p10k.zsh`, `cleanup.sh`, `setup.sh`) when `chezmoi.os == "windows"`.
 - `.chezmoiexternal.toml.tmpl` — gates `adb-keys/security` (sso git-repo) on `is_work || is_cloudtop`; gates oh-my-zsh + plugins on `chezmoi.os != "windows"`.
 - `.chezmoiscripts/run_onchange_after_setup.sh.tmpl` — outer gate `{{ if and (ne .chezmoi.os "windows") (not (index . "is_setup")) }}`. Inner sections additionally gate by `is_work` (ADB pontis), `is_codespace` (chsh skip), `chezmoi.os` (apt vs brew vs fc-cache).
+- `.chezmoiscripts/run_onchange_after_setup.ps1.tmpl` — Windows counterpart, gate `{{ if and (eq .chezmoi.os "windows") (not (index . "is_setup")) }}`. Installs `npm_global` CLIs and touches the sentinel; no *nix setup.
 - `.chezmoitemplates/setup-body.sh` — inherits all Layer 1 vars when included.
 
 Inspect current values with `chezmoi data | grep -E 'is_|"os"'`.
@@ -87,9 +90,10 @@ Inspect current values with `chezmoi data | grep -E 'is_|"os"'`.
 
 - `.chezmoi.toml.tmpl` — chezmoi config, defines top-level flags (`is_setup` / `is_work` / `is_cloudtop` / `is_codespace` / `is_devcontainer` / `is_container` / `is_wsl` / `is_ssh` / `is_ci`), identifiers (`osid`, `chassis`), and nested `[data.cpu]` / `[data.linux]` / `[data.darwin]` / `[data.windows]` sections. See Layer 1 table above for the full schema.
 - `.chezmoiexternal.toml.tmpl` — declarative external dependencies (oh-my-zsh, p10k, zsh plugins, `.agents` skills repo, work-only ADB security repo). All `type = "git-repo"` with `--depth=1` and `--ff-only` pull.
-- `.chezmoidata/packages.yaml` — declarative OS package lists (darwin / linux) plus a cross-platform `npm_global` list of global npm CLIs, consumed by `.chezmoitemplates/setup-body.sh`. Adding a package: edit YAML, delete the bootstrap sentinel (`rm ~/.cache/chezmoi/bootstrap-done`), `chezmoi init --force`, then `chezmoi apply`. Setup re-runs and recreates the sentinel.
+- `.chezmoidata/packages.yaml` — declarative OS package lists (darwin / linux) plus a cross-platform `npm_global` list of global npm CLIs, consumed by `.chezmoitemplates/setup-body.sh` (*nix) and `.chezmoiscripts/run_onchange_after_setup.ps1.tmpl` (Windows). Adding a package: edit YAML, delete the bootstrap sentinel (`rm ~/.cache/chezmoi/bootstrap-done`), `chezmoi init --force`, then `chezmoi apply`. Setup re-runs and recreates the sentinel.
 - `.chezmoitemplates/setup-body.sh` — shared bash body used by both bootstrap entry points. Contains: OS packages, font cache refresh, chsh, LazyVim install, work-only ADB pontisd setup. Each section is internally idempotent.
 - `.chezmoiscripts/run_onchange_after_setup.sh.tmpl` — chezmoi-driven entry. Thin wrapper around `setup-body.sh`, gated by `is_setup` and OS. Runs at `chezmoi apply` when rendered content changes.
+- `.chezmoiscripts/run_onchange_after_setup.ps1.tmpl` — Windows-only chezmoi-driven entry (PowerShell). Installs the `npm_global` CLIs (skips if npm absent) and touches the bootstrap sentinel. Does not share `setup-body.sh` (no bash on Windows). Renders empty on non-Windows so chezmoi skips it.
 - `executable_setup.sh.tmpl` — manual entry, deployed to `~/setup.sh`. Same body, no gates (user runs it intentionally). Not deployed on Windows (`.chezmoiignore`).
 - `.chezmoiignore` — keeps `install.sh`, READMEs, `CLAUDE.md` from being deployed; OS- and env-gated exclusions.
 - `dot_zshrc` / `dot_bashrc` — shell configs. Plain (non-`.tmpl`) so `chezmoi re-add` works.
@@ -136,6 +140,10 @@ Auto-runs as part of `chezmoi apply`. Wrapped in:
 #### Entry point 2: manual (`executable_setup.sh.tmpl` → `~/setup.sh`)
 
 Always deployed (except Windows). Contains only `{{ template "setup-body.sh" . }}` — no `is_setup` gate, since user runs it intentionally. Useful when you want to bootstrap on a machine where `is_setup=true` is set, or to re-run only the script portion without invoking chezmoi.
+
+#### Entry point 3: Windows (`.chezmoiscripts/run_onchange_after_setup.ps1.tmpl`)
+
+Windows-only, PowerShell. Cannot share `setup-body.sh` (no bash), so it is a slim path: install the `npm_global` CLIs (skipped with a message if npm is not on PATH — node/npm are assumed pre-installed) and touch the same `bootstrap-done` sentinel so `is_setup` flips true on the next `chezmoi init --force`, exactly like the *nix path. Everything is wrapped in `{{ if and (eq .chezmoi.os "windows") (not (index . "is_setup")) }}`, so it renders empty (and chezmoi skips it) on macOS/Linux. Runs with chezmoi's default `.ps1` interpreter; the commands are Windows PowerShell 5.1 compatible.
 
 #### Why share via `.chezmoitemplates`?
 
