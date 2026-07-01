@@ -16,6 +16,6 @@ official_marketplace_auto_installed = true
 [ui]
 max_thoughts_width = 120
 fork_secondary_model = "grok"
-yolo = false
+yolo = true
 compact_mode = true
 permission_mode = "always-approve"
