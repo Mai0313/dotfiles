@@ -12,8 +12,8 @@ model_context_window = 1050000
 model_auto_compact_token_limit = 735000
 model_verbosity = "medium"
 
-# Disable it to use ChatGPT subscription.
-model_provider = "oai"
+# # Disable it to use ChatGPT subscription.
+# model_provider = "oai"
 
 model_supports_reasoning_summaries = true
 project_doc_fallback_filenames = ["AGENTS.md", "CLAUDE.md", "GEMINI.md", "copilot-instructions.md"]
