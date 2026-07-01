@@ -8,14 +8,14 @@ name = "grok-build-0.1"
 env_key = "OPENAI_API_KEY"
 
 [models]
-default = "grok"
+default = "grok-build-0.1"
 
 [marketplace]
 official_marketplace_auto_installed = true
 
 [ui]
 max_thoughts_width = 120
-fork_secondary_model = "grok"
+fork_secondary_model = "grok-build"
 yolo = true
 compact_mode = true
 permission_mode = "always-approve"
