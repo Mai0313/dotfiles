@@ -105,7 +105,13 @@ nvm install --lts
 nvm alias default 'lts/*'
 set -u
 
-# ---------- 6. Work-only: ADB systemd environment + pontisd ----------
+# ---------- 6. Global npm CLIs ----------
+# node/npm are on PATH now (nvm loaded above). List lives in packages.yaml.
+if command -v npm >/dev/null 2>&1; then
+    npm install -g {{ range .packages.npm_global }}{{ . }} {{ end }}
+fi
+
+# ---------- 7. Work-only: ADB systemd environment + pontisd ----------
 {{ if and .is_work (eq .chezmoi.os "linux") -}}
 KEYS_DIR="$HOME/adb-keys/security/adb"
 if [ -d "$KEYS_DIR" ] && command -v systemctl >/dev/null 2>&1; then
@@ -115,14 +121,14 @@ if [ -d "$KEYS_DIR" ] && command -v systemctl >/dev/null 2>&1; then
 fi
 {{- end }}
 
-# ---------- 7. Input method: IBus (Chinese) ----------
+# ---------- 8. Input method: IBus (Chinese) ----------
 {{ if eq .chezmoi.os "linux" -}}
 sudo apt-get update
 sudo apt-get install -y ibus ibus-gtk ibus-gtk3 ibus-chewing pinyin-database
 echo "run_im ibus" > "$HOME/.xinputrc"
 {{- end }}
 
-# ---------- 8. Mark bootstrap as complete ----------
+# ---------- 9. Mark bootstrap as complete ----------
 # Read by .chezmoi.toml.tmpl on subsequent `chezmoi init --force` so is_setup
 # stays true without manual intervention. Delete this file to force re-run.
 SENTINEL="{{ joinPath .chezmoi.cacheDir "bootstrap-done" }}"

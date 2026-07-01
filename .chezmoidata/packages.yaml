@@ -18,3 +18,14 @@ packages:
     - curl
     - ripgrep
     - fd-find
+  # Global npm CLIs, installed after nvm sets up node LTS. Cross-platform.
+  # npm and corepack ship with node, so they are intentionally excluded.
+  npm_global:
+    - "@anthropic-ai/claude-code"
+    - "@charmland/crush"
+    - "@google/gemini-cli"
+    - "@mai0313/vct"
+    - "@openai/codex"
+    - opencode-ai
+    - reasonix
+    - tree-sitter-cli

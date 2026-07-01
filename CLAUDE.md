@@ -87,7 +87,7 @@ Inspect current values with `chezmoi data | grep -E 'is_|"os"'`.
 
 - `.chezmoi.toml.tmpl` — chezmoi config, defines top-level flags (`is_setup` / `is_work` / `is_cloudtop` / `is_codespace` / `is_devcontainer` / `is_container` / `is_wsl` / `is_ssh` / `is_ci`), identifiers (`osid`, `chassis`), and nested `[data.cpu]` / `[data.linux]` / `[data.darwin]` / `[data.windows]` sections. See Layer 1 table above for the full schema.
 - `.chezmoiexternal.toml.tmpl` — declarative external dependencies (oh-my-zsh, p10k, zsh plugins, `.agents` skills repo, work-only ADB security repo). All `type = "git-repo"` with `--depth=1` and `--ff-only` pull.
-- `.chezmoidata/packages.yaml` — declarative OS package lists (darwin / linux), consumed by `.chezmoitemplates/setup-body.sh`. Adding a package: edit YAML, delete the bootstrap sentinel (`rm ~/.cache/chezmoi/bootstrap-done`), `chezmoi init --force`, then `chezmoi apply`. Setup re-runs and recreates the sentinel.
+- `.chezmoidata/packages.yaml` — declarative OS package lists (darwin / linux) plus a cross-platform `npm_global` list of global npm CLIs, consumed by `.chezmoitemplates/setup-body.sh`. Adding a package: edit YAML, delete the bootstrap sentinel (`rm ~/.cache/chezmoi/bootstrap-done`), `chezmoi init --force`, then `chezmoi apply`. Setup re-runs and recreates the sentinel.
 - `.chezmoitemplates/setup-body.sh` — shared bash body used by both bootstrap entry points. Contains: OS packages, font cache refresh, chsh, LazyVim install, work-only ADB pontisd setup. Each section is internally idempotent.
 - `.chezmoiscripts/run_onchange_after_setup.sh.tmpl` — chezmoi-driven entry. Thin wrapper around `setup-body.sh`, gated by `is_setup` and OS. Runs at `chezmoi apply` when rendered content changes.
 - `executable_setup.sh.tmpl` — manual entry, deployed to `~/setup.sh`. Same body, no gates (user runs it intentionally). Not deployed on Windows (`.chezmoiignore`).
@@ -109,16 +109,17 @@ Both `dot_zshrc` and `dot_bashrc` share the same pattern:
 
 ### Bootstrap Architecture
 
-Two entry points share `.chezmoitemplates/setup-body.sh`. The body has eight idempotent sections:
+Two entry points share `.chezmoitemplates/setup-body.sh`. The body has nine idempotent sections:
 
 1. **OS packages** — apt + VS Code repo + Neovim PPA + lazygit GitHub release on Linux; brew on darwin. Package list lives in `.chezmoidata/packages.yaml`.
 2. **Font cache refresh** — `fc-cache -f` (Linux only).
 3. **Default shell** — `chsh -s zsh` (skipped on Codespaces because dev container controls the shell).
 4. **LazyVim starter** — `git clone` into `~/.config/nvim` only if absent. Deliberately a script clone (not a chezmoi external) because LazyVim is meant to be customized after first install — an external would re-pull and clobber user edits.
 5. **nvm + default LTS** — installs nvm into `~/.nvm` (mac/linux) via the official installer if absent, then `nvm install --lts` and `nvm alias default 'lts/*'`. Runs with `PROFILE=/dev/null` so the installer does not append source lines to the chezmoi-managed `~/.zshrc` / `~/.bashrc` (those already load `~/.nvm`).
-6. **Work-only ADB systemd env + pontisd restart** — gated by `{{ if and .is_work (eq .chezmoi.os "linux") }}`, renders to nothing elsewhere.
-7. **Input method (IBus)** — installs IBus + Chewing and writes `~/.xinputrc` (Linux only).
-8. **Mark bootstrap complete** — touches the `bootstrap-done` sentinel (see sentinel workflow below). Must stay last.
+6. **Global npm CLIs** — `npm install -g` over the `npm_global` list in `packages.yaml`. Runs right after nvm so node/npm are on PATH. Installs latest (no version pins); npm re-install is a no-op when already current, so re-runs are cheap.
+7. **Work-only ADB systemd env + pontisd restart** — gated by `{{ if and .is_work (eq .chezmoi.os "linux") }}`, renders to nothing elsewhere.
+8. **Input method (IBus)** — installs IBus + Chewing and writes `~/.xinputrc` (Linux only).
+9. **Mark bootstrap complete** — touches the `bootstrap-done` sentinel (see sentinel workflow below). Must stay last.
 
 #### Entry point 1: chezmoi-driven (`.chezmoiscripts/run_onchange_after_setup.sh.tmpl`)
 
