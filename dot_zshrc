@@ -137,6 +137,13 @@ case "$__fqdn" in
     ;;
 esac
 case "$__fqdn" in
+  *.roam.internal)
+    # Roam-only aliases.
+    alias agy='/usr/local/bin/jetski'
+    alias jetski-cli='/usr/local/bin/jetski'
+    ;;
+esac
+case "$__fqdn" in
   *.c.googlers.com|*.corp.google.com)
     # Cloudtop-only aliases.
     source /etc/bash_completion.d/g4d
