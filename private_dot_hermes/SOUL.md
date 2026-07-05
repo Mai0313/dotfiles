@@ -15,6 +15,7 @@
 - All the available skills are located at `~/.agents/skills`
 - You can create/use `Workflow` / `Subagents` / `Agent Team` to run multiple tasks in the same time if you need for better performance.
     - `Workflow` is better than `Subagents` on multi-tasks
+- If you wanna update `.env.example`, you must check if `.env` needs to be updated as well.
 
 ## Text formatting
 
