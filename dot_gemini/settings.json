@@ -1,4 +1,5 @@
 {
+  "$schema": "https://raw.githubusercontent.com/google-gemini/gemini-cli/refs/heads/main/schemas/settings.schema.json",
   "context": {
     "fileFiltering": {
       "enableRecursiveFileSearch": true
@@ -18,7 +19,7 @@
   },
   "security": {
     "folderTrust": {
-      "enabled": true
+      "enabled": false
     },
     "enablePermanentToolApproval": true,
     "auth": {
@@ -72,7 +73,7 @@
     "showModelInfoInChat": true,
     "showLineNumbers": false,
     "hideBanner": true,
-    "inlineThinkingMode": "off",
+    "inlineThinkingMode": "full",
     "loadingPhrases": "all",
     "autoThemeSwitching": true,
     "dynamicWindowTitle": true,
@@ -145,7 +146,8 @@
     "name": "auto",
     "maxSessionTurns": -1,
     "skipNextSpeakerCheck": true,
-    "compressionThreshold": 0.6
+    "compressionThreshold": 0.8,
+    "disableLoopDetection": true
   },
   "output": {
     "format": "text"
