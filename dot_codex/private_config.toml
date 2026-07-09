@@ -17,6 +17,7 @@ model_verbosity = "medium"
 
 model_supports_reasoning_summaries = true
 project_doc_fallback_filenames = ["AGENTS.md", "CLAUDE.md", "GEMINI.md", "copilot-instructions.md"]
+project_doc_max_bytes = 32768
 web_search = "live"
 suppress_unstable_features_warning = true
 
