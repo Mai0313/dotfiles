@@ -1,0 +1,71 @@
+{
+  "experimental": true,
+  "footer": {
+    "showModelEffort": true,
+    "showDirectory": true,
+    "showBranch": true,
+    "showContextWindow": true,
+    "showQuota": true,
+    "showAiUsed": true,
+    "showAgent": true,
+    "showCodeChanges": true,
+    "showYolo": true,
+    "showCiStatus": true,
+    "showPullRequest": true,
+    "showCustom": true
+  },
+  "model": "claude-sonnet-5",
+  "askUser": false,
+  "autoUpdate": true,
+  "autoUpdatesChannel": "prerelease",
+  "banner": "always",
+  "bashEnv": true,
+  "beep": true,
+  "beepOnSchedule": true,
+  "compactPaste": false,
+  "contextTier": "long_context",
+  "continueOnAutoMode": false,
+  "copyOnSelect": false,
+  "disableAllHooks": false,
+  "includeCoAuthoredBy": true,
+  "inlineImageLiveWindow": 10,
+  "inlineImages": true,
+  "keepAlive": "on",
+  "logLevel": "default",
+  "memory": true,
+  "mergeStrategy": "rebase",
+  "mouse": true,
+  "notifications": true,
+  "remoteExport": true,
+  "remoteSessions": true,
+  "renderMarkdown": true,
+  "respectGitignore": true,
+  "screenReader": true,
+  "scrollbar": true,
+  "showReasoning": true,
+  "showTipsOnStartup": true,
+  "stayInAutopilot": true,
+  "storeTokenPlaintext": true,
+  "stream": true,
+  "streamerMode": true,
+  "strictKnownMarketplaces": {},
+  "terminalProgress": true,
+  "theme": "github",
+  "toolSearch": true,
+  "updateTerminalTitle": true,
+  "customAgents": {
+    "defaultLocalOnly": false
+  },
+  "dynamicRetrieval": {
+    "skills": true,
+    "mcp": true
+  },
+  "ide": {
+    "autoConnect": false,
+    "openDiffOnEdit": false
+  },
+  "tabs": {
+    "enabled": true
+  },
+  "effortLevel": "xhigh"
+}
