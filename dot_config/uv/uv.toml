@@ -1,15 +1,9 @@
 #:schema https://raw.githubusercontent.com/astral-sh/uv/refs/heads/main/uv.schema.json
 
 # https://docs.astral.sh/uv/reference/settings
-managed = true
-# If you don't want to use the `uv` CLI, you can set this to false.
-package = true
 check-url = "https://pypi.org/simple"
 publish-url = "https://upload.pypi.org/legacy/"
 compile-bytecode = true
-# concurrent-builds = 4
-# concurrent-downloads = 4
-# concurrent-installs = 4
 index-strategy = "unsafe-best-match"
 link-mode = "copy"
 system-certs = true
