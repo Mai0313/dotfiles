@@ -33,25 +33,36 @@
       "source": {
         "source": "github",
         "repo": "anthropics/claude-plugins-official"
-      }
+      },
+      "autoUpdate": true
     },
     "anthropic-agent-skills": {
       "source": {
         "source": "github",
         "repo": "anthropics/skills"
-      }
+      },
+      "autoUpdate": true
     },
     "mai0313-agent-skills": {
       "source": {
         "source": "github",
         "repo": "Mai0313/skills"
-      }
+      },
+      "autoUpdate": true
+    },
+    "claude-code-plugins": {
+      "source": {
+        "source": "git",
+        "url": "https://github.com/anthropics/claude-code.git"
+      },
+      "autoUpdate": true
     }
   },
   "language": "zh-TW",
   "spinnerTipsEnabled": true,
   "effortLevel": "xhigh",
   "showClearContextOnPlanAccept": false,
+  "askUserQuestionTimeout": "never",
   "autoUpdatesChannel": "latest",
   "tui": "fullscreen",
   "autoMemoryEnabled": true,
