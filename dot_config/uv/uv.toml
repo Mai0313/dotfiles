@@ -1,16 +1,17 @@
 #:schema https://raw.githubusercontent.com/astral-sh/uv/refs/heads/main/uv.schema.json
+# Example: https://docs.astral.sh/uv/reference/settings/#configuration
 
-# https://docs.astral.sh/uv/reference/settings
 check-url = "https://pypi.org/simple"
-publish-url = "https://upload.pypi.org/legacy/"
 compile-bytecode = true
-index-strategy = "unsafe-best-match"
-link-mode = "copy"
-system-certs = true
-no-binary = false
+# concurrent-builds = 4
+# concurrent-downloads = 4
+# concurrent-installs = 4
+publish-url = "https://upload.pypi.org/legacy/"
 offline = false
 prerelease = "if-necessary-or-explicit"
-preview = true
+preview-features = true
+python-preference = "managed"
+system-certs = false
 
 # https://docs.astral.sh/uv/reference/settings/#index
 [[index]]
@@ -20,5 +21,8 @@ default = true
 
 [pip]
 universal = true
-annotation-style = "line"
+annotation-style = "split"
+compile-bytecode = true
+index-url = "https://pypi.org/simple"
 output-file = "requirements.txt"
+prerelease = "if-necessary-or-explicit"
