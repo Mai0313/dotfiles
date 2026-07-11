@@ -23,15 +23,6 @@
         }
       }
     },
-    "openai": {
-      "options": {
-        "baseURL": "https://api.mai0313.com",
-        "apiKey": "{env:OPENAI_API_KEY}",
-        "headers": {
-          "x-litellm-end-user-id": "opencode-cli"
-        }
-      }
-    },
     "deepseek": {
       "options": {
         "baseURL": "https://api.mai0313.com",
@@ -42,6 +33,15 @@
       }
     },
     "google": {
+      "options": {
+        "baseURL": "https://api.mai0313.com",
+        "apiKey": "{env:OPENAI_API_KEY}",
+        "headers": {
+          "x-litellm-end-user-id": "opencode-cli"
+        }
+      }
+    },
+    "openai": {
       "options": {
         "baseURL": "https://api.mai0313.com",
         "apiKey": "{env:OPENAI_API_KEY}",
