@@ -16,8 +16,8 @@ model_verbosity = "medium"
 model_provider = "oai"
 
 [memories]
-extract_model = "gpt-5.6-sol"
-consolidation_model = "gpt-5.6-sol"
+extract_model = "gpt-5.6-luna"
+consolidation_model = "gpt-5.6-terra"
 
 # Issues for Azure Deployment:
 # https://github.com/openai/codex/issues/31864
