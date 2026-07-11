@@ -2,16 +2,16 @@
 # Example: https://docs.astral.sh/uv/reference/settings/#configuration
 
 check-url = "https://pypi.org/simple"
+publish-url = "https://upload.pypi.org/legacy/"
 compile-bytecode = true
 # concurrent-builds = 4
 # concurrent-downloads = 4
 # concurrent-installs = 4
-publish-url = "https://upload.pypi.org/legacy/"
+index-strategy = "first-index"
+system-certs = false
 offline = false
 prerelease = "if-necessary-or-explicit"
 preview-features = true
-python-preference = "managed"
-system-certs = false
 
 # https://docs.astral.sh/uv/reference/settings/#index
 [[index]]
