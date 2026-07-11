@@ -2,21 +2,30 @@
   "$schema": "https://opencode.ai/config.json",
   "lsp": true,
   "enabled_providers": [
-    "openai",
-    "google",
     "anthropic",
-    "deepseek",
+    "azure",
     "copilot",
+    "deepseek",
+    "google",
+    "openai",
+    "huggingface",
+    "opencode",
     "openrouter",
     "xai",
-    "azure",
-    "huggingface",
-    "opencode"
   ],
   "provider": {
+    "anthropic": {
+      "options": {
+        "baseURL": "https://api.mai0313.com",
+        "apiKey": "{env:OPENAI_API_KEY}",
+        "headers": {
+          "x-litellm-end-user-id": "opencode-cli"
+        }
+      }
+    },
     "openai": {
       "options": {
-        "baseURL": "{env:OPENAI_BASE_URL}",
+        "baseURL": "https://api.mai0313.com",
         "apiKey": "{env:OPENAI_API_KEY}",
         "headers": {
           "x-litellm-end-user-id": "opencode-cli"
@@ -25,7 +34,7 @@
     },
     "deepseek": {
       "options": {
-        "baseURL": "{env:OPENAI_BASE_URL}",
+        "baseURL": "https://api.mai0313.com",
         "apiKey": "{env:OPENAI_API_KEY}",
         "headers": {
           "x-litellm-end-user-id": "opencode-cli"
@@ -34,7 +43,7 @@
     },
     "google": {
       "options": {
-        "baseURL": "{env:OPENAI_BASE_URL}",
+        "baseURL": "https://api.mai0313.com",
         "apiKey": "{env:OPENAI_API_KEY}",
         "headers": {
           "x-litellm-end-user-id": "opencode-cli"
