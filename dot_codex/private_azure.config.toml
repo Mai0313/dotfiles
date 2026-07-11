@@ -2,12 +2,12 @@
 # Example: https://developers.openai.com/codex/config-sample
 # Profile Example: https://developers.openai.com/codex/config-advanced#profiles
 
-model = "gpt-5.5"
-review_model = "gpt-5.5"
+model = "gpt-5.6-sol"
+review_model = "gpt-5.6-sol"
 personality = "pragmatic"
 approval_policy = "never"
-model_reasoning_effort = "xhigh"
-plan_mode_reasoning_effort = "xhigh"
+model_reasoning_effort = "ultra"
+plan_mode_reasoning_effort = "ultra"
 model_reasoning_summary = "auto"
 model_context_window = 1050000
 model_auto_compact_token_limit = 735000
@@ -16,5 +16,5 @@ model_verbosity = "medium"
 model_provider = "oai"
 
 [memories]
-extract_model = "gpt-5.5"
-consolidation_model = "gpt-5.5"
+extract_model = "gpt-5.6-sol"
+consolidation_model = "gpt-5.6-sol"
