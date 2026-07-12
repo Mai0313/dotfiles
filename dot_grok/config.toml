@@ -1,11 +1,11 @@
 [cli]
 installer = "internal"
 
-[model.grok]
-model = "grok-4.5"
-base_url = "https://api.mai0313.com"
-name = "grok-4.5"
-env_key = "OPENAI_API_KEY"
+# [model.grok]
+# model = "grok-4.5"
+# base_url = "https://api.mai0313.com"
+# name = "grok-4.5"
+# env_key = "OPENAI_API_KEY"
 
 [marketplace]
 official_marketplace_auto_installed = true
