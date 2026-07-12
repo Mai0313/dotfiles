@@ -37,6 +37,8 @@ http_headers = { "x-litellm-end-user-id" = "codex" }
 
 [features]
 shell_tool = true
+apps = true
+hooks = false
 codex_git_commit = true
 shell_snapshot = true
 multi_agent = true
@@ -50,6 +52,10 @@ prevent_idle_sleep = true
 goals = true
 collaboration_modes = true
 mentions_v2 = true
+unified_exec = true
+remote_plugin = true
+network_proxy = false
+fast_mode = true
 
 [memories]
 generate_memories = true
