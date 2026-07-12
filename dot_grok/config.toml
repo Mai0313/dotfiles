@@ -18,3 +18,4 @@ max_thoughts_width = 120
 yolo = true
 compact_mode = true
 permission_mode = "always-approve"
+auto_interject_on_task_wait = true
