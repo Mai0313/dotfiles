@@ -6,7 +6,7 @@ model = "gpt-5.6-sol"
 review_model = "gpt-5.6-sol"
 personality = "pragmatic"
 approval_policy = "never"
-model_reasoning_effort = "ultra"
+model_reasoning_effort = "low"
 plan_mode_reasoning_effort = "ultra"
 model_reasoning_summary = "auto"
 model_context_window = 1050000
@@ -19,42 +19,8 @@ model_provider = "oai"
 extract_model = "gpt-5.6-luna"
 consolidation_model = "gpt-5.6-terra"
 
-# Azure and GPT-5.6 Responses Lite / collaboration namespace issues:
+# GPT-5.6 collaboration reserved namespace issues:
 # https://github.com/openai/codex/issues/31864
-# https://github.com/openai/codex/issues/31870
 # https://github.com/openai/codex/issues/31875
-# https://github.com/openai/codex/issues/31882
-#
-# Generic custom-provider namespace compatibility issues:
-# https://github.com/openai/codex/issues/23186
-# https://github.com/openai/codex/issues/26234
-# https://github.com/openai/codex/issues/32318
-#
-# Earlier MultiAgentV2 encrypted-tool schema issues:
-# https://github.com/openai/codex/issues/26753
-# https://github.com/openai/codex/issues/27205
-# https://github.com/openai/codex/issues/27260
-# https://github.com/openai/codex/issues/27331
-# https://github.com/openai/codex/issues/27589
-#
-# Related Responses Lite routing and tool-exposure issues:
-# https://github.com/openai/codex/issues/30224
-# https://github.com/openai/codex/issues/30238
-# https://github.com/openai/codex/issues/30388
-# https://github.com/openai/codex/issues/30403
-# https://github.com/openai/codex/issues/30406
-# https://github.com/openai/codex/issues/30422
-# https://github.com/openai/codex/issues/30461
-# https://github.com/openai/codex/issues/30595
-# https://github.com/openai/codex/issues/30912
-# https://github.com/openai/codex/issues/31022
-# https://github.com/openai/codex/issues/31150
-# https://github.com/openai/codex/issues/31607
-# https://github.com/openai/codex/issues/31705
-# https://github.com/openai/codex/issues/31717
-# https://github.com/openai/codex/issues/31843
-# https://github.com/openai/codex/issues/31894
-# https://github.com/openai/codex/issues/32086
-# https://github.com/openai/codex/issues/32436
 [features.multi_agent_v2]
 tool_namespace = "agents"
