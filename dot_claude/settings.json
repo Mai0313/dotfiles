@@ -58,6 +58,8 @@
     }
   },
   "language": "zh-TW",
+  "feedbackSurveyRate": 0,
+  "cleanupPeriodDays": 365,
   "spinnerTipsEnabled": true,
   "effortLevel": "xhigh",
   "showClearContextOnPlanAccept": false,
