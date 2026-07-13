@@ -177,3 +177,8 @@ renderer = "None"
 print_events = false
 highlight_damage = false
 prefer_egl = false
+
+[[keyboard.bindings]]
+key = "Return"
+mods = "Shift"
+chars = "\u001B\r"
