@@ -75,7 +75,7 @@ job_max_runtime_seconds = 1800
 [tui]
 notifications = ["agent-turn-complete", "approval-requested"]
 alternate_screen = "always"
-status_line = ["current-dir", "model-with-reasoning", "git-branch", "pull-request-number", "context-used", "used-tokens", "five-hour-limit", "weekly-limit", "task-progress"]
+status_line = ["current-dir", "model-with-reasoning", "git-branch", "pull-request-number", "context-used", "five-hour-limit", "weekly-limit"]
 status_line_use_colors = true
 
 [plugins."computer-use@openai-bundled"]
