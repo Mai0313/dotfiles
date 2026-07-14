@@ -182,3 +182,9 @@ prefer_egl = false
 key = "Return"
 mods = "Shift"
 chars = "\u001B\r"
+
+[[hints.enabled]]
+regex = "(https?://[\\w\\d./?=#&%+@\\-_~]+[\\w\\d./?=#&%+@\\-_~])"
+command = "xdg-open"
+mouse = { enabled = true }
+binding = { key = "O", mods = "Control|Shift" }
