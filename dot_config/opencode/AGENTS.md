@@ -12,10 +12,10 @@
 - If you really need to run a Python script, you can use uv as a package management tool.
 - Do not create or update any comment on internal site or external site only if you got the permission.
 - You can use `rg` instead of `grep` for better performance, this package is a rusted grep.
-- All the available skills are located at `~/.agents/skills`
-- You can create/use `Workflow` / `Subagents` / `Agent Team` to run multiple tasks in the same time if you need for better performance.
-    - `Workflow` is better than `Subagents` on multi-tasks
-- If you wanna update `.env.example`, you must check if `.env` needs to be updated as well.
+- You can create/use `Subagents` / `Agent Team` / `Workflow` to run multiple tasks at the same time for better performance. Pick one based on how the work needs to be coordinated:
+    - `Subagents`: use for a single independent fire-and-forget task where you only need the final result back (e.g. a broad search or reading many files). Each call starts fresh with its own context and shares no state with others.
+    - `Agent Team`: use when several named agents must collaborate and exchange information dynamically, coordinating back and forth via `SendMessage` while keeping their context alive. The model decides the flow at runtime.
+    - `Workflow`: use for large-scale, repeatable, or multi-stage work where the control flow (loops, fan-out, pipelines) should be deterministic and defined in code rather than improvised by the model. Prefer it over plain `Subagents` whenever there are multiple stages or many items.
 
 ## Text formatting
 
