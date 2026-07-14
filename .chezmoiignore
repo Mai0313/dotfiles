@@ -9,6 +9,7 @@ CLAUDE.md
 .p10k.zsh
 cleanup.sh
 setup.sh
+.config/alacritty
 {{- end }}
 
 {{ if or .is_work .is_cloudtop -}}

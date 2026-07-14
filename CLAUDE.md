@@ -89,7 +89,7 @@ Inspect current values with `chezmoi data | grep -E 'is_|"os"'`.
 ### Key Files
 
 - `.chezmoi.toml.tmpl` — chezmoi config, defines top-level flags (`is_setup` / `is_work` / `is_cloudtop` / `is_codespace` / `is_devcontainer` / `is_container` / `is_wsl` / `is_ssh` / `is_ci`), identifiers (`osid`, `chassis`), and nested `[data.cpu]` / `[data.linux]` / `[data.darwin]` / `[data.windows]` sections. See Layer 1 table above for the full schema.
-- `.chezmoiexternal.toml.tmpl` — declarative external dependencies (oh-my-zsh, p10k, zsh plugins, `.agents` skills repo, work-only ADB security repo). All `type = "git-repo"` with `--depth=1` and `--ff-only` pull.
+- `.chezmoiexternal.toml.tmpl` — declarative external dependencies (oh-my-zsh, p10k, zsh plugins, `.agents` skills repo, Alacritty themes, work-only ADB security repo). All `type = "git-repo"` with `--depth=1` and `--ff-only` pull.
 - `.chezmoidata/packages.yaml` — declarative OS package lists (darwin / linux) plus a cross-platform `npm_global` list of global npm CLIs, consumed by `.chezmoitemplates/setup-body.sh` (*nix) and `.chezmoiscripts/run_onchange_after_setup.ps1.tmpl` (Windows). Adding a package: edit YAML, delete the bootstrap sentinel (`rm ~/.cache/chezmoi/bootstrap-done`), `chezmoi init --force`, then `chezmoi apply`. Setup re-runs and recreates the sentinel.
 - `.chezmoitemplates/setup-body.sh` — shared bash body used by both bootstrap entry points. Contains: OS packages, font cache refresh, chsh, LazyVim install, work-only ADB pontisd setup. Each section is internally idempotent.
 - `.chezmoiscripts/run_onchange_after_setup.sh.tmpl` — chezmoi-driven entry. Thin wrapper around `setup-body.sh`, gated by `is_setup` and OS. Runs at `chezmoi apply` when rendered content changes.
@@ -175,6 +175,7 @@ The chezmoi-driven script gate uses `{{- if ... -}}` (with both `-`) so the body
 | Path | URL | Refresh | Condition |
 |---|---|---|---|
 | `.agents` | `Mai0313/skills` (GitHub) | 1h | always |
+| `.config/alacritty/themes` | `alacritty/alacritty-theme` (GitHub) | 24h | non-Windows |
 | `.oh-my-zsh` | `ohmyzsh/ohmyzsh` (GitHub) | 24h | non-Windows |
 | `.oh-my-zsh/custom/themes/powerlevel10k` | `romkatv/powerlevel10k` | 24h | non-Windows |
 | `.oh-my-zsh/custom/plugins/zsh-autosuggestions` | `zsh-users/zsh-autosuggestions` | 24h | non-Windows |
