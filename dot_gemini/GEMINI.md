@@ -11,7 +11,7 @@
 - Commit messages must be in English.
 - If you really need to run a Python script, you can use uv as a package management tool.
 - Do not create or update any comment on internal site or external site only if you got the permission.
-- You can use `rg` instead of `grep` for better performance, this package is a rusted grep.
+- Prefer `rg` over `grep` for better performance, since it is a rust based grep. If `rg` returns wrong results due to string handling issues, fall back to `grep` to ensure correctness.
 - You can create/use `Subagents` / `Agent Team` / `Workflow` to run multiple tasks at the same time for better performance. Pick one based on how the work needs to be coordinated:
     - `Subagents`: use for a single independent fire-and-forget task where you only need the final result back (e.g. a broad search or reading many files). Each call starts fresh with its own context and shares no state with others.
     - `Agent Team`: use when several named agents must collaborate and exchange information dynamically, coordinating back and forth via `SendMessage` while keeping their context alive. The model decides the flow at runtime.
