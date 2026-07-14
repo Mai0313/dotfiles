@@ -1,3 +1,4 @@
+#:schema https://raw.githubusercontent.com/distinction-dev/alacritty-schema/main/alacritty/reference.json
 # Alacritty configuration - all values below are Alacritty defaults.
 # Reference: https://alacritty.org/config-alacritty.html
 # Note: Alacritty applies these defaults automatically, so an empty file
@@ -7,8 +8,6 @@
 live_config_reload = true
 ipc_socket = true
 working_directory = "None"
-
-[env]
 
 [window]
 dynamic_padding = true
