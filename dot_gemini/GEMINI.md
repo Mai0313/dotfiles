@@ -38,5 +38,7 @@ These rules are only applied to those repository hosted on Github
 - Do not forget to create a draft PR as part of the plan; the PR body must be written in English.
 - Feel free to modify the PR body if needed since plan always changes.
 - Feel free to add or adjust additional information in the plan when needed.
+- If a task is large or complex, split it into several focused commits, each one a self-contained logical step.
+    - Everything still lands in a single PR, so the number of commits does not matter; more granular commits just make the changes easier to track, review, and revert.
 - If a change is small, you can ask if the user wants to commit and push it directly to default branch instead of opening a PR.
     - linting, formatting, and testing steps are still required even if the change is small.
