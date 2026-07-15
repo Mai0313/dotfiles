@@ -72,7 +72,7 @@ OS detection comes from chezmoi built-ins: `eq .chezmoi.os "linux"` / `"darwin"`
 **Current consumers of Layer 1 vars:**
 - `.chezmoiignore` — gates `.gemini/GEMINI.md` on `is_work || is_cloudtop`. Also gates Linux-only files (`.zshrc`, `.bashrc`, `.p10k.zsh`, `cleanup.sh`, `setup.sh`) when `chezmoi.os == "windows"`.
 - `.chezmoiexternal.toml.tmpl` — gates `adb-keys/security` (sso git-repo) on `is_work || is_cloudtop`; gates oh-my-zsh + plugins on `chezmoi.os != "windows"`.
-- `.chezmoiscripts/run_onchange_after_setup.sh.tmpl` — outer gate `{{ if and (ne .chezmoi.os "windows") (not (index . "is_setup")) }}`. Inner sections additionally gate by `is_work` (ADB pontis), `is_codespace` (chsh skip), `chezmoi.os` (apt vs brew vs fc-cache).
+- `.chezmoiscripts/run_onchange_after_setup.sh.tmpl` — outer gate `{{ if and (ne .chezmoi.os "windows") (not (index . "is_setup")) }}`. Inner sections additionally gate by `is_work` (ADB pontis; npm global skipped on work macOS), `is_codespace` (chsh skip), `chezmoi.os` (apt vs brew vs fc-cache).
 - `.chezmoiscripts/run_onchange_after_setup.ps1.tmpl` — Windows counterpart, gate `{{ if and (eq .chezmoi.os "windows") (not (index . "is_setup")) }}`. Installs `npm_global` CLIs and touches the sentinel; no *nix setup.
 - `.chezmoitemplates/setup-body.sh` — inherits all Layer 1 vars when included.
 
@@ -120,7 +120,7 @@ Two entry points share `.chezmoitemplates/setup-body.sh`. The body has nine idem
 3. **Default shell** — `chsh -s zsh` (skipped on Codespaces because dev container controls the shell).
 4. **LazyVim starter** — `git clone` into `~/.config/nvim` only if absent. Deliberately a script clone (not a chezmoi external) because LazyVim is meant to be customized after first install — an external would re-pull and clobber user edits.
 5. **nvm + default LTS** — installs nvm into `~/.nvm` (mac/linux) via the official installer if absent, then `nvm install --lts` and `nvm alias default 'lts/*'`. Runs with `PROFILE=/dev/null` so the installer does not append source lines to the chezmoi-managed `~/.zshrc` / `~/.bashrc` (those already load `~/.nvm`).
-6. **Global npm CLIs** — `npm install -g` over the `npm_global` list in `packages.yaml`. Runs right after nvm so node/npm are on PATH. Installs latest (no version pins); npm re-install is a no-op when already current, so re-runs are cheap.
+6. **Global npm CLIs** — `npm install -g` over the `npm_global` list in `packages.yaml`. Runs right after nvm so node/npm are on PATH. Installs latest (no version pins); npm re-install is a no-op when already current, so re-runs are cheap. Gated by `{{ if not (and .is_work (eq .chezmoi.os "darwin")) }}` — work macOS (Roam laptops) still gets nvm + node LTS from section 5, but no global CLIs.
 7. **Work-only ADB systemd env + pontisd restart** — gated by `{{ if and .is_work (eq .chezmoi.os "linux") }}`, renders to nothing elsewhere.
 8. **Input method (IBus)** — installs IBus + Chewing and writes `~/.xinputrc` (Linux only).
 9. **Mark bootstrap complete** — touches the `bootstrap-done` sentinel (see sentinel workflow below). Must stay last.

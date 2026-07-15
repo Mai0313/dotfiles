@@ -107,9 +107,12 @@ set -u
 
 # ---------- 6. Global npm CLIs ----------
 # node/npm are on PATH now (nvm loaded above). List lives in packages.yaml.
+# Skipped on work macOS.
+{{ if not (and .is_work (eq .chezmoi.os "darwin")) -}}
 if command -v npm >/dev/null 2>&1; then
     npm install -g {{ range .packages.npm_global }}{{ . }} {{ end }}
 fi
+{{- end }}
 
 # ---------- 7. Work-only: ADB systemd environment + pontisd ----------
 {{ if and .is_work (eq .chezmoi.os "linux") -}}
