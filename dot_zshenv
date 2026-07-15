@@ -1,0 +1,2 @@
+# Sourced by every zsh, including non-interactive scripts. Keep it fast.
+# Env vars and PATH belong here; aliases and prompt go in ~/.zshrc.

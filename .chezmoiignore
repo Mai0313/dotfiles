@@ -5,6 +5,8 @@ CLAUDE.md
 
 {{ if eq .chezmoi.os "windows" -}}
 .zshrc
+.zshenv
+.zprofile
 .bashrc
 .p10k.zsh
 cleanup.sh

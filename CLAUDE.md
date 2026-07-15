@@ -70,7 +70,7 @@ OS detection comes from chezmoi built-ins: `eq .chezmoi.os "linux"` / `"darwin"`
 **Note**: `.chezmoi.toml.tmpl` runs at `chezmoi init`, not at every `chezmoi apply`. Adding a new data key (like `is_setup`) requires `chezmoi init --force` once to regenerate `~/.config/chezmoi/chezmoi.toml`. Templates that read `is_setup` use `index . "is_setup"` (rather than `.is_setup`) so missing keys default to nil → `not nil` → treated as `false` → setup runs. This keeps the change backward-compatible without forcing a re-init. New keys added later should use the same `index . "<key>"` pattern when used by a template that may run before the user re-inits.
 
 **Current consumers of Layer 1 vars:**
-- `.chezmoiignore` — gates `.gemini/GEMINI.md` on `is_work || is_cloudtop`. Also gates Linux-only files (`.zshrc`, `.bashrc`, `.p10k.zsh`, `cleanup.sh`, `setup.sh`) when `chezmoi.os == "windows"`.
+- `.chezmoiignore` — gates `.gemini/GEMINI.md` on `is_work || is_cloudtop`. Also gates Linux-only files (`.zshrc`, `.zshenv`, `.zprofile`, `.bashrc`, `.p10k.zsh`, `cleanup.sh`, `setup.sh`) when `chezmoi.os == "windows"`.
 - `.chezmoiexternal.toml.tmpl` — gates `adb-keys/security` (sso git-repo) on `is_work || is_cloudtop`; gates oh-my-zsh + plugins on `chezmoi.os != "windows"`.
 - `.chezmoiscripts/run_onchange_after_setup.sh.tmpl` — outer gate `{{ if and (ne .chezmoi.os "windows") (not (index . "is_setup")) }}`. Inner sections additionally gate by `is_work` (ADB pontis; npm global skipped on work macOS), `is_codespace` (chsh skip), `chezmoi.os` (apt vs brew vs fc-cache).
 - `.chezmoiscripts/run_onchange_after_setup.ps1.tmpl` — Windows counterpart, gate `{{ if and (eq .chezmoi.os "windows") (not (index . "is_setup")) }}`. Installs `npm_global` CLIs and touches the sentinel; no *nix setup.
@@ -97,6 +97,7 @@ Inspect current values with `chezmoi data | grep -E 'is_|"os"'`.
 - `executable_setup.sh.tmpl` — manual entry, deployed to `~/setup.sh`. Same body, no gates (user runs it intentionally). Not deployed on Windows (`.chezmoiignore`).
 - `.chezmoiignore` — keeps `install.sh`, READMEs, `CLAUDE.md` from being deployed; OS- and env-gated exclusions.
 - `dot_zshrc` / `dot_bashrc` — shell configs. Plain (non-`.tmpl`) so `chezmoi re-add` works.
+- `dot_zshenv` / `dot_zprofile` — zsh startup hooks, currently comment-only placeholders. `.zshenv` is read by every zsh (scripts included), `.zprofile` only by login shells, before `.zshrc`. Also plain files so `re-add` works.
 - `dot_p10k.zsh` — Powerlevel10k prompt theme (lean style, NerdFont).
 - `dot_claude/settings.json`, `dot_gemini/settings.json`, `dot_codex/private_config.toml` — IDE / agent settings.
 - `executable_cleanup.sh` — ad-hoc cleanup utility (NOT auto-run; deployed as `~/cleanup.sh` for manual use).
