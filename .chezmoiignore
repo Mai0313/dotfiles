@@ -1,6 +1,5 @@
 install.sh
 README.md
-README.zh-TW.md
 CLAUDE.md
 
 {{ if eq .chezmoi.os "windows" -}}
