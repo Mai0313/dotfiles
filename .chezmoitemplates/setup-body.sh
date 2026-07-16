@@ -12,6 +12,17 @@ brew install {{ range .packages.darwin }}{{ . }} {{ end }}
 sudo apt-get update
 sudo apt-get install -y {{ range .packages.linux }}{{ . }} {{ end }}
 
+{{ if .is_cloudtop -}}
+# Corp machines get VS Code from google3, not the public Microsoft apt repo.
+# install_vscode_for_google3.sh reads the google3 depot, which needs a valid
+# LOAS certificate, so refresh it first. gcertstatus is a no-op when the cert
+# is still good and only falls through to the interactive gcert when it expired.
+if command -v gcertstatus >/dev/null 2>&1; then
+    gcertstatus --quiet --check_remaining=1h || gcert
+fi
+sudo apt install --update code
+/google/src/files/head/depot/google3/devtools/editors/vscode/install_vscode_for_google3.sh
+{{- else -}}
 if [ ! -f /usr/share/keyrings/microsoft.gpg ]; then
     wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > /tmp/microsoft.gpg
     sudo install -D -o root -g root -m 644 /tmp/microsoft.gpg /usr/share/keyrings/microsoft.gpg
@@ -28,6 +39,7 @@ Signed-By: /usr/share/keyrings/microsoft.gpg
 VSCODE
     sudo apt-get update
 fi
+{{- end }}
 
 # Distro nvim is often too old (or absent) for LazyVim, and the neovim PPA is
 # Ubuntu-only (breaks on Debian/glinux). Install the official release tarball to

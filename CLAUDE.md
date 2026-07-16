@@ -72,7 +72,7 @@ OS detection comes from chezmoi built-ins: `eq .chezmoi.os "linux"` / `"darwin"`
 **Current consumers of Layer 1 vars:**
 - `.chezmoiignore` — gates `.gemini/GEMINI.md` on `is_work || is_cloudtop`. Also gates Linux-only files (`.zshrc`, `.zshenv`, `.zprofile`, `.bashrc`, `.p10k.zsh`, `cleanup.sh`, `setup.sh`) when `chezmoi.os == "windows"`.
 - `.chezmoiexternal.toml.tmpl` — gates `adb-keys/security` (sso git-repo) on `is_work || is_cloudtop`; gates oh-my-zsh + plugins on `chezmoi.os != "windows"`.
-- `.chezmoiscripts/run_onchange_after_setup.sh.tmpl` — outer gate `{{ if and (ne .chezmoi.os "windows") (not (index . "is_setup")) }}`. Inner sections additionally gate by `is_work` (ADB pontis; npm global skipped on work macOS), `is_codespace` (chsh skip), `chezmoi.os` (apt vs brew vs fc-cache).
+- `.chezmoiscripts/run_onchange_after_setup.sh.tmpl` — outer gate `{{ if and (ne .chezmoi.os "windows") (not (index . "is_setup")) }}`. Inner sections additionally gate by `is_work` (ADB pontis; npm global skipped on work macOS), `is_cloudtop` (VS Code from google3 instead of the Microsoft apt repo), `is_codespace` (chsh skip), `chezmoi.os` (apt vs brew vs fc-cache).
 - `.chezmoiscripts/run_onchange_after_setup.ps1.tmpl` — Windows counterpart, gate `{{ if and (eq .chezmoi.os "windows") (not (index . "is_setup")) }}`. Installs `npm_global` CLIs and touches the sentinel; no *nix setup.
 - `.chezmoitemplates/setup-body.sh` — inherits all Layer 1 vars when included.
 
@@ -116,7 +116,7 @@ Both `dot_zshrc` and `dot_bashrc` share the same pattern:
 
 Two entry points share `.chezmoitemplates/setup-body.sh`. The body has nine idempotent sections:
 
-1. **OS packages** — apt + VS Code repo + Neovim PPA + lazygit GitHub release on Linux; brew on darwin. Package list lives in `.chezmoidata/packages.yaml`.
+1. **OS packages** — apt + VS Code + Neovim PPA + lazygit GitHub release on Linux; brew on darwin. Package list lives in `.chezmoidata/packages.yaml`. VS Code install path forks on `is_cloudtop`: corp machines run `gcert` (only when the LOAS cert expired) then the google3 installer, everyone else adds the public Microsoft apt repo.
 2. **Font cache refresh** — `fc-cache -f` (Linux only).
 3. **Default shell** — `chsh -s zsh` (skipped on Codespaces because dev container controls the shell).
 4. **LazyVim starter** — `git clone` into `~/.config/nvim` only if absent. Deliberately a script clone (not a chezmoi external) because LazyVim is meant to be customized after first install — an external would re-pull and clobber user edits.
