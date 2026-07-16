@@ -15,9 +15,10 @@ model_verbosity = "medium"
 
 model_provider = "oai"
 
-[memories]
-extract_model = "gpt-5.6-luna"
-consolidation_model = "gpt-5.6-terra"
+# Use default memory models.
+# [memories]
+# extract_model = "gpt-5.6-luna"
+# consolidation_model = "gpt-5.6-terra"
 
 # GPT-5.6 collaboration reserved namespace issues:
 # https://github.com/openai/codex/issues/31864
