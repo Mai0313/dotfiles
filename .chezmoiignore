@@ -13,6 +13,6 @@ setup.sh
 .config/alacritty
 {{- end }}
 
-{{ if or .is_work .is_cloudtop -}}
+{{ if .is_work -}}
 .gemini/GEMINI.md
 {{- end }}

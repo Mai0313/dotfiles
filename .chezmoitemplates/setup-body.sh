@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Detect container-like environments (Docker/Podman, Dev Container, Codespaces).
+in_container() {
+    [ -f /.dockerenv ] || [ -f /run/.containerenv ] || [ -n "${CODESPACES:-}" ] || [ -n "${REMOTE_CONTAINERS:-}" ] || [ -n "${DEVCONTAINER:-}" ]
+}
+
 # ---------- 1. OS packages ----------
 {{ if eq .chezmoi.os "darwin" -}}
 if ! command -v brew >/dev/null 2>&1; then
@@ -12,8 +17,9 @@ brew install {{ range .packages.darwin }}{{ . }} {{ end }}
 sudo apt-get update
 sudo apt-get install -y {{ range .packages.linux }}{{ . }} {{ end }}
 
-{{ if .is_cloudtop -}}
-# Corp machines get VS Code from google3, not the public Microsoft apt repo.
+{{ if .is_work -}}
+# Corp Linux (gLinux) gets VS Code from google3, not the Microsoft apt repo.
+# In this linux branch, is_work means a corp workstation (roam is macOS).
 # install_vscode_for_google3.sh reads the google3 depot, which needs a valid
 # LOAS certificate, so refresh it first. gcertstatus is a no-op when the cert
 # is still good and only falls through to the interactive gcert when it expired.
@@ -83,16 +89,16 @@ fi
 {{- end }}
 
 # ---------- 3. Set zsh as default shell ----------
-{{ if not .is_codespace -}}
+# Skipped in containers: the image controls the shell, chsh can hang
+# non-interactively, and the change does not survive a rebuild.
 ZSH_PATH="$(command -v zsh || true)"
-if [ -n "$ZSH_PATH" ] && [ "${SHELL:-}" != "$ZSH_PATH" ]; then
+if ! in_container && [ -n "$ZSH_PATH" ] && [ "${SHELL:-}" != "$ZSH_PATH" ]; then
     {{ if eq .chezmoi.os "darwin" -}}
     chsh -s /bin/zsh
     {{- else }}
     sudo chsh -s "$ZSH_PATH" "$(whoami)"
     {{- end }}
 fi
-{{- end }}
 
 # ---------- 4. LazyVim starter ----------
 NVIM_DIR="$HOME/.config/nvim"
@@ -138,14 +144,9 @@ fi
 
 # ---------- 8. Input method: IBus (Chinese) ----------
 {{ if eq .chezmoi.os "linux" -}}
-sudo apt-get update
-sudo apt-get install -y ibus ibus-gtk ibus-gtk3 ibus-chewing pinyin-database
-echo "run_im ibus" > "$HOME/.xinputrc"
+if ! in_container; then
+    sudo apt-get update
+    sudo apt-get install -y ibus ibus-gtk ibus-gtk3 ibus-chewing pinyin-database
+    echo "run_im ibus" > "$HOME/.xinputrc"
+fi
 {{- end }}
-
-# ---------- 9. Mark bootstrap as complete ----------
-# Read by .chezmoi.toml.tmpl on subsequent `chezmoi init --force` so is_setup
-# stays true without manual intervention. Delete this file to force re-run.
-SENTINEL="{{ joinPath .chezmoi.cacheDir "bootstrap-done" }}"
-mkdir -p "$(dirname "$SENTINEL")"
-touch "$SENTINEL"

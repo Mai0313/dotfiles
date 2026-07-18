@@ -20,14 +20,14 @@ New codespaces will be configured automatically.
 
 ## Environment Detection
 
-The config template automatically detects the environment:
+The config template computes a single `is_work` flag from the FQDN; container
+and OS differences are handled at runtime by the setup script.
 
-| Environment | Detection | `is_work` | `is_cloudtop` | `is_codespace` |
-|---|---|---|---|---|
-| Cloudtop | `*.c.googlers.com` | `true` | `true` | `false` |
-| Roam (work) | `*.roam.internal` | `true` | `false` | `false` |
-| GitHub Codespaces | `CODESPACES=true` | `false` | `false` | `true` |
-| Personal | default | `false` | `false` | `false` |
+| Environment | Detection | `is_work` |
+|---|---|---|
+| Cloudtop (gLinux) | `*.c.googlers.com` / `*.corp.google.com` | `true` |
+| Roam (work macOS) | `*.roam.internal` | `true` |
+| Personal / Codespaces / containers | default | `false` |
 
 ## Daily Usage
 
@@ -50,14 +50,12 @@ The one-liner above (`chezmoi init --apply`) covers fresh machines and
 Codespaces. Already-initialized machines pick up future changes via
 `chezmoi update`.
 
-After the first successful bootstrap you can flip `is_setup = true` in
-`~/.config/chezmoi/chezmoi.toml` (under `[data]`) to skip the auto bootstrap
-on subsequent applies. Flip back to `false` when you add a package to
-`.chezmoidata/packages.yaml` and want it installed.
+The bootstrap script auto-runs on the first `chezmoi apply` and re-runs only
+when its content changes, for example when you edit `.chezmoidata/packages.yaml`.
+Each section is idempotent, so a re-run just installs what changed.
 
-`~/setup.sh` is also deployed (Linux/macOS only) as a manual entry point —
-identical body to the chezmoi-driven script, no `is_setup` gate. Run it
-yourself when you want to bootstrap without invoking chezmoi.
+`~/setup.sh` is also deployed (Linux/macOS only) as a manual entry point with
+the identical body. Run it yourself to bootstrap without invoking chezmoi.
 
 ### Cleanup
 

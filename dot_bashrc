@@ -127,7 +127,7 @@ alias cop='copilot'
 alias cod='codex'
 
 # Environment-specific settings, gated at runtime via FQDN.
-# Matches is_work / is_cloudtop detection in .chezmoi.toml.tmpl.
+# Work patterns mirror is_work in .chezmoi.toml.tmpl; cloudtop/roam split is runtime-only.
 __fqdn=$(hostname -f 2>/dev/null || hostname)
 case "$__fqdn" in
   *.c.googlers.com|*.corp.google.com|*.roam.internal)
