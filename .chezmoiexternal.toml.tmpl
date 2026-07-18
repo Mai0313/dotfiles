@@ -50,7 +50,7 @@
         args = ["--ff-only"]
 {{- end }}
 
-{{ if or .is_work .is_cloudtop -}}
+{{ if .is_work -}}
 ["adb-keys/security"]
     type = "git-repo"
     url = "sso://googleplex-android/platform/vendor/google/security"

@@ -17,8 +17,9 @@ brew install {{ range .packages.darwin }}{{ . }} {{ end }}
 sudo apt-get update
 sudo apt-get install -y {{ range .packages.linux }}{{ . }} {{ end }}
 
-{{ if .is_cloudtop -}}
-# Corp machines get VS Code from google3, not the public Microsoft apt repo.
+{{ if .is_work -}}
+# Corp Linux (gLinux) gets VS Code from google3, not the Microsoft apt repo.
+# In this linux branch, is_work means a corp workstation (roam is macOS).
 # install_vscode_for_google3.sh reads the google3 depot, which needs a valid
 # LOAS certificate, so refresh it first. gcertstatus is a no-op when the cert
 # is still good and only falls through to the interactive gcert when it expired.
