@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Detect container-like environments (Docker/Podman, Dev Container, Codespaces).
+in_container() {
+    [ -f /.dockerenv ] || [ -f /run/.containerenv ] || [ -n "${CODESPACES:-}" ] || [ -n "${REMOTE_CONTAINERS:-}" ] || [ -n "${DEVCONTAINER:-}" ]
+}
+
 # ---------- 1. OS packages ----------
 {{ if eq .chezmoi.os "darwin" -}}
 if ! command -v brew >/dev/null 2>&1; then
@@ -83,16 +88,16 @@ fi
 {{- end }}
 
 # ---------- 3. Set zsh as default shell ----------
-{{ if not .is_codespace -}}
+# Skipped in containers: the image controls the shell, chsh can hang
+# non-interactively, and the change does not survive a rebuild.
 ZSH_PATH="$(command -v zsh || true)"
-if [ -n "$ZSH_PATH" ] && [ "${SHELL:-}" != "$ZSH_PATH" ]; then
+if ! in_container && [ -n "$ZSH_PATH" ] && [ "${SHELL:-}" != "$ZSH_PATH" ]; then
     {{ if eq .chezmoi.os "darwin" -}}
     chsh -s /bin/zsh
     {{- else }}
     sudo chsh -s "$ZSH_PATH" "$(whoami)"
     {{- end }}
 fi
-{{- end }}
 
 # ---------- 4. LazyVim starter ----------
 NVIM_DIR="$HOME/.config/nvim"
@@ -138,9 +143,11 @@ fi
 
 # ---------- 8. Input method: IBus (Chinese) ----------
 {{ if eq .chezmoi.os "linux" -}}
-sudo apt-get update
-sudo apt-get install -y ibus ibus-gtk ibus-gtk3 ibus-chewing pinyin-database
-echo "run_im ibus" > "$HOME/.xinputrc"
+if ! in_container; then
+    sudo apt-get update
+    sudo apt-get install -y ibus ibus-gtk ibus-gtk3 ibus-chewing pinyin-database
+    echo "run_im ibus" > "$HOME/.xinputrc"
+fi
 {{- end }}
 
 # ---------- 9. Mark bootstrap as complete ----------
