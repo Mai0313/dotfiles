@@ -53,13 +53,13 @@ OS detection comes from chezmoi built-ins: `eq .chezmoi.os "linux"` / `"darwin"`
 **Note**: `.chezmoi.toml.tmpl` runs at `chezmoi init`, not at every `chezmoi apply`, so editing it needs `chezmoi init --force` once to regenerate `~/.config/chezmoi/chezmoi.toml`.
 
 **Current consumers of `is_work`:**
-- `.chezmoiignore` — gates `.gemini/GEMINI.md`. Also gates Linux-only files (`.zshrc`, `.zshenv`, `.zprofile`, `.bashrc`, `.p10k.zsh`, `cleanup.sh`, `setup.sh`) when `chezmoi.os == "windows"`.
+- `.chezmoiignore` — gates `.gemini/GEMINI.md`. Also gates non-Windows files (`.zshrc`, `.zshenv`, `.zprofile`, `.bashrc`, `.p10k.zsh`, `cleanup.sh`, `setup.sh`, `.config/alacritty`) when `chezmoi.os == "windows"`.
 - `.chezmoiexternal.toml.tmpl` — gates `adb-keys/security` (sso git-repo); gates oh-my-zsh + plugins on `chezmoi.os != "windows"`.
 - `.chezmoitemplates/setup-body.sh` — §1 routes VS Code (corp Linux → google3, else Microsoft repo), §6 skips global npm on work macOS, §7 gates the ADB pontisd restart. Container and OS gating inside the body is runtime, not chezmoi data.
 
 Inspect the current value with `chezmoi data | grep is_work`.
 
-**Layer 2 — runtime shell gating (actual behavior).** Shell configs (`dot_zshrc`, `dot_bashrc`) do their own `case "$(hostname -f)"` match on the same FQDN patterns to toggle env-specific blocks (aliases, env vars). **All live gating for these mixed-content files happens here, not in chezmoi templates.**
+**Layer 2 — runtime shell gating (actual behavior).** Shell configs (`dot_zshrc`, `dot_bashrc`) do their own `case` match (on `$(hostname -f 2>/dev/null || hostname)`) against the same FQDN patterns to toggle env-specific blocks (aliases, env vars). **All live gating for these mixed-content files happens here, not in chezmoi templates.**
 
 **Why runtime, not template, for shell configs?** `chezmoi re-add` cannot reverse-merge local edits back into Go template syntax. Keeping `dot_zshrc` / `dot_bashrc` as plain (non-`.tmpl`) scripts means the user can edit them in `$HOME` and sync back with `chezmoi re-add ~/.zshrc` without hand-patching the source tree. This rule applies because these files mix universal and env-specific content in the same file — runtime gating is the only option.
 
@@ -70,9 +70,9 @@ Inspect the current value with `chezmoi data | grep is_work`.
 ### Key Files
 
 - `.chezmoi.toml.tmpl` — chezmoi config. Computes the single `is_work` flag from the FQDN and pins `sourceDir`. See Layer 1 above.
-- `.chezmoiexternal.toml.tmpl` — declarative external dependencies (oh-my-zsh, p10k, zsh plugins, `.agents` skills repo, Alacritty themes, work-only ADB security repo). All `type = "git-repo"` with `--depth=1` and `--ff-only` pull.
+- `.chezmoiexternal.toml.tmpl` — declarative external dependencies (oh-my-zsh, p10k, zsh plugins, `.agents` skills repo, Alacritty themes, work-only ADB security repo). All `type = "git-repo"`; the five non-Windows externals pin `--depth=1` clone and `--ff-only` pull, while `.agents` and `adb-keys/security` use plain full clones/pulls.
 - `.chezmoidata/packages.yaml` — declarative OS package lists (darwin / linux) plus a cross-platform `npm_global` list of global npm CLIs, consumed by `.chezmoitemplates/setup-body.sh` (*nix) and `.chezmoiscripts/run_onchange_after_setup.ps1.tmpl` (Windows). Adding a package: edit the YAML and run `chezmoi apply` — `run_onchange` sees the changed content and re-runs setup.
-- `.chezmoitemplates/setup-body.sh` — shared bash body used by both bootstrap entry points. Contains: OS packages, font cache refresh, chsh, LazyVim install, work-only ADB pontisd setup. Each section is internally idempotent.
+- `.chezmoitemplates/setup-body.sh` — shared bash body used by both bootstrap entry points. Contains: OS packages, font cache refresh, chsh, LazyVim install, nvm + node LTS, global npm CLIs, work-only ADB pontisd setup, IBus input method. Each section is internally idempotent.
 - `.chezmoiscripts/run_onchange_after_setup.sh.tmpl` — chezmoi-driven entry. Thin wrapper around `setup-body.sh`, gated by OS. Runs at `chezmoi apply` when rendered content changes.
 - `.chezmoiscripts/run_onchange_after_setup.ps1.tmpl` — Windows-only chezmoi-driven entry (PowerShell). Installs the `npm_global` CLIs (skips if npm absent). Does not share `setup-body.sh` (no bash on Windows). Renders empty on non-Windows so chezmoi skips it.
 - `executable_setup.sh.tmpl` — manual entry, deployed to `~/setup.sh`. Same body, no gates (user runs it intentionally). Not deployed on Windows (`.chezmoiignore`).
@@ -80,18 +80,22 @@ Inspect the current value with `chezmoi data | grep is_work`.
 - `dot_zshrc` / `dot_bashrc` — shell configs. Plain (non-`.tmpl`) so `chezmoi re-add` works.
 - `dot_zshenv` / `dot_zprofile` — zsh startup hooks, currently comment-only placeholders. `.zshenv` is read by every zsh (scripts included), `.zprofile` only by login shells, before `.zshrc`. Also plain files so `re-add` works.
 - `dot_p10k.zsh` — Powerlevel10k prompt theme (lean style, NerdFont).
-- `dot_claude/settings.json`, `dot_gemini/settings.json`, `dot_codex/private_config.toml` — IDE / agent settings.
+- `dot_claude/`, `dot_gemini/`, `dot_codex/`, `dot_copilot/`, `dot_grok/`, `dot_config/opencode/`, `dot_local/share/crush/`, `private_dot_hermes/` — per-tool agent/IDE config. Each ships a settings file (`settings.json` / `config.toml` / `opencode.json` / `private_crush.json` / `private_config.toml`) plus a shared instruction file (`CLAUDE.md` / `GEMINI.md` / `AGENTS.md` / `copilot-instructions.md` / `SOUL.md`) carrying the same coding-guideline body; `dot_claude` and `dot_gemini` also ship a statusline script.
+- `dot_config/*` — terminal and CLI tool configs (`alacritty.toml`, `btop`, `fastfetch`, `htop`, `neofetch`, `pip.conf`, `uv.toml`, git `ignore`).
+- `dot_local/share/fonts/meslo/` — MesloLGS NF (NerdFont) TTFs used by the p10k prompt.
 - `executable_cleanup.sh` — ad-hoc cleanup utility (NOT auto-run; deployed as `~/cleanup.sh` for manual use).
 - `install.sh` — Codespace bootstrap one-liner; runs `chezmoi init --apply`. Not deployed to `$HOME`.
 
 ### Shell Config Structure
 
-Both `dot_zshrc` and `dot_bashrc` share the same pattern:
-1. PATH extensions (Go, Rust, Cargo, Miniconda, Neovim)
-2. NVM lazy loading
-3. Common aliases (`cc='claude'`, `cop='copilot'`)
-4. Runtime-gated environment block — FQDN `case` matching `*.c.googlers.com|*.corp.google.com|*.roam.internal` (work: `ADB_VENDOR_KEYS`) and `*.c.googlers.com|*.corp.google.com` (Cloudtop: `gemini`, `jetski-cli`, `flash`, `recovery`, `listd` aliases). No-op on personal machines.
-5. Editor selection (vim over SSH, nvim locally)
+Both `dot_zshrc` and `dot_bashrc` cover the same ground, with a few zsh-only pieces called out:
+1. PATH extensions (`.local/bin`, Go, Cargo, Miniconda, Neovim, OpenOCD)
+2. NVM loading — zsh lazy-loads via the oh-my-zsh `nvm` plugin (`zstyle ':omz:plugins:nvm' lazy yes`); bash sources `~/.nvm/nvm.sh` eagerly
+3. Common aliases (`cc='claude'`, `cop='copilot'`, `cod='codex'`)
+4. Runtime-gated environment blocks — three FQDN `case` arms: work (`*.c.googlers.com|*.corp.google.com|*.roam.internal` → `sshping`, `ADB_VENDOR_KEYS`, `CORP_SSH_HELPER_OVERRIDES`), roam-only (`*.roam.internal` → `agy`, `jetski-cli`), and Cloudtop (`*.c.googlers.com|*.corp.google.com` → sources `g4d` + `dc_setup.sh`, plus `gemini`/`agy`/`jetski`/`flash`/`recovery`/`listd`/`fetch`/`duckie` aliases). No-op on personal machines.
+5. Editor selection (zsh only: vim over SSH, nvim locally)
+
+zsh additionally loads oh-my-zsh (theme `powerlevel10k`, plugins `git`/`dotenv`/`nvm`/`zsh-autosuggestions`/`zsh-syntax-highlighting`); bash does not.
 
 ### Bootstrap Architecture
 
@@ -111,9 +115,9 @@ Two entry points share `.chezmoitemplates/setup-body.sh`. The body opens with an
 Auto-runs as part of `chezmoi apply`. Wrapped in:
 
 ```
-{{ if ne .chezmoi.os "windows" }}
+{{- if ne .chezmoi.os "windows" -}}
 {{ template "setup-body.sh" . }}
-{{ end }}
+{{- end -}}
 ```
 
 `run_onchange_` re-runs the script whenever its rendered content changes — editing `packages.yaml` or switching OS / work env. It runs once on a fresh machine and stays quiet afterwards; each body section is idempotent, so a re-run only installs what changed. There is no `is_setup` flag or sentinel: `run_onchange` alone gives the run-once, re-run-on-change behavior.
@@ -152,4 +156,4 @@ The chezmoi-driven script gate uses `{{- if ... -}}` (with both `-`) so the body
 | `.oh-my-zsh/custom/plugins/zsh-syntax-highlighting` | `zsh-users/zsh-syntax-highlighting` | 24h | non-Windows |
 | `adb-keys/security` | `sso://googleplex-android/.../security` | 1h | `is_work` |
 
-All use `type = "git-repo"` with `--depth=1` and `--ff-only`. Pulling on chezmoi's schedule is compatible with oh-my-zsh's own `git pull`-based self-update — no need to disable oh-my-zsh auto-update. Externals refresh independently of the setup script's `run_onchange_` hash.
+All are `type = "git-repo"`. The five non-Windows externals (Alacritty themes, oh-my-zsh, p10k, and the two zsh plugins) pin `--depth=1` clone and `--ff-only` pull; `.agents` and `adb-keys/security` use plain full clones/pulls. Pulling on chezmoi's schedule is compatible with oh-my-zsh's own `git pull`-based self-update — no need to disable oh-my-zsh auto-update. Externals refresh independently of the setup script's `run_onchange_` hash.
