@@ -149,10 +149,3 @@ if ! in_container; then
     echo "run_im ibus" > "$HOME/.xinputrc"
 fi
 {{- end }}
-
-# ---------- 9. Mark bootstrap as complete ----------
-# Read by .chezmoi.toml.tmpl on subsequent `chezmoi init --force` so is_setup
-# stays true without manual intervention. Delete this file to force re-run.
-SENTINEL="{{ joinPath .chezmoi.cacheDir "bootstrap-done" }}"
-mkdir -p "$(dirname "$SENTINEL")"
-touch "$SENTINEL"
