@@ -70,7 +70,7 @@ Inspect the current value with `chezmoi data | grep is_work`.
 ### Key Files
 
 - `.chezmoi.toml.tmpl` — chezmoi config. Computes the single `is_work` flag from the FQDN and pins `sourceDir`. See Layer 1 above.
-- `.chezmoiexternal.toml.tmpl` — declarative external dependencies (oh-my-zsh, p10k, zsh plugins, `.agents` skills repo, Alacritty themes, work-only ADB security repo). All `type = "git-repo"`; the five non-Windows externals pin `--depth=1` clone and `--ff-only` pull, while `.agents` and `adb-keys/security` use plain full clones/pulls.
+- `.chezmoiexternal.toml.tmpl` — declarative external dependencies (oh-my-zsh, p10k, zsh plugins, `.agents` skills repo, work-only ADB security repo). All `type = "git-repo"`; the four non-Windows externals pin `--depth=1` clone and `--ff-only` pull, while `.agents` and `adb-keys/security` use plain full clones/pulls.
 - `.chezmoidata/packages.yaml` — declarative OS package lists (darwin / linux) plus a cross-platform `npm_global` list of global npm CLIs, consumed by `.chezmoitemplates/setup-body.sh` (*nix) and `.chezmoiscripts/run_onchange_after_setup.ps1.tmpl` (Windows). Adding a package: edit the YAML and run `chezmoi apply` — `run_onchange` sees the changed content and re-runs setup.
 - `.chezmoitemplates/setup-body.sh` — shared bash body used by both bootstrap entry points. Contains: OS packages, font cache refresh, chsh, LazyVim install, nvm + node LTS, global npm CLIs, work-only ADB pontisd setup, IBus input method. Each section is internally idempotent.
 - `.chezmoiscripts/run_onchange_after_setup.sh.tmpl` — chezmoi-driven entry. Thin wrapper around `setup-body.sh`, gated by OS. Runs at `chezmoi apply` when rendered content changes.
@@ -149,11 +149,10 @@ The chezmoi-driven script gate uses `{{- if ... -}}` (with both `-`) so the body
 | Path | URL | Refresh | Condition |
 |---|---|---|---|
 | `.agents` | `Mai0313/skills` (GitHub) | 1h | always |
-| `.config/alacritty/themes` | `alacritty/alacritty-theme` (GitHub) | 24h | non-Windows |
 | `.oh-my-zsh` | `ohmyzsh/ohmyzsh` (GitHub) | 24h | non-Windows |
 | `.oh-my-zsh/custom/themes/powerlevel10k` | `romkatv/powerlevel10k` | 24h | non-Windows |
 | `.oh-my-zsh/custom/plugins/zsh-autosuggestions` | `zsh-users/zsh-autosuggestions` | 24h | non-Windows |
 | `.oh-my-zsh/custom/plugins/zsh-syntax-highlighting` | `zsh-users/zsh-syntax-highlighting` | 24h | non-Windows |
 | `adb-keys/security` | `sso://googleplex-android/.../security` | 1h | `is_work` |
 
-All are `type = "git-repo"`. The five non-Windows externals (Alacritty themes, oh-my-zsh, p10k, and the two zsh plugins) pin `--depth=1` clone and `--ff-only` pull; `.agents` and `adb-keys/security` use plain full clones/pulls. Pulling on chezmoi's schedule is compatible with oh-my-zsh's own `git pull`-based self-update — no need to disable oh-my-zsh auto-update. Externals refresh independently of the setup script's `run_onchange_` hash.
+All are `type = "git-repo"`. The four non-Windows externals (oh-my-zsh, p10k, and the two zsh plugins) pin `--depth=1` clone and `--ff-only` pull; `.agents` and `adb-keys/security` use plain full clones/pulls. Pulling on chezmoi's schedule is compatible with oh-my-zsh's own `git pull`-based self-update — no need to disable oh-my-zsh auto-update. Externals refresh independently of the setup script's `run_onchange_` hash.

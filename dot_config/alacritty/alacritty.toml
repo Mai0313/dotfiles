@@ -4,9 +4,9 @@
 # Reference: https://alacritty.org/config-alacritty.html
 
 [general]
-# Themes are cloned by chezmoi (.chezmoiexternal.toml.tmpl).
-# Swap the filename for any other theme in ~/.config/alacritty/themes/themes/.
-import = ["~/.config/alacritty/themes/themes/nvim_dark.toml"]
+# Theme is a chezmoi-tracked file. To use another, grab one from
+# https://github.com/alacritty/alacritty-theme and point import at it.
+import = ["~/.config/alacritty/nvim_dark.toml"]
 live_config_reload = true
 ipc_socket = true
 working_directory = "None"
