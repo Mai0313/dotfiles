@@ -29,7 +29,7 @@ temperature = 0.7
 top_p = 0.95
 max_completion_tokens = 8192
 context_window = 1000000
-supports_backend_search = true
+supports_backend_search = false
 
 [model.deepseek]
 model = "deepseek-v4-pro"
@@ -42,7 +42,7 @@ temperature = 0.7
 top_p = 0.95
 max_completion_tokens = 8192
 context_window = 1000000
-supports_backend_search = true
+supports_backend_search = false
 
 [model.gpt-5.6-luna]
 model = "gpt-5.6-luna"
@@ -55,7 +55,7 @@ temperature = 0.7
 top_p = 0.95
 max_completion_tokens = 8192
 context_window = 1000000
-supports_backend_search = true
+supports_backend_search = false
 
 [model.gpt-5.6-terra]
 model = "gpt-5.6-terra"
@@ -68,7 +68,7 @@ temperature = 0.7
 top_p = 0.95
 max_completion_tokens = 8192
 context_window = 1000000
-supports_backend_search = true
+supports_backend_search = false
 
 [model.gpt-5.6-sol]
 model = "gpt-5.6-sol"
@@ -81,7 +81,7 @@ temperature = 0.7
 top_p = 0.95
 max_completion_tokens = 8192
 context_window = 1000000
-supports_backend_search = true
+supports_backend_search = false
 
 [marketplace]
 official_marketplace_auto_installed = true
