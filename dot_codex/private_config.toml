@@ -113,6 +113,16 @@ git-show-sidebar-pr-icons = true
 git-pull-request-merge-method = "squash"
 selected-avatar-id = "custom:ikun"
 conversationDetailMode = "STEPS_COMMANDS"
+localeOverride = "zh-TW"
+defaultTerminalLocation = "bottom"
+reduced-motion-preference = "system"
+sansFontSize = 16
+codeFontSize = 14
+appearanceDiffMarkerStyle = "color"
+enabled-reasoning-efforts = ["low", "medium", "high", "xhigh", "ultra", "max"]
+show-ultra-in-model-picker-slider = true
+open-local-url-in-target-preference = "external-browser"
+reviewDelivery = "detached"
 
 [windows]
 sandbox = "elevated"
