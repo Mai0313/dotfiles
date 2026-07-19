@@ -9,7 +9,72 @@ installer = "internal"
 model = "grok-4.5"
 base_url = "https://api.mai0313.com"
 name = "Grok 4.5 (Mai0313)"
-description = "Grok 4.5 from api.mai0313.com"
+description = "From api.mai0313.com"
+env_key = "OPENAI_API_KEY"
+api_backend = "responses"
+temperature = 0.7
+top_p = 0.95
+max_completion_tokens = 8192
+context_window = 1000000
+supports_backend_search = true
+
+[model.gemini]
+model = "gemini-pro-latest"
+base_url = "https://api.mai0313.com"
+name = "Gemini Pro Latest (Mai0313)"
+description = "From api.mai0313.com"
+env_key = "OPENAI_API_KEY"
+api_backend = "responses"
+temperature = 0.7
+top_p = 0.95
+max_completion_tokens = 8192
+context_window = 1000000
+supports_backend_search = true
+
+[model.deepseek]
+model = "deepseek-v4-pro"
+base_url = "https://api.mai0313.com"
+name = "Deepseek V4 Pro (Mai0313)"
+description = "From api.mai0313.com"
+env_key = "OPENAI_API_KEY"
+api_backend = "responses"
+temperature = 0.7
+top_p = 0.95
+max_completion_tokens = 8192
+context_window = 1000000
+supports_backend_search = true
+
+[model.gpt-5.6-luna]
+model = "gpt-5.6-luna"
+base_url = "https://api.mai0313.com"
+name = "GPT 5.6 Luna (Mai0313)"
+description = "From api.mai0313.com"
+env_key = "OPENAI_API_KEY"
+api_backend = "responses"
+temperature = 0.7
+top_p = 0.95
+max_completion_tokens = 8192
+context_window = 1000000
+supports_backend_search = true
+
+[model.gpt-5.6-terra]
+model = "gpt-5.6-terra"
+base_url = "https://api.mai0313.com"
+name = "GPT 5.6 Terra (Mai0313)"
+description = "From api.mai0313.com"
+env_key = "OPENAI_API_KEY"
+api_backend = "responses"
+temperature = 0.7
+top_p = 0.95
+max_completion_tokens = 8192
+context_window = 1000000
+supports_backend_search = true
+
+[model.gpt-5.6-sol]
+model = "gpt-5.6-sol"
+base_url = "https://api.mai0313.com"
+name = "GPT 5.6 Sol (Mai0313)"
+description = "From api.mai0313.com"
 env_key = "OPENAI_API_KEY"
 api_backend = "responses"
 temperature = 0.7
