@@ -93,12 +93,26 @@ enabled = true
 [plugins."presentations@openai-primary-runtime"]
 enabled = true
 
+[plugins."sites@openai-bundled"]
+enabled = true
+
+[plugins."browser@openai-bundled"]
+enabled = true
+
+[plugins."chrome@openai-bundled"]
+enabled = true
+
+[plugins."visualize@openai-bundled"]
+enabled = true
+
 [desktop]
 show-context-window-usage = true
 followUpQueueMode = "steer"
 hotkey-window-projectless-default-enabled = true
 git-show-sidebar-pr-icons = true
 git-pull-request-merge-method = "squash"
+selected-avatar-id = "custom:ikun"
+conversationDetailMode = "STEPS_COMMANDS"
 
 [windows]
 sandbox = "elevated"
