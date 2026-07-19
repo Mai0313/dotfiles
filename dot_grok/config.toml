@@ -1,11 +1,22 @@
+# Environment: https://docs.x.ai/build/settings/reference#environment-variables
+# Values: https://docs.x.ai/build/settings/reference#toml-values
+# Example: https://docs.x.ai/build/settings#example-configtoml
+
 [cli]
 installer = "internal"
 
 [model.grok]
 model = "grok-4.5"
 base_url = "https://api.mai0313.com"
-name = "grok-4.5"
+name = "Grok 4.5 (Mai0313)"
+description = "Grok 4.5 from api.mai0313.com"
 env_key = "OPENAI_API_KEY"
+api_backend = "responses"
+temperature = 0.7
+top_p = 0.95
+max_completion_tokens = 8192
+context_window = 1000000
+supports_backend_search = true
 
 [marketplace]
 official_marketplace_auto_installed = true
