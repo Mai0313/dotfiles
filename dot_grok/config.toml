@@ -75,7 +75,7 @@ context_window = 1000000
 supports_backend_search = true
 supports_reasoning_effort = true
 
-[model.gpt-5.6-luna]
+[model.gpt-5-6-luna]
 model = "gpt-5.6-luna"
 base_url = "https://api.mai0313.com"
 name = "GPT 5.6 Luna (Mai0313)"
@@ -83,13 +83,14 @@ description = "From api.mai0313.com"
 env_key = "OPENAI_API_KEY"
 api_backend = "responses"
 temperature = 0.7
-top_p = 0.95
+# gpt-5.6 does not support top_p, so this is commented out
+# top_p = 0.95
 max_completion_tokens = 8192
 context_window = 1000000
-supports_backend_search = true
+supports_backend_search = false
 supports_reasoning_effort = true
 
-[model.gpt-5.6-terra]
+[model.gpt-5-6-terra]
 model = "gpt-5.6-terra"
 base_url = "https://api.mai0313.com"
 name = "GPT 5.6 Terra (Mai0313)"
@@ -97,13 +98,14 @@ description = "From api.mai0313.com"
 env_key = "OPENAI_API_KEY"
 api_backend = "responses"
 temperature = 0.7
-top_p = 0.95
+# gpt-5.6 does not support top_p, so this is commented out
+# top_p = 0.95
 max_completion_tokens = 8192
 context_window = 1000000
-supports_backend_search = true
+supports_backend_search = false
 supports_reasoning_effort = true
 
-[model.gpt-5.6-sol]
+[model.gpt-5-6-sol]
 model = "gpt-5.6-sol"
 base_url = "https://api.mai0313.com"
 name = "GPT 5.6 Sol (Mai0313)"
@@ -111,10 +113,11 @@ description = "From api.mai0313.com"
 env_key = "OPENAI_API_KEY"
 api_backend = "responses"
 temperature = 0.7
-top_p = 0.95
+# gpt-5.6 does not support top_p, so this is commented out
+# top_p = 0.95
 max_completion_tokens = 8192
 context_window = 1000000
-supports_backend_search = true
+supports_backend_search = false
 supports_reasoning_effort = true
 
 [marketplace]
