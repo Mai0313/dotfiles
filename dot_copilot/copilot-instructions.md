@@ -34,11 +34,19 @@ These rules are only applied to those repository hosted on Github
     - After making changes, you can use the appropriate skill on your own to review them if skill exists.
     - The PR should be kept as draft before all actions are passed.
     - After all actions are passed, you can ask if user wants to change the PR to ready for review.
+- Anything published to GitHub must be written in English only, including PR titles and bodies, issue titles and bodies, comments, and review replies.
 - Update all the documents if needed.
-- Do not forget to create a draft PR as part of the plan; the PR body must be written in English.
+- Do not forget to create a draft PR as part of the plan.
 - Feel free to modify the PR body if needed since plan always changes.
 - Feel free to add or adjust additional information in the plan when needed.
 - If a task is large or complex, split it into several focused commits, each one a self-contained logical step.
     - Everything still lands in a single PR, so the number of commits does not matter; more granular commits just make the changes easier to track, review, and revert.
 - If a change is small, you can ask if the user wants to commit and push it directly to default branch instead of opening a PR.
     - linting, formatting, and testing steps are still required even if the change is small.
+- Whenever something worth doing later shows up, an improvement idea, a bug that does not belong in the current PR, or any follow-up out of the current scope, ask the user whether to open an issue to track it.
+    - A new issue captures the idea and the requirement only: what was observed, why it matters, what the desired outcome is.
+    - Do not write the design or the implementation plan into a new issue. Leave a `## Plan` section with `TBD` as a placeholder.
+    - The reason is context pollution: a plan drafted in the middle of another task carries that task's assumptions and steers whoever picks the issue up later. Keep that freedom for them.
+- When you are asked to work on an existing issue, that is when the detailed plan gets written.
+    - Write the plan into the issue body under the placeholder, or post it as a comment, before starting the work.
+    - Keep it updated as the plan changes, so the issue stays a usable trace of what happened.
