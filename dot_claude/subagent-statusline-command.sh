@@ -4,9 +4,13 @@
 # expects JSONL back: one {"id","content"} object per row. Runs every 5s with a
 # 5s timeout, so keep it to a single jq pass.
 #
-# Layout is a fixed-width table so rows line up vertically:
-#   mark name(14) elapsed(6) bar+pct(10) trend(1) tokens(6) model(12) effort(6) label
-# Everything before the label is 63 columns wide; the label gets the rest.
+# Layout is a fixed-width table so rows line up vertically, columns 3 apart:
+#   mark name(22) elapsed(6) bar+pct(10) model[/effort]
+# The label/description is deliberately left out: what a subagent is doing is
+# the main agent's problem, this panel only answers how far along it is.
+# A task only carries its own .effort when its agent definition pins one, so it
+# falls back to the session .effort.level the subagent inherits, shown dimmed.
+# There is no cost anywhere in this payload, per task or per session.
 #
 # .tasks[] fields: id name type status description label startTime model effort
 #                  contextWindowSize tokenCount tokenSamples cwd
@@ -48,33 +52,34 @@ def pctcolor: if . >= 80 then "31" elif . >= 50 then "33" else "32" end;
 # say nothing. "claude-haiku-4-5-20251001" -> "haiku-4-5"
 def shortmodel: sub("^claude-"; "") | sub("-[0-9]{8}$"; "");
 
-# Only mark terminal states; running rows already have a spinner.
+# Only mark terminal states; running rows already have a spinner, and that
+# spinner plus its space is exactly what an empty mark leaves room for.
 def mark:
   { completed: ("✓" | paint("32")),
     failed:    ("✗" | paint("31")),
     killed:    ("⊘" | paint("31")),
-    paused:    ("⏸" | paint("33")) }[.] // empty;
+    paused:    ("⏸" | paint("33")) }[.] // "";
 
-((.columns // 120) - 63) as $room
+(.effort.level // "") as $inherited
 | (.tasks // [])[]
 | . as $t
 | ($t.tokenCount // 0) as $tok
 | ($t.contextWindowSize // 0) as $win
 | (if $win > 0 then (($tok * 100 / $win) | floor) else -1 end) as $pct
+| (if ($t.effort // "") != "" then { v: ($t.effort | tostring), c: "33" }
+   else { v: $inherited, c: "2;33" } end) as $eff
+| (($t.model // "") | shortmodel) as $model
+| (($t.status // "") | mark) as $m
 | [
-    ($t.status | mark),
-    (($t.name // "?") | pad(14) | paint("1;35")),
+    (($t.name // (($t.type // "agent") | sub("^[^:]+:"; ""))) | pad(22) | paint("1;35")),
     ((if ($t.startTime // 0) > 0 then ($t.startTime | elapsed) else "" end) | lpad(6) | paint("2")),
     (if $pct >= 0
      then (($pct | bar5) + " " + ($pct | tostring | lpad(3)) + "%") | paint($pct | pctcolor)
-     else spaces(10) end)
-    + (if ($t.tokenSamples | length) >= 2 and ($t.tokenSamples[-1] > $t.tokenSamples[0])
-       then ("▲" | paint("2")) else " " end),
-    ((if $tok > 0 then ($tok | human) else "" end) | lpad(6) | paint("2")),
-    (($t.model // "") | shortmodel | pad(12) | paint("36")),
-    (($t.effort // "") | tostring | pad(6) | paint("33")),
-    (($t.label // $t.description // "")[0:(if $room > 20 then $room else 20 end)] | paint("2"))
+     else spaces(10) end),
+    (($model | paint("36"))
+     + (if $eff.v != "" then ((if $model != "" then "/" else "" end) + $eff.v | paint($eff.c)) else "" end))
   ]
-| join(" ")
+| join("   ")
+| (if ($m | length) > 0 then ($m + " " + .) else . end)
 | { id: $t.id, content: . }
 ' 2>/dev/null || true
