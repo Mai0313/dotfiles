@@ -16,6 +16,10 @@
     - `Subagents`: use for a single independent fire-and-forget task where you only need the final result back (e.g. a broad search or reading many files). Each call starts fresh with its own context and shares no state with others.
     - `Agent Team`: use when several named agents must collaborate and exchange information dynamically, coordinating back and forth via `SendMessage` while keeping their context alive. The model decides the flow at runtime.
     - `Workflow`: use for large-scale, repeatable, or multi-stage work where the control flow (loops, fan-out, pipelines) should be deterministic and defined in code rather than improvised by the model. Prefer it over plain `Subagents` whenever there are multiple stages or many items.
+- Optional, only when your tooling offers it: when you delegate a task you may also pick which model runs it, for example a smaller and faster one. This applies to the delegated task only; the main thread keeps its own model. If there is no way to select a model, ignore this and delegate as usual.
+    - Think of the available models as a ladder from most to least capable, and default to one step down. When unsure how heavy a task is, stay on the default model: a wrong or shallow answer costs far more than the tokens it saved.
+    - Only jump several steps down, to the smallest and fastest model, when you are certain the task is pure execution with no judgement in it: running a command and reporting what it printed, collecting file contents, simple searches, mass renaming, or reformatting. Tell it to return the raw result without interpreting it. Analysis, design decisions, debugging, and code that will be committed never qualify.
+    - If your tooling exposes reasoning effort or thinking budget, with or without a model choice, apply the same judgement there. Lowering it is gentler than dropping several model levels, so prefer it. High effort is not free quality either: on a simple task it invites overthinking, and a correct answer gets second-guessed into a worse one.
 
 ## Text formatting
 
