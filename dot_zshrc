@@ -158,6 +158,7 @@ case "$__fqdn" in
     alias listd='/google/bin/releases/android/flashstation/list_devices'
     alias fetch='/google/data/ro/projects/android/fetch_artifact'
     alias duckie='/google/bin/releases/gemini-agents-duckie/duckie_cli'
+    alias gbrowser='/google/bin/releases/gemini-agents-gbrowser/gbrowser'
     ;;
 esac
 unset __fqdn
