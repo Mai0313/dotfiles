@@ -1,0 +1,14 @@
+{
+  "agentMode": "accept-edits",
+  "allowNonWorkspaceAccess": true,
+  "artifactReviewPolicy": "agent-decides",
+  "model": "Gemini 3.1 Pro (High)",
+  "notifications": true,
+  "showFeedbackSurvey": false,
+  "statusLine": {
+    "type": "command",
+    "command": "~/.gemini/statusline.sh"
+  },
+  "toolPermission": "always-proceed",
+  "useTerminalCursor": true
+}

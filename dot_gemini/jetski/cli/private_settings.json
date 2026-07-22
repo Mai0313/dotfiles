@@ -1,0 +1,17 @@
+{
+  "allowNonWorkspaceAccess": true,
+  "artifactReviewPolicy": "agent-decides",
+  "bestOfN": {
+    "numForks": 4,
+    "mergeStrategy": "safe_merge"
+  },
+  "model": "Gemini Next",
+  "notifications": true,
+  "showFeedbackSurvey": false,
+  "statusLine": {
+    "type": "command",
+    "command": "~/.gemini/statusline.sh"
+  },
+  "toolPermission": "always-proceed",
+  "useTerminalCursor": true
+}

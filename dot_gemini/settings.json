@@ -1,0 +1,158 @@
+{
+  "$schema": "https://raw.githubusercontent.com/google-gemini/gemini-cli/refs/heads/main/schemas/settings.schema.json",
+  "context": {
+    "fileFiltering": {
+      "enableRecursiveFileSearch": true
+    },
+    "loadMemoryFromIncludeDirectories": true,
+    "fileName": [
+      "AGENTS.md",
+      "CLAUDE.md",
+      "GEMINI.md",
+      "copilot-instructions.md"
+    ],
+    "discoveryMaxDirs": 200
+  },
+  "ide": {
+    "hasSeenNudge": true,
+    "enabled": true
+  },
+  "security": {
+    "folderTrust": {
+      "enabled": false
+    },
+    "enablePermanentToolApproval": true,
+    "auth": {
+      "selectedType": "gemini-api-key"
+    },
+    "toolSandboxing": true
+  },
+  "general": {
+    "previewFeatures": true,
+    "sessionRetention": {
+      "enabled": true,
+      "maxAge": "30d",
+      "warningAcknowledged": true
+    },
+    "defaultApprovalMode": "default",
+    "enableNotifications": true,
+    "enableAutoUpdate": true,
+    "modelRouting": true,
+    "maxAttempts": 10,
+    "vimMode": false,
+    "plan": {
+      "modelRouting": true,
+      "enabled": true,
+      "directory": "~/.gemini/plans"
+    },
+    "debugKeystrokeLogging": false,
+    "logRagSnippets": true
+  },
+  "ui": {
+    "showStatusInTitle": true,
+    "footer": {
+      "hideContextPercentage": false,
+      "hideCWD": false,
+      "hideSandboxStatus": false,
+      "hideModelInfo": false,
+      "items": [
+        "workspace",
+        "git-branch",
+        "sandbox",
+        "model-name",
+        "context-used",
+        "quota",
+        "memory-usage",
+        "session-id",
+        "code-changes",
+        "token-count"
+      ]
+    },
+    "showMemoryUsage": true,
+    "showCitations": true,
+    "showModelInfoInChat": true,
+    "showLineNumbers": false,
+    "hideBanner": true,
+    "inlineThinkingMode": "full",
+    "loadingPhrases": "all",
+    "autoThemeSwitching": true,
+    "dynamicWindowTitle": true,
+    "hideTips": false,
+    "showShortcutsHint": true,
+    "hideContextSummary": true,
+    "hideFooter": false,
+    "showUserIdentity": true,
+    "useBackgroundColor": true,
+    "showSpinner": true,
+    "terminalBackgroundPollingInterval": 60,
+    "useAlternateBuffer": false,
+    "incrementalRendering": true,
+    "theme": "GitHub",
+    "escapePastedAtSymbols": true,
+    "terminalBuffer": true
+  },
+  "tools": {
+    "shell": {
+      "showColor": true,
+      "enableInteractiveShell": true
+    },
+    "autoAccept": true,
+    "useRipgrep": true,
+    "sandbox": false,
+    "sandboxNetworkAccess": true,
+    "disableLLMCorrection": true
+  },
+  "experimental": {
+    "introspectionAgentSettings": {
+      "enabled": true
+    },
+    "modelSteering": true,
+    "directWebFetch": true,
+    "enableAgents": true,
+    "useOSC52Paste": true,
+    "useOSC52Copy": true,
+    "gemmaModelRouter": {
+      "enabled": false
+    },
+    "worktrees": true,
+    "memoryManager": true,
+    "topicUpdateNarration": true,
+    "autoMemory": true,
+    "generalistProfile": true,
+    "contextManagement": true,
+    "voiceMode": true,
+    "voice": {
+      "activationMode": "push-to-talk",
+      "backend": "gemini-live",
+      "whisperModel": "ggml-base.en.bin"
+    }
+  },
+  "advanced": {
+    "autoConfigureMemory": true
+  },
+  "agents": {
+    "overrides": {
+      "codebase_investigator": {
+        "runConfig": {
+          "maxTurns": 150
+        }
+      }
+    },
+    "browser": {
+      "blockFileUploads": false
+    }
+  },
+  "model": {
+    "name": "auto",
+    "maxSessionTurns": -1,
+    "skipNextSpeakerCheck": true,
+    "compressionThreshold": 0.8,
+    "disableLoopDetection": true
+  },
+  "output": {
+    "format": "text"
+  },
+  "hooksConfig": {
+    "notifications": true
+  }
+}
