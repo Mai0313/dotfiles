@@ -16,3 +16,8 @@ setup.sh
 {{ if .is_work -}}
 .gemini/GEMINI.md
 {{- end }}
+
+{{ if not (and .is_work (eq .chezmoi.os "linux")) -}}
+.local/bin/kgrep
+.local/bin/linux-kernel-mount
+{{- end }}

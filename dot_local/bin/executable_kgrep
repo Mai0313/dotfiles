@@ -1,0 +1,24 @@
+#!/bin/bash
+# Run ripgrep on mai0313 instead of dragging file contents over sshfs.
+# Home paths match on both machines, so the printed paths are directly usable
+# under the local ~/linux_kernel mount.
+#
+#   kgrep <rg args...>              search the whole ~/linux_kernel
+#   kgrep -t c cpuidle_enter kernel_mbu_staging/kernel/aosp/drivers
+
+set -u
+
+REMOTE_HOST="${LINUX_KERNEL_HOST:-mai0313.c.googlers.com}"
+REMOTE_DIR="${LINUX_KERNEL_REMOTE_DIR:-linux_kernel}"
+
+if [ $# -eq 0 ]; then
+    echo "usage: $(basename "$0") <rg args...>" >&2
+    exit 2
+fi
+
+quoted=""
+for arg in "$@"; do
+    quoted+=" $(printf '%q' "$arg")"
+done
+
+exec ssh "$REMOTE_HOST" "cd $(printf '%q' "$REMOTE_DIR") && rg --line-number --color=never$quoted"

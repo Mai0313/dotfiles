@@ -1,0 +1,72 @@
+#!/bin/bash
+# Mount ~/linux_kernel from mai0313.c.googlers.com over sshfs.
+# The kernel tree is read-only here: this box is only used to look up code.
+
+set -u
+
+# Remote path is relative to the remote home; the ssh user comes from ~/.ssh/config.
+REMOTE_HOST="${LINUX_KERNEL_HOST:-mai0313.c.googlers.com}"
+REMOTE_DIR="${LINUX_KERNEL_REMOTE_DIR:-linux_kernel}"
+LOCAL_DIR="${LINUX_KERNEL_LOCAL_DIR:-$HOME/linux_kernel}"
+
+# Tuned for a high-latency link: cache aggressively, keep several ssh channels
+# open so parallel readers do not serialise, and skip compression.
+SSHFS_OPTS=(
+    -o reconnect
+    -o ServerAliveInterval=15
+    -o ServerAliveCountMax=3
+    -o ConnectTimeout=10
+    -o Ciphers=aes128-gcm@openssh.com
+    -o Compression=no
+    -o cache=yes
+    -o cache_timeout=3600
+    -o attr_timeout=3600
+    -o entry_timeout=3600
+    -o dcache_timeout=3600
+    -o kernel_cache
+    -o max_conns=8
+    -o max_read=262144
+    -o idmap=user
+    -o ro
+)
+
+is_mounted() {
+    mountpoint -q "$LOCAL_DIR"
+}
+
+do_mount() {
+    if is_mounted; then
+        echo "already mounted: $LOCAL_DIR"
+        return 0
+    fi
+    mkdir -p "$LOCAL_DIR"
+    sshfs "$REMOTE_HOST:$REMOTE_DIR" "$LOCAL_DIR" "${SSHFS_OPTS[@]}" "$@" || return 1
+    echo "mounted $REMOTE_HOST:$REMOTE_DIR -> $LOCAL_DIR (read-only)"
+}
+
+do_umount() {
+    if ! is_mounted; then
+        echo "not mounted: $LOCAL_DIR"
+        return 0
+    fi
+    fusermount3 -u "$LOCAL_DIR" || fusermount3 -uz "$LOCAL_DIR"
+    echo "unmounted $LOCAL_DIR"
+}
+
+case "${1:-mount}" in
+    mount)   do_mount ;;
+    umount|unmount)
+             do_umount ;;
+    remount) do_umount; do_mount ;;
+    # Runs in the foreground, for systemd.
+    daemon)  mkdir -p "$LOCAL_DIR"
+             exec sshfs -f "$REMOTE_HOST:$REMOTE_DIR" "$LOCAL_DIR" "${SSHFS_OPTS[@]}" ;;
+    status)  if is_mounted; then
+                 mount | grep " $LOCAL_DIR "
+             else
+                 echo "not mounted: $LOCAL_DIR"
+                 exit 1
+             fi ;;
+    *)       echo "usage: $(basename "$0") [mount|umount|remount|status|daemon]" >&2
+             exit 2 ;;
+esac
