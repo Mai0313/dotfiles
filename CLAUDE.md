@@ -19,10 +19,13 @@ Windows has no bash, so it does not share this body. A separate `.chezmoiscripts
 chezmoi diff          # Preview changes before applying
 chezmoi apply         # Apply source state to $HOME (deploys files + may run setup script)
 chezmoi re-add        # Sync local edits back to source directory
-chezmoi add ~/.file   # Start managing a new file
+chezmoi add ~/.file   # Start tracking a new file
+chezmoi forget ~/.file # Stop tracking a file (removes it from the source dir, keeps $HOME copy)
 chezmoi cd            # cd into this source directory
 chezmoi init --force  # Re-evaluate .chezmoi.toml.tmpl (e.g., after adding new data keys)
 ```
+
+Tracking changes must go through chezmoi, never by hand-creating or `rm`-ing files in the source directory: use `chezmoi add` to start tracking and `chezmoi forget` to stop. `forget` leaves the deployed copy in `$HOME` alone; `chezmoi destroy` removes both.
 
 After editing templates, validate with `chezmoi execute-template < file.tmpl` or `chezmoi diff` to verify output.
 

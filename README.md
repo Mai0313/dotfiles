@@ -35,9 +35,15 @@ and OS differences are handled at runtime by the setup script.
 chezmoi diff          # Check what changed between local and source
 chezmoi apply         # Apply source state to local files
 chezmoi re-add        # Sync local changes back to source directory
-chezmoi add ~/.file   # Start managing a new file
+chezmoi add ~/.file   # Start tracking a new file
+chezmoi forget ~/.file # Stop tracking a file (keeps the local copy)
 chezmoi update        # Pull from remote + apply (for other machines)
 ```
+
+Tracking is always managed through chezmoi: `chezmoi add` to start tracking a
+file, `chezmoi forget` to stop. `forget` only removes the file from the source
+directory, the copy in `$HOME` stays untouched. Use `chezmoi destroy` if you
+also want the local copy gone.
 
 ### First-time setup on a new machine
 
