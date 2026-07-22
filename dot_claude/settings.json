@@ -77,7 +77,7 @@
   "skipDangerousModePermissionPrompt": true,
   "theme": "auto",
   "editorMode": "normal",
-  "viewMode": "focus",
+  "viewMode": "default",
   "preferredNotifChannel": "auto",
   "autoCompactEnabled": true,
   "switchModelsOnFlag": false,
