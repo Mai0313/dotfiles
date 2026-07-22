@@ -12,6 +12,7 @@
   "permissions": {
     "defaultMode": "bypassPermissions"
   },
+  "model": "claude-fable-5[1m]",
   "worktree": {
     "baseRef": "fresh"
   },
@@ -71,7 +72,6 @@
   "effortLevel": "xhigh",
   "showClearContextOnPlanAccept": false,
   "askUserQuestionTimeout": "never",
-  "autoUpdatesChannel": "latest",
   "tui": "fullscreen",
   "autoMemoryEnabled": true,
   "autoMemoryDirectory": "~/.claude/memories",
@@ -90,6 +90,5 @@
   "inputNeededNotifEnabled": false,
   "agentPushNotifEnabled": false,
   "skipAutoPermissionPrompt": true,
-  "useAutoModeDuringPlan": true,
-  "model": "claude-fable-5[1m]"
+  "useAutoModeDuringPlan": true
 }
