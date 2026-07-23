@@ -1,4 +1,5 @@
 #:schema https://developers.openai.com/codex/config-schema.json
+# For checking git-diff, see: https://github.com/openai/codex/blob/main/codex-rs/core/config.schema.json
 # Example: https://developers.openai.com/codex/config-sample
 
 model = "gpt-5.6-sol"
@@ -9,13 +10,14 @@ model_reasoning_effort = "ultra"
 plan_mode_reasoning_effort = "ultra"
 model_reasoning_summary = "auto"
 model_context_window = 1050000
-model_auto_compact_token_limit = 735000
+model_auto_compact_token_limit = 945000
+model_auto_compact_token_limit_scope = "total"
 model_verbosity = "medium"
 
 # # Disable it to use ChatGPT subscription.
 # model_provider = "oai"
 
-model_supports_reasoning_summaries = true
+# model_supports_reasoning_summaries = true
 project_doc_fallback_filenames = ["AGENTS.md", "CLAUDE.md", "GEMINI.md", "copilot-instructions.md"]
 project_doc_max_bytes = 32768
 web_search = "live"
@@ -23,7 +25,7 @@ suppress_unstable_features_warning = true
 
 approvals_reviewer = "auto_review"
 sandbox_mode = "danger-full-access"
-hide_agent_reasoning = true
+hide_agent_reasoning = false
 show_raw_agent_reasoning = false
 disable_paste_burst = false
 check_for_update_on_startup = true
@@ -49,6 +51,7 @@ memories = true
 prevent_idle_sleep = true
 goals = true
 mentions_v2 = true
+multi_agent_v2 = true
 unified_exec = true
 remote_plugin = true
 fast_mode = true
@@ -65,12 +68,12 @@ enabled = false
 enabled = false
 
 [agents]
-# Maximum concurrently open agent threads. Default: 6
-max_threads = 10
-# Maximum nested spawn depth. Root session starts at depth 0. Default: 1
+enabled = true
+max_concurrent_threads_per_session = 10
 max_depth = 3
-# Default timeout per worker for spawn_agents_on_csv jobs. When unset, the tool defaults to 1800 seconds.
-job_max_runtime_seconds = 1800
+default_subagent_model = "gpt-5.6-terra"
+default_subagent_reasoning_effort = "medium"
+interrupt_message = true
 
 [tui]
 notifications = ["agent-turn-complete", "approval-requested"]
@@ -109,6 +112,9 @@ enabled = true
 enabled = true
 
 [plugins."visualize@openai-bundled"]
+enabled = true
+
+[plugins."superpowers@openai-curated-remote"]
 enabled = true
 
 [desktop]
