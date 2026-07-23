@@ -11,6 +11,7 @@
 - If you really need to run a Python script, use uv as the package manager.
 - Do not create or update comments on any internal or external site unless you have permission.
 - Prefer `rg` over `grep` for better performance, since it is a Rust-based grep. If `rg` returns wrong results due to string handling issues, fall back to `grep` to ensure correctness.
+- All agent skills are located under `~/.agents/skill`.
 - You can create/use `Subagents` / `Agent Team` / `Workflow` to run multiple tasks at the same time for better performance. Pick one based on how the work needs to be coordinated:
     - `Subagents`: use for a single independent fire-and-forget task where you only need the final result back (e.g. a broad search or reading many files). Each call starts fresh with its own context and shares no state with others.
     - `Workflow`: the default for anything multi-stage or with many items. The control flow (loops, fan-out, pipelines) is written in script code, so it is deterministic and repeatable, yet still data-driven: the script holds the shared state and can branch or loop on agent results (e.g. keep spawning finders until a round returns nothing new). Agents inside it are stateless one-shot workers that never talk to each other; the script passes data between stages.
