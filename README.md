@@ -7,13 +7,13 @@ Managed with [chezmoi](https://www.chezmoi.io/).
 One-liner to set up a new machine:
 
 ```bash
-sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin" init --apply https://github.com/mai0313/dotfiles.git
+sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin" init --apply https://github.com/Mai0313/dotfiles
 ```
 
 ### GitHub Codespaces
 
 1. Go to [GitHub Settings > Codespaces](https://github.com/settings/codespaces)
-2. Set **Dotfiles repository** to `mai0313/dotfiles`
+2. Set **Dotfiles repository** to `Mai0313/dotfiles`
 3. Check **Automatically install dotfiles**
 
 New codespaces will be configured automatically.
