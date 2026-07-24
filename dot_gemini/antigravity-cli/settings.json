@@ -7,7 +7,7 @@
   "showFeedbackSurvey": false,
   "statusLine": {
     "type": "command",
-    "command": "~/.gemini/statusline.sh"
+    "command": "bash ~/.gemini/statusline.sh"
   },
   "toolPermission": "always-proceed",
   "useTerminalCursor": true
