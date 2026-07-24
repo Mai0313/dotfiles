@@ -72,6 +72,7 @@
       "autoUpdate": true
     }
   },
+  "workflowSizeGuideline": "large",
   "viewMode": "default",
   "language": "zh-TW",
   "feedbackSurveyRate": 0,
