@@ -56,7 +56,7 @@ OS detection comes from chezmoi built-ins: `eq .chezmoi.os "linux"` / `"darwin"`
 **Note**: `.chezmoi.toml.tmpl` runs at `chezmoi init`, not at every `chezmoi apply`, so editing it needs `chezmoi init --force` once to regenerate `~/.config/chezmoi/chezmoi.toml`.
 
 **Current consumers of `is_work`:**
-- `.chezmoiignore` — gates `.gemini/GEMINI.md`. Also gates non-Windows files (`.zshrc`, `.zshenv`, `.zprofile`, `.bashrc`, `.p10k.zsh`, `cleanup.sh`, `setup.sh`, `.config/alacritty`) when `chezmoi.os == "windows"`.
+- `.chezmoiignore` — gates `.local/bin/kgrep` and `.local/bin/linux-kernel-mount` off unless `is_work && linux`. Also gates non-Windows files (`.zshrc`, `.zshenv`, `.zprofile`, `.bashrc`, `.p10k.zsh`, `cleanup.sh`, `setup.sh`, `.config/alacritty`) when `chezmoi.os == "windows"`.
 - `.chezmoiexternal.toml.tmpl` — gates `adb-keys/security` (sso git-repo); gates oh-my-zsh + plugins on `chezmoi.os != "windows"`.
 - `.chezmoitemplates/setup-body.sh` — §1 routes VS Code (corp Linux → google3, else Microsoft repo), §6 skips global npm on work macOS, §7 gates the ADB pontisd restart. Container and OS gating inside the body is runtime, not chezmoi data.
 
@@ -73,7 +73,7 @@ Inspect the current value with `chezmoi data | grep is_work`.
 ### Key Files
 
 - `.chezmoi.toml.tmpl` — chezmoi config. Computes the single `is_work` flag from the FQDN and pins `sourceDir`. See Layer 1 above.
-- `.chezmoiexternal.toml.tmpl` — declarative external dependencies (oh-my-zsh, p10k, zsh plugins, `.agents` skills repo, work-only ADB security repo). All `type = "git-repo"`; the four non-Windows externals pin `--depth=1` clone and `--ff-only` pull, while `.agents` and `adb-keys/security` use plain full clones/pulls.
+- `.chezmoiexternal.toml.tmpl` — declarative external dependencies (oh-my-zsh, p10k, zsh plugins, `.agents` skills repo, `.gemini` config repo, work-only ADB security repo). All `type = "git-repo"`; the four non-Windows externals pin `--depth=1` clone and `--ff-only` pull, while `.agents`, `.gemini`, and `adb-keys/security` use plain full clones/pulls.
 - `.chezmoidata/packages.yaml` — declarative OS package lists (darwin / linux) plus a cross-platform `npm_global` list of global npm CLIs, consumed by `.chezmoitemplates/setup-body.sh` (*nix) and `.chezmoiscripts/run_onchange_after_setup.ps1.tmpl` (Windows). Adding a package: edit the YAML and run `chezmoi apply` — `run_onchange` sees the changed content and re-runs setup.
 - `.chezmoitemplates/setup-body.sh` — shared bash body used by both bootstrap entry points. Contains: OS packages, font cache refresh, chsh, LazyVim install, nvm + node LTS, global npm CLIs, work-only ADB pontisd setup, IBus input method. Each section is internally idempotent.
 - `.chezmoiscripts/run_onchange_after_setup.sh.tmpl` — chezmoi-driven entry. Thin wrapper around `setup-body.sh`, gated by OS. Runs at `chezmoi apply` when rendered content changes.
@@ -83,7 +83,7 @@ Inspect the current value with `chezmoi data | grep is_work`.
 - `dot_zshrc` / `dot_bashrc` — shell configs. Plain (non-`.tmpl`) so `chezmoi re-add` works.
 - `dot_zshenv` / `dot_zprofile` — zsh startup hooks, currently comment-only placeholders. `.zshenv` is read by every zsh (scripts included), `.zprofile` only by login shells, before `.zshrc`. Also plain files so `re-add` works.
 - `dot_p10k.zsh` — Powerlevel10k prompt theme (lean style, NerdFont).
-- `dot_claude/`, `dot_gemini/`, `dot_codex/`, `dot_copilot/`, `dot_grok/`, `dot_config/opencode/`, `dot_local/share/crush/`, `private_dot_hermes/` — per-tool agent/IDE config. Each ships a settings file (`settings.json` / `config.toml` / `opencode.json` / `private_crush.json` / `private_config.toml`) plus a shared instruction file (`CLAUDE.md` / `GEMINI.md` / `AGENTS.md` / `copilot-instructions.md` / `SOUL.md`) carrying the same coding-guideline body; `dot_claude` and `dot_gemini` also ship a statusline script.
+- `dot_claude/`, `dot_codex/`, `dot_copilot/`, `dot_grok/`, `dot_config/opencode/`, `dot_local/share/crush/`, `private_dot_hermes/` — per-tool agent/IDE config. Each ships a settings file (`settings.json` / `config.toml` / `opencode.json` / `private_crush.json` / `private_config.toml`) plus a shared instruction file (`CLAUDE.md` / `AGENTS.md` / `copilot-instructions.md` / `SOUL.md`) carrying the same coding-guideline body; `dot_claude` also ships a statusline script. Gemini's equivalent config (`GEMINI.md`, `settings.json`, statusline, sidecars) no longer lives here — it is tracked as the `.gemini` external repo, see Externals below.
 - `dot_config/*` — terminal and CLI tool configs (`alacritty.toml`, `btop`, `fastfetch`, `htop`, `neofetch`, `pip.conf`, `uv.toml`, git `ignore`).
 - `dot_local/share/fonts/meslo/` — MesloLGS NF (NerdFont) TTFs used by the p10k prompt.
 - `dot_local/bin/` — work-Linux-only helpers for the sshfs-mounted kernel tree at `~/linux_kernel`: `linux-kernel-mount` (mount/umount/remount/status, plus a `daemon` mode for the systemd user service) and `kgrep` (runs ripgrep on the remote host instead of pulling file contents over the mount). Host and paths are overridable via `LINUX_KERNEL_HOST` / `LINUX_KERNEL_REMOTE_DIR` / `LINUX_KERNEL_LOCAL_DIR`. Ignored unless `is_work && linux`.
@@ -153,10 +153,11 @@ The chezmoi-driven script gate uses `{{- if ... -}}` (with both `-`) so the body
 | Path | URL | Refresh | Condition |
 |---|---|---|---|
 | `.agents` | `Mai0313/skills` (GitHub) | 1h | always |
+| `.gemini` | `Mai0313/.gemini` (GitHub) | 1h | always |
 | `.oh-my-zsh` | `ohmyzsh/ohmyzsh` (GitHub) | 24h | non-Windows |
 | `.oh-my-zsh/custom/themes/powerlevel10k` | `romkatv/powerlevel10k` | 24h | non-Windows |
 | `.oh-my-zsh/custom/plugins/zsh-autosuggestions` | `zsh-users/zsh-autosuggestions` | 24h | non-Windows |
 | `.oh-my-zsh/custom/plugins/zsh-syntax-highlighting` | `zsh-users/zsh-syntax-highlighting` | 24h | non-Windows |
 | `adb-keys/security` | `sso://googleplex-android/.../security` | 1h | `is_work` |
 
-All are `type = "git-repo"`. The four non-Windows externals (oh-my-zsh, p10k, and the two zsh plugins) pin `--depth=1` clone and `--ff-only` pull; `.agents` and `adb-keys/security` use plain full clones/pulls. Pulling on chezmoi's schedule is compatible with oh-my-zsh's own `git pull`-based self-update — no need to disable oh-my-zsh auto-update. Externals refresh independently of the setup script's `run_onchange_` hash.
+All are `type = "git-repo"`. The four non-Windows externals (oh-my-zsh, p10k, and the two zsh plugins) pin `--depth=1` clone and `--ff-only` pull; `.agents`, `.gemini`, and `adb-keys/security` use plain full clones/pulls. `.gemini` deploys the whole `~/.gemini` directory (GEMINI.md, settings, statusline, babysitter sidecars); the gemini CLI's own runtime state (oauth creds, logs, tmp) is `.gitignore`d in that repo, so it coexists with the working copy just like oh-my-zsh's cache does. Pulling on chezmoi's schedule is compatible with oh-my-zsh's own `git pull`-based self-update — no need to disable oh-my-zsh auto-update. Externals refresh independently of the setup script's `run_onchange_` hash.

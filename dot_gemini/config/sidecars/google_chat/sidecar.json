@@ -1,1 +1,0 @@
-{"command":"/google/bin/releases/jetski-devs/jetski-sidecar-google-chat/google_chat","restartPolicy":"always","args":["--project_number","451047320648","--pubsub_subscription_id","projects/jetski-chat-l9c4l4/subscriptions/jetski-chat-sub"],"description":"Google Chat sidecar"}
