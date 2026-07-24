@@ -1,5 +1,13 @@
 {
   "sidecars": {
+    "bug_triage": {
+      "allProjects": true,
+      "enabled": true
+    },
+    "cl_review": {
+      "allProjects": true,
+      "enabled": true
+    },
     "google_chat": {
       "allProjects": true,
       "enabled": true
