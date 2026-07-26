@@ -39,6 +39,8 @@ After editing templates, validate with `chezmoi execute-template < file.tmpl` or
 - `.tmpl` suffix -> processed as Go templates with chezmoi data
 - `.chezmoitemplates/<name>` -> shared template fragments included with `{{ template "<name>" . }}`
 
+**Special files and the `.tmpl` suffix.** `.chezmoiignore`, `.chezmoiremove`, and `.chezmoiexternal.<format>` are *always* interpreted as templates, with or without a `.tmpl` suffix. This repo deliberately names them without it (`.chezmoiexternal.toml`, not `.chezmoiexternal.toml.tmpl`) so editors recognize the format and keep syntax highlighting. **Future-agent guidance: do NOT "fix" these by adding `.tmpl` back** — it changes nothing functionally and only breaks editor support. Note that both names can coexist and chezmoi reads both, so renaming must use `git mv`, never a copy. By contrast `.chezmoidata.<format>`, `.chezmoiroot`, and `.chezmoiversion` are never templates (Go template syntax in them is taken literally, or fails to parse), and `.chezmoi.<format>.tmpl` requires the suffix.
+
 ### Environment Detection
 
 **This repo detects the environment in two layers for two different purposes. Do not consolidate them without understanding why.**
@@ -57,7 +59,7 @@ OS detection comes from chezmoi built-ins: `eq .chezmoi.os "linux"` / `"darwin"`
 
 **Current consumers of `is_work`:**
 - `.chezmoiignore` — gates `.local/bin/kgrep` and `.local/bin/linux-kernel-mount` off unless `is_work && linux`. Also gates non-Windows files (`.zshrc`, `.zshenv`, `.zprofile`, `.bashrc`, `.p10k.zsh`, `cleanup.sh`, `setup.sh`, `.config/alacritty`) when `chezmoi.os == "windows"`.
-- `.chezmoiexternal.toml.tmpl` — gates `adb-keys/security` (sso git-repo); gates oh-my-zsh + plugins on `chezmoi.os != "windows"`.
+- `.chezmoiexternal.toml` — gates `adb-keys/security` (sso git-repo); gates oh-my-zsh + plugins on `chezmoi.os != "windows"`.
 - `.chezmoitemplates/setup-body.sh` — §1 routes VS Code (corp Linux → google3, else Microsoft repo), §6 skips global npm on work macOS, §7 gates the ADB pontisd restart. Container and OS gating inside the body is runtime, not chezmoi data.
 
 Inspect the current value with `chezmoi data | grep is_work`.
@@ -73,13 +75,14 @@ Inspect the current value with `chezmoi data | grep is_work`.
 ### Key Files
 
 - `.chezmoi.toml.tmpl` — chezmoi config. Computes the single `is_work` flag from the FQDN and pins `sourceDir`. See Layer 1 above.
-- `.chezmoiexternal.toml.tmpl` — declarative external dependencies (oh-my-zsh, p10k, zsh plugins, `.agents` skills repo, `.gemini` config repo, work-only ADB security repo). All `type = "git-repo"`; the four non-Windows externals pin `--depth=1` clone and `--ff-only` pull, while `.agents`, `.gemini`, and `adb-keys/security` use plain full clones/pulls.
+- `.chezmoiexternal.toml` — declarative external dependencies (oh-my-zsh, p10k, zsh plugins, `.agents` skills repo, `.gemini` config repo, work-only ADB security repo). All `type = "git-repo"`; the four non-Windows externals pin `--depth=1` clone and `--ff-only` pull, while `.agents`, `.gemini`, and `adb-keys/security` use plain full clones/pulls.
 - `.chezmoidata/packages.yaml` — declarative OS package lists (darwin / linux) plus a cross-platform `npm_global` list of global npm CLIs, consumed by `.chezmoitemplates/setup-body.sh` (*nix) and `.chezmoiscripts/run_onchange_after_setup.ps1.tmpl` (Windows). Adding a package: edit the YAML and run `chezmoi apply` — `run_onchange` sees the changed content and re-runs setup.
 - `.chezmoitemplates/setup-body.sh` — shared bash body used by both bootstrap entry points. Contains: OS packages, font cache refresh, chsh, LazyVim install, nvm + node LTS, global npm CLIs, work-only ADB pontisd setup, IBus input method. Each section is internally idempotent.
 - `.chezmoiscripts/run_onchange_after_setup.sh.tmpl` — chezmoi-driven entry. Thin wrapper around `setup-body.sh`, gated by OS. Runs at `chezmoi apply` when rendered content changes.
 - `.chezmoiscripts/run_onchange_after_setup.ps1.tmpl` — Windows-only chezmoi-driven entry (PowerShell). Installs the `npm_global` CLIs (skips if npm absent). Does not share `setup-body.sh` (no bash on Windows). Renders empty on non-Windows so chezmoi skips it.
 - `executable_setup.sh.tmpl` — manual entry, deployed to `~/setup.sh`. Same body, no gates (user runs it intentionally). Not deployed on Windows (`.chezmoiignore`).
 - `.chezmoiignore` — keeps `install.sh`, READMEs, `CLAUDE.md` from being deployed; OS- and env-gated exclusions.
+- `.chezmoiversion` — minimum chezmoi version needed to apply this source state (`2.40.0`, the oldest release verified to handle everything here). An older chezmoi aborts with `source state requires chezmoi version ... or later` instead of silently degrading. Raise it only when the repo starts using a newer feature.
 - `dot_zshrc` / `dot_bashrc` — shell configs. Plain (non-`.tmpl`) so `chezmoi re-add` works.
 - `dot_zshenv` / `dot_zprofile` — zsh startup hooks, currently comment-only placeholders. `.zshenv` is read by every zsh (scripts included), `.zprofile` only by login shells, before `.zshrc`. Also plain files so `re-add` works.
 - `dot_p10k.zsh` — Powerlevel10k prompt theme (lean style, NerdFont).
@@ -148,7 +151,7 @@ diff <(chezmoi execute-template < .chezmoiscripts/run_onchange_after_setup.sh.tm
 
 The chezmoi-driven script gate uses `{{- if ... -}}` (with both `-`) so the body's `#!/usr/bin/env bash` lands on line 1 of the rendered file. A leading newline causes `fork/exec` to fail with `exec format error` because the kernel doesn't see `#!` at byte 0. Always check `chezmoi execute-template < <script>.tmpl | head -c 2` returns `#!` after editing the gate.
 
-### Externals (`.chezmoiexternal.toml.tmpl`)
+### Externals (`.chezmoiexternal.toml`)
 
 | Path | URL | Refresh | Condition |
 |---|---|---|---|
@@ -160,4 +163,4 @@ The chezmoi-driven script gate uses `{{- if ... -}}` (with both `-`) so the body
 | `.oh-my-zsh/custom/plugins/zsh-syntax-highlighting` | `zsh-users/zsh-syntax-highlighting` | 24h | non-Windows |
 | `adb-keys/security` | `sso://googleplex-android/.../security` | 1h | `is_work` |
 
-All are `type = "git-repo"`. The four non-Windows externals (oh-my-zsh, p10k, and the two zsh plugins) pin `--depth=1` clone and `--ff-only` pull; `.agents`, `.gemini`, and `adb-keys/security` use plain full clones/pulls. `.gemini` deploys the whole `~/.gemini` directory (GEMINI.md, settings, statusline, babysitter sidecars); the gemini CLI's own runtime state (oauth creds, logs, tmp) is `.gitignore`d in that repo, so it coexists with the working copy just like oh-my-zsh's cache does. Pulling on chezmoi's schedule is compatible with oh-my-zsh's own `git pull`-based self-update — no need to disable oh-my-zsh auto-update. Externals refresh independently of the setup script's `run_onchange_` hash.
+All are `type = "git-repo"`. The four non-Windows externals (oh-my-zsh, p10k, and the two zsh plugins) pin `--depth=1` clone and `--ff-only` pull; `.agents`, `.gemini`, and `adb-keys/security` use plain full clones/pulls. `.gemini` deploys the whole `~/.gemini` directory (GEMINI.md, settings, statusline, babysitter sidecars); the gemini CLI's own runtime state (oauth creds, logs, tmp) is `.gitignore`d in that repo, so it coexists with the working copy just like oh-my-zsh's cache does. Pulling on chezmoi's schedule is compatible with oh-my-zsh's own `git pull`-based self-update — no need to disable oh-my-zsh auto-update. Externals refresh independently of the setup script's `run_onchange_` hash. `refreshPeriod` does apply to `git-repo` externals (it throttles the `git pull`), even though upstream docs only mention it under `file` and `archive` — do not remove it from the entries here.
