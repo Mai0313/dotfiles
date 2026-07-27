@@ -1,17 +1,17 @@
 [".agents"]
     type = "git-repo"
-    url = "https://github.com/Mai0313/skills.git"
+    url = "https://github.com/Mai0313/skills"
     refreshPeriod = "1h"
 
 [".gemini"]
     type = "git-repo"
-    url = "https://github.com/Mai0313/.gemini.git"
+    url = "https://github.com/Mai0313/.gemini"
     refreshPeriod = "1h"
 
 {{ if ne .chezmoi.os "windows" -}}
 [".oh-my-zsh"]
     type = "git-repo"
-    url = "https://github.com/ohmyzsh/ohmyzsh.git"
+    url = "https://github.com/ohmyzsh/ohmyzsh"
     refreshPeriod = "24h"
     [".oh-my-zsh".clone]
         args = ["--depth=1"]
@@ -20,7 +20,7 @@
 
 [".oh-my-zsh/custom/themes/powerlevel10k"]
     type = "git-repo"
-    url = "https://github.com/romkatv/powerlevel10k.git"
+    url = "https://github.com/romkatv/powerlevel10k"
     refreshPeriod = "24h"
     [".oh-my-zsh/custom/themes/powerlevel10k".clone]
         args = ["--depth=1"]
@@ -29,7 +29,7 @@
 
 [".oh-my-zsh/custom/plugins/zsh-autosuggestions"]
     type = "git-repo"
-    url = "https://github.com/zsh-users/zsh-autosuggestions.git"
+    url = "https://github.com/zsh-users/zsh-autosuggestions"
     refreshPeriod = "24h"
     [".oh-my-zsh/custom/plugins/zsh-autosuggestions".clone]
         args = ["--depth=1"]
@@ -38,7 +38,7 @@
 
 [".oh-my-zsh/custom/plugins/zsh-syntax-highlighting"]
     type = "git-repo"
-    url = "https://github.com/zsh-users/zsh-syntax-highlighting.git"
+    url = "https://github.com/zsh-users/zsh-syntax-highlighting"
     refreshPeriod = "24h"
     [".oh-my-zsh/custom/plugins/zsh-syntax-highlighting".clone]
         args = ["--depth=1"]
