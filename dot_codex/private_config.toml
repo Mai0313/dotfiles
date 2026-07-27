@@ -82,8 +82,8 @@ status_line = ["current-dir", "model-with-reasoning", "git-branch", "pull-reques
 status_line_use_colors = true
 
 [marketplaces.mai0313-skills]
-last_updated = "2026-07-25T17:16:05Z"
-last_revision = "4c6b41b0ec88dad90f0c8b158bf69021e2a0f4cb"
+last_updated = "2026-07-27T15:15:16Z"
+last_revision = "3b89bbdc943b77c3fc6f67bf32d993e385567e63"
 source_type = "git"
 source = "https://github.com/Mai0313/skills"
 
