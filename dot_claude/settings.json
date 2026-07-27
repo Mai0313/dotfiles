@@ -15,7 +15,6 @@
   "worktree": {
     "baseRef": "fresh"
   },
-  "workflowSizeGuideline": "large",
   "statusLine": {
     "type": "command",
     "command": "bash ~/.claude/statusline-command.sh",
