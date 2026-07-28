@@ -46,10 +46,7 @@ These rules only apply to repositories hosted on GitHub.
     - Everything still lands in a single PR, so the number of commits does not matter; more granular commits just make the changes easier to track, review, and revert.
 - If a change is small, you can ask if the user wants to commit and push it directly to the default branch instead of opening a PR.
     - Linting, formatting, and testing are still required.
-- Whenever something worth doing later shows up (an improvement idea, a bug that does not belong in the current PR, or any follow-up outside the current scope), ask the user whether to open an issue to track it.
-    - A new issue captures the idea and the requirement only: what was observed, why it matters, what the desired outcome is.
-    - Do not write the design or the implementation plan into a new issue. Leave a `## Plan` section with `TBD` as a placeholder.
-    - The reason is context pollution: a plan drafted in the middle of another task carries that task's assumptions and biases whoever picks the issue up later. Keep that freedom for them.
+- Whenever something worth doing later shows up (an improvement idea, a bug that does not belong in the current PR, or any follow-up outside the current scope), ask the user whether to open an issue to track it. The `create-issue` skill owns what goes in it.
 - When you are asked to work on an existing issue, that is when the detailed plan gets written.
     - Write the plan into the issue body under the placeholder, or post it as a comment, before starting the work.
     - Keep it updated as the plan changes, so the issue stays a usable trace of what happened.
