@@ -33,7 +33,7 @@ ignore-dir-patterns:
     - .*/linux_kernel$
 type: []
 exclude-type: []
-max-cores: 128
+max-cores: 0
 top: 0
 depth: 0
 sequential-scanning: false
