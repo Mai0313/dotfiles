@@ -57,7 +57,7 @@
       },
       "autoUpdate": true
     },
-    "mai0313-agent-skills": {
+    "mai0313-skills": {
       "source": {
         "source": "github",
         "repo": "Mai0313/skills"
