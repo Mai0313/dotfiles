@@ -82,8 +82,8 @@ status_line = ["current-dir", "model-with-reasoning", "git-branch", "pull-reques
 status_line_use_colors = true
 
 [marketplaces.mai0313-skills]
-last_updated = "2026-07-27T15:15:16Z"
-last_revision = "3b89bbdc943b77c3fc6f67bf32d993e385567e63"
+last_updated = "2026-07-28T16:09:23Z"
+last_revision = "6d6aa9f65149c5253fd2a272425365491426d0a8"
 source_type = "git"
 source = "https://github.com/Mai0313/skills"
 
@@ -113,9 +113,6 @@ enabled = true
 
 [plugins."visualize@openai-bundled"]
 enabled = true
-
-[plugins."superpowers@openai-curated-remote"]
-enabled = false
 
 [desktop]
 show-context-window-usage = true
