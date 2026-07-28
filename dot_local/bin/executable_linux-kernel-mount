@@ -32,6 +32,19 @@ SSHFS_OPTS=(
 
 SERVICE="${LINUX_KERNEL_SERVICE:-linux-kernel-sshfs.service}"
 
+# On the cloudtop itself $LOCAL_DIR is the real tree, so there is nothing to mount
+# and sshfs would be pointed at its own host. Callers only ever want to end up able
+# to read the tree, and that already holds here, so say so and succeed.
+if [ "$(hostname -s)" = "${REMOTE_HOST%%.*}" ]; then
+    action="${1:-mount}"
+    if [ "$action" = daemon ]; then
+        echo "$(basename "$0"): refusing to sshfs $REMOTE_HOST onto itself" >&2
+        exit 1
+    fi
+    echo "on $REMOTE_HOST: $LOCAL_DIR is the real tree, not an sshfs mount"
+    exit 0
+fi
+
 is_mounted() {
     mountpoint -q "$LOCAL_DIR"
 }
