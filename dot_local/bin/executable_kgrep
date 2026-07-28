@@ -21,4 +21,8 @@ for arg in "$@"; do
     quoted+=" $(printf '%q' "$arg")"
 done
 
-exec ssh "$REMOTE_HOST" "cd $(printf '%q' "$REMOTE_DIR") && rg --line-number --color=never$quoted"
+# The remote redirect is what matters: rg sees the ssh channel as a readable pipe
+# on stdin, decides to search stdin instead of the working directory, and a search
+# with no path argument then silently reports no matches. -n only detaches the
+# local end, so it keeps kgrep from eating a caller's pipe but does not fix that.
+exec ssh -n "$REMOTE_HOST" "cd $(printf '%q' "$REMOTE_DIR") && rg --line-number --color=never$quoted < /dev/null"

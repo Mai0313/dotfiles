@@ -30,8 +30,45 @@ SSHFS_OPTS=(
     -o ro
 )
 
+SERVICE="${LINUX_KERNEL_SERVICE:-linux-kernel-sshfs.service}"
+
 is_mounted() {
     mountpoint -q "$LOCAL_DIR"
+}
+
+# Wherever the systemd user unit is installed, it owns the mount. Working around
+# it does not stick: Restart=always brings the daemon back 30s after a manual
+# umount, and a hand-rolled mount is invisible to a later `systemctl stop`.
+# Set LINUX_KERNEL_NO_SYSTEMD=1 to drive sshfs directly anyway.
+service_installed() {
+    [ -z "${LINUX_KERNEL_NO_SYSTEMD:-}" ] &&
+        command -v systemctl >/dev/null 2>&1 &&
+        systemctl --user cat "$SERVICE" >/dev/null 2>&1
+}
+
+# $1: mounted|unmounted. The unit takes a moment to settle after a verb.
+wait_for() {
+    local i=0
+    while [ "$i" -lt 60 ]; do
+        if [ "$1" = mounted ]; then
+            is_mounted && return 0
+        else
+            is_mounted || return 0
+        fi
+        sleep 0.5
+        i=$((i + 1))
+    done
+    return 1
+}
+
+# $1: systemctl verb, $2: state to end up in.
+do_service() {
+    systemctl --user "$1" "$SERVICE" || return 1
+    if ! wait_for "$2"; then
+        echo "$SERVICE: $1 left $LOCAL_DIR not $2" >&2
+        return 1
+    fi
+    echo "$1 via $SERVICE: $LOCAL_DIR ($2)"
 }
 
 do_mount() {
@@ -54,14 +91,17 @@ do_umount() {
 }
 
 case "${1:-mount}" in
-    mount)   do_mount ;;
+    mount)   if service_installed; then do_service start mounted; else do_mount; fi ;;
     umount|unmount)
-             do_umount ;;
-    remount) do_umount; do_mount ;;
+             if service_installed; then do_service stop unmounted; else do_umount; fi ;;
+    # sshfs caches metadata and contents for an hour, so this is how a remote
+    # `git pull` or `repo sync` becomes visible here.
+    remount) if service_installed; then do_service restart mounted; else do_umount; do_mount; fi ;;
     # Runs in the foreground, for systemd.
     daemon)  mkdir -p "$LOCAL_DIR"
              exec sshfs -f "$REMOTE_HOST:$REMOTE_DIR" "$LOCAL_DIR" "${SSHFS_OPTS[@]}" ;;
-    status)  if is_mounted; then
+    status)  service_installed && echo "service: $(systemctl --user is-active "$SERVICE")"
+             if is_mounted; then
                  mount | grep " $LOCAL_DIR "
              else
                  echo "not mounted: $LOCAL_DIR"
