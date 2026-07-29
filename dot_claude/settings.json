@@ -97,6 +97,5 @@
   "inputNeededNotifEnabled": false,
   "agentPushNotifEnabled": false,
   "skipAutoPermissionPrompt": true,
-  "useAutoModeDuringPlan": true,
-  "model": "claude-opus-4-8[1m]"
+  "useAutoModeDuringPlan": true
 }
