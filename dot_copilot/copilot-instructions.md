@@ -4,8 +4,9 @@
 - All commit messages should be in English and follow conventional commits rules.
     - The commit message should be short, DO NOT INCLUDE ANY IMPLEMENTATION DETAILS.
 - The user prefers responses in Traditional Chinese.
-    - Write natural Traditional Chinese sentences. Do NOT deliberately mix English words into sentences when a natural Chinese expression exists.
-    - However, when technical terms, computer science jargon, hardware terminology, or variable names come up, keep them in their original English form instead of translating them into Chinese (e.g., register, cache, commit, branch, framework).
+    - Every word of the sentence is Chinese by default. English is the exception, and it needs a reason.
+    - The only reason is "this has no natural Chinese form": identifiers, file paths, commands, product names, and established technical jargon (register, cache, commit, branch, framework). Do not translate those into Chinese.
+    - Ordinary verbs, adverbs, and connectives are always Chinese. Write "現在我們開始", never "Now 我們開始"; write "這個情況有點麻煩", never "這個 case 有點 tricky". Mixing English into a sentence that already has a natural Chinese form is 晶晶體 and reads as affected, not technical.
 - Do NOT use 破折號 (dash) or full-width punctuation marks (全形標點符號).
 - Please speak like a real human, not a robot or an LLM.
 - If you really need to run a Python script, use uv as the package manager.
@@ -13,7 +14,7 @@
 - Prefer `rg` over `grep` for better performance, since it is a Rust-based grep. If `rg` returns wrong results due to string handling issues, fall back to `grep` to ensure correctness.
 - All agent skills are located under `~/.agents/skill`.
 - Default to doing the work yourself; delegate when the reading or the item count would not fit comfortably in the main conversation. Size the fleet to the change, not to the budget: a one-file diff gets one reviewer at most. High effort and ultracode raise the ceiling, they are not an instruction to fill it. Always tell the worker what shape to return, and treat what comes back as a summary of work you never saw: spot-check anything you would commit or report.
-    - `Subagents`: the default when you delegate. One independent task, one result back (e.g. a broad search, or reading many files). Each starts fresh with no shared state, and a few in parallel already covers most fan-out.
+    - `Subagents`: the default when you delegate. One independent task, or a single round-trip command, and one result back (e.g. a broad search, reading many files, or running a noisy command when only its verdict matters). Each starts fresh with no shared state, and a few in parallel already covers most fan-out.
     - `Workflow`: only for real scale, when the same stages repeat over many items. The control flow (loops, fan-out, pipelines) lives in script code, so it is deterministic and can branch or loop on agent results.
     - `Agent Team`: only when one agent's accumulated context must survive multiple exchanges (via `SendMessage`), e.g. a multi-round design debate. Rare in practice.
 - Optional, only when your tooling lets you pick the model for a delegated task (the main thread always keeps its own; no such option means skip this and delegate as usual):
