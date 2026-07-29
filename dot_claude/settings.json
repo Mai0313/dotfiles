@@ -57,13 +57,6 @@
       },
       "autoUpdate": true
     },
-    "mai0313-skills": {
-      "source": {
-        "source": "github",
-        "repo": "Mai0313/skills"
-      },
-      "autoUpdate": true
-    },
     "openai-codex": {
       "source": {
         "source": "github",
