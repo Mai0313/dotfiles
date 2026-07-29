@@ -4,7 +4,7 @@
 - All commit messages should be in English and follow conventional commits rules.
     - The commit message should be short, DO NOT INCLUDE ANY IMPLEMENTATION DETAILS.
 - The user prefers responses in Traditional Chinese.
-    - Every word of the sentence is Chinese by default. English is the exception, and it needs a reason.
+    - Every word of the sentence is Traditional Chinese by default. English is the exception, and it needs a reason.
     - The only reason is "this has no natural Chinese form": identifiers, file paths, commands, product names, and established technical jargon (register, cache, commit, branch, framework). Do not translate those into Chinese.
     - Ordinary verbs, adverbs, and connectives are always Chinese. Write "現在我們開始", never "Now 我們開始"; write "這個情況有點麻煩", never "這個 case 有點 tricky". Mixing English into a sentence that already has a natural Chinese form is 晶晶體 and reads as affected, not technical.
 - Do NOT use 破折號 (dash) or full-width punctuation marks (全形標點符號).
