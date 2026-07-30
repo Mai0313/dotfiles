@@ -38,11 +38,10 @@ These rules only apply to repositories hosted on GitHub.
 - When building a plan to develop a project:
     - Do not forget to include linting, formatting, and testing steps before drafting a PR in the plan.
     - After making changes, review them with the appropriate skill if one exists.
-    - Keep the PR as a draft until all actions pass.
+    - Open the PR as a draft and keep it that way until all actions pass.
     - Once they pass, ask if the user wants to mark it ready for review.
 - Anything published to GitHub must be written in English only, including PR titles and bodies, issue titles and bodies, comments, and review replies.
 - Update the documentation if needed.
-- Do not forget to create a draft PR as part of the plan.
 - Feel free to update the plan and the PR body as things change, since plans always do.
 - If a task is large or complex, split it into several focused commits, each one a self-contained logical step.
     - Everything still lands in a single PR, so the number of commits does not matter; more granular commits just make the changes easier to track, review, and revert.
