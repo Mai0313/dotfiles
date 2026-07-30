@@ -3,8 +3,10 @@
   "cleanupPeriodDays": 365,
   "skillListingBudgetFraction": 0.05,
   "skillOverrides": {
+    "buganizer-cli": "name-only",
+    "critique": "name-only",
     "gerrit": "name-only",
-    "critique": "name-only"
+    "x20": "name-only"
   },
   "env": {
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
