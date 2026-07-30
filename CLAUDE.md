@@ -86,12 +86,37 @@ Inspect the current value with `chezmoi data | grep is_work`.
 - `dot_zshrc` / `dot_bashrc` — shell configs. Plain (non-`.tmpl`) so `chezmoi re-add` works.
 - `dot_zshenv` / `dot_zprofile` — zsh startup hooks, currently comment-only placeholders. `.zshenv` is read by every zsh (scripts included), `.zprofile` only by login shells, before `.zshrc`. Also plain files so `re-add` works.
 - `dot_p10k.zsh` — Powerlevel10k prompt theme (lean style, NerdFont).
-- `dot_claude/`, `dot_codex/`, `dot_copilot/`, `dot_grok/`, `dot_config/opencode/`, `dot_local/share/crush/`, `private_dot_hermes/` — per-tool agent/IDE config. Each ships a settings file (`settings.json` / `config.toml` / `opencode.json` / `private_crush.json` / `private_config.toml`) plus a shared instruction file (`CLAUDE.md` / `AGENTS.md` / `copilot-instructions.md` / `SOUL.md`) carrying the same coding-guideline body; `dot_claude` also ships a statusline script. Gemini's equivalent config (`GEMINI.md`, `settings.json`, statusline, sidecars) no longer lives here — it is tracked as the `.gemini` external repo, see Externals below.
+- `dot_claude/`, `dot_codex/`, `dot_copilot/`, `dot_grok/`, `dot_config/opencode/`, `dot_local/share/crush/`, `private_dot_hermes/` — per-tool agent/IDE config. Each ships a settings file (`settings.json` / `config.toml` / `opencode.json` / `private_crush.json` / `private_config.toml`) plus a shared instruction file (`CLAUDE.md` / `AGENTS.md` / `copilot-instructions.md` / `SOUL.md`) carrying the same coding-guideline body — these must stay byte-identical, see Shared Agent Instruction Files below; `dot_claude` also ships a statusline script. Gemini's equivalent config (`GEMINI.md`, `settings.json`, statusline, sidecars) no longer lives here — it is tracked as the `.gemini` external repo, see Externals below.
 - `dot_config/*` — terminal and CLI tool configs (`alacritty.toml`, `btop`, `fastfetch`, `htop`, `neofetch`, `pip.conf`, `uv.toml`, git `ignore`).
 - `dot_local/share/fonts/meslo/` — MesloLGS NF (NerdFont) TTFs used by the p10k prompt.
 - `dot_local/bin/` — work-Linux-only helpers for the sshfs-mounted kernel tree at `~/linux_kernel`: `linux-kernel-mount` (mount/umount/remount/status, plus a `daemon` mode for the systemd user service) and `kgrep` (runs ripgrep on the remote host instead of pulling file contents over the mount). Host and paths are overridable via `LINUX_KERNEL_HOST` / `LINUX_KERNEL_REMOTE_DIR` / `LINUX_KERNEL_LOCAL_DIR`. Ignored unless `is_work && linux`.
 - `executable_cleanup.sh` — ad-hoc cleanup utility (NOT auto-run; deployed as `~/cleanup.sh` for manual use).
 - `install.sh` — Codespace bootstrap one-liner; runs `chezmoi init --apply`. Not deployed to `$HOME`.
+
+### Shared Agent Instruction Files
+
+Every agent CLI reads a different filename, but they must all get the same instructions. **These six files are byte-identical copies of one body. Editing any one of them means editing all six in the same commit — never let them drift.**
+
+| Path | Deployed to | Read by |
+|---|---|---|
+| `dot_claude/CLAUDE.md` | `~/.claude/CLAUDE.md` | Claude Code |
+| `dot_codex/AGENTS.md` | `~/.codex/AGENTS.md` | Codex |
+| `dot_grok/AGENTS.md` | `~/.grok/AGENTS.md` | Grok CLI |
+| `dot_config/opencode/AGENTS.md` | `~/.config/opencode/AGENTS.md` | opencode |
+| `dot_copilot/copilot-instructions.md` | `~/.copilot/copilot-instructions.md` | GitHub Copilot CLI |
+| `private_dot_hermes/SOUL.md` | `~/.hermes/SOUL.md` | Hermes |
+
+Verify after any edit — all six checksums must match:
+
+```bash
+md5sum dot_claude/CLAUDE.md dot_codex/AGENTS.md dot_grok/AGENTS.md \
+       dot_config/opencode/AGENTS.md dot_copilot/copilot-instructions.md \
+       private_dot_hermes/SOUL.md
+```
+
+The per-tool settings files sitting next to them (`settings.json`, `config.toml`, `opencode.json`, `private_crush.json`, `private_config.toml`) are **not** shared — each is tool-specific and unrelated to the others. `dot_local/share/crush/` ships only a settings file, no instruction file.
+
+`~/.gemini/GEMINI.md` is a **partial** sibling: it lives in the `.gemini` external repo (not this one, see Externals below) and shares only the `## General` section. The `## For GitHub Repositories Only` section stays out of it because that machine is a corp environment. Changes to `## General` should be carried over there by hand; anything below it should not.
 
 ### Shell Config Structure
 
