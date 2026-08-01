@@ -108,6 +108,9 @@ enabled = true
 [plugins."visualize@openai-bundled"]
 enabled = true
 
+[plugins."superpowers@openai-bundled"]
+enabled = true
+
 [desktop]
 show-context-window-usage = true
 followUpQueueMode = "steer"
