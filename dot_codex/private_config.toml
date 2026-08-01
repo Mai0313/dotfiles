@@ -111,6 +111,9 @@ enabled = true
 [plugins."superpowers@openai-bundled"]
 enabled = true
 
+[plugins."superpowers@openai-curated-remote"]
+enabled = false
+
 [desktop]
 show-context-window-usage = true
 followUpQueueMode = "steer"
@@ -135,3 +138,6 @@ sandbox = "elevated"
 
 [notice]
 hide_rate_limit_model_nudge = true
+
+[projects."/home/wei/.local/share/chezmoi"]
+trust_level = "trusted"
