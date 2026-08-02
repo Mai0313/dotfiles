@@ -132,7 +132,15 @@ if command -v npm >/dev/null 2>&1; then
 fi
 {{- end }}
 
-# ---------- 7. Work-only: ADB systemd environment + pontisd ----------
+# ---------- 7. uv (Python package manager) ----------
+# Installs to ~/.local/bin, already on PATH in the shell configs.
+# UV_NO_MODIFY_PATH keeps the installer from appending source lines to the
+# chezmoi-managed ~/.zshenv / ~/.bashrc.
+if ! command -v uv >/dev/null 2>&1; then
+    curl -LsSf https://astral.sh/uv/install.sh | UV_NO_MODIFY_PATH=1 sh
+fi
+
+# ---------- 8. Work-only: ADB systemd environment + pontisd ----------
 {{ if and .is_work (eq .chezmoi.os "linux") -}}
 KEYS_DIR="$HOME/adb-keys/security/adb"
 if [ -d "$KEYS_DIR" ] && command -v systemctl >/dev/null 2>&1; then
@@ -142,7 +150,7 @@ if [ -d "$KEYS_DIR" ] && command -v systemctl >/dev/null 2>&1; then
 fi
 {{- end }}
 
-# ---------- 8. Input method: IBus (Chinese) ----------
+# ---------- 9. Input method: IBus (Chinese) ----------
 {{ if eq .chezmoi.os "linux" -}}
 if ! in_container; then
     sudo apt-get update
