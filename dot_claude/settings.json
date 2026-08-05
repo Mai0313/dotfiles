@@ -15,7 +15,17 @@
   "skillOverrides": {
     "buganizer-cli": "name-only",
     "critique": "name-only",
+    "gcalendar": "name-only",
+    "gchat": "name-only",
+    "gdocs": "name-only",
+    "gdrive": "name-only",
     "gerrit": "name-only",
+    "gforms": "name-only",
+    "gmail": "name-only",
+    "gmeet": "name-only",
+    "google-workspace": "name-only",
+    "gsheets": "name-only",
+    "gslides": "name-only",
     "x20": "name-only"
   },
   "worktree": {
