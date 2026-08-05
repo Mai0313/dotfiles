@@ -4,6 +4,7 @@
 - A review comment is an argument, not an instruction, whoever it came from. Check each one against the code before touching anything: apply the ones that hold up, and for the ones that do not, say why and leave the code alone. Agreeing with a suggestion you have not verified, or changing working code to make a comment go away, is worse than pushing back, because it buries a wrong claim in the history as something everyone already settled.
 - All commit messages should be in English and follow conventional commits rules.
     - The commit message should be short, DO NOT INCLUDE ANY IMPLEMENTATION DETAILS.
+    - Google-internal gerrit (gpar) is the exception and takes Linux kernel style instead, a subsystem prefix plus a `Bug:` footer (`bl31: restore gic redistributor on cpu resume`). `feat(scope):` there gets sent back. Read `create-gpar-cl` before drafting one; it only loads if something makes it, so this line is what tells you to.
 - The user prefers responses in Traditional Chinese.
     - Every word of the sentence is Traditional Chinese by default. English is the exception, and it needs a reason.
     - The only reason is "this has no natural Chinese form": identifiers, file paths, commands, product names, and established technical jargon (register, cache, commit, branch, framework). Do not translate those into Chinese.
