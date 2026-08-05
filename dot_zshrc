@@ -147,6 +147,7 @@ case "$__fqdn" in
   *.c.googlers.com|*.corp.google.com)
     # Cloudtop-only aliases.
     source /etc/bash_completion.d/g4d
+    source /etc/bash_completion.d/cogd
     # Device Cloud: adds dc_* tools to PATH, plus dc_envsetup / dc_tab_completion.
     source /google/bin/releases/si-sw-eng-prod-team/dc_checkout/dc_setup.sh
     alias gemini='/google/bin/releases/gemini-cli/tools/gemini'
