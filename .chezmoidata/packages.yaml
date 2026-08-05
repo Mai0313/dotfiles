@@ -20,7 +20,6 @@ packages:
     - fd-find
     - tmux
     - htop
-    - fastfetch
     - gh
   # Corp-only apt packages, all reachable from the repos a gLinux machine has by
   # default. Deliberately absent: bugged and vscode-google3, which
