@@ -136,6 +136,10 @@ case "$__fqdn" in
     export ADB_VENDOR_KEYS="$HOME/adb-keys/security/adb"
     # https://yaqs.corp.google.com/eng/q/2346264355185623040
     export CORP_SSH_HELPER_OVERRIDES="relay=sup-ssh-relay.corp.google.com"
+    # For getting 7 days auth, we can use these commands from b/540327136
+    # `gcert --lifetime=168h --nocorpssh --noprodssh && gcert --noloas2 --reuse_sso_cookie`
+    # `rw <hostname> --remote_gcert_args="--lifetime=168h --nocorpssh --noprodssh"`
+    export AUTH_REMOTE_GCERT_ARGS="--lifetime=168h --nocorpssh --noprodssh"
     ;;
 esac
 case "$__fqdn" in
