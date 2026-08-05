@@ -23,11 +23,17 @@ sudo apt-get install -y {{ range .packages.linux }}{{ . }} {{ end }}
 # install_vscode_for_google3.sh reads the google3 depot, which needs a valid
 # LOAS certificate, so refresh it first. gcertstatus is a no-op when the cert
 # is still good and only falls through to the interactive gcert when it expired.
+# The installer pulls in code, bugged and vscode-google3 itself (and adds the
+# bugged repo they need), so do not list any of them here.
 if command -v gcertstatus >/dev/null 2>&1; then
     gcertstatus --quiet --check_remaining=1h || gcert
 fi
-sudo apt install --update code
 /google/src/files/head/depot/google3/devtools/editors/vscode/install_vscode_for_google3.sh
+
+# Corp-only packages, from the corp apt repos. Some land in the delayed-install
+# queue instead of being applied right away, so flush the queue afterwards.
+sudo apt-get install -y {{ range .packages.work_linux }}{{ . }} {{ end }}
+sudo install-delayed-packages -u
 {{- else -}}
 if [ ! -f /usr/share/keyrings/microsoft.gpg ]; then
     wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > /tmp/microsoft.gpg
@@ -141,6 +147,8 @@ if ! command -v uv >/dev/null 2>&1; then
 fi
 
 # ---------- 8. Work-only: ADB systemd environment + pontisd ----------
+# The pontisd package itself is installed in section 1; this only points it at
+# the ADB vendor keys and restarts it.
 {{ if and .is_work (eq .chezmoi.os "linux") -}}
 KEYS_DIR="$HOME/adb-keys/security/adb"
 if [ -d "$KEYS_DIR" ] && command -v systemctl >/dev/null 2>&1; then

@@ -60,7 +60,7 @@ OS detection comes from chezmoi built-ins: `eq .chezmoi.os "linux"` / `"darwin"`
 **Current consumers of `is_work`:**
 - `.chezmoiignore` — gates `.local/bin/kgrep` and `.local/bin/linux-kernel-mount` off unless `is_work && linux`. Also gates non-Windows files (`.zshrc`, `.zshenv`, `.zprofile`, `.bashrc`, `.p10k.zsh`, `cleanup.sh`, `setup.sh`, `.config/alacritty`) when `chezmoi.os == "windows"`.
 - `.chezmoiexternal.toml` — gates `adb-keys/security` (sso git-repo); gates oh-my-zsh + plugins on `chezmoi.os != "windows"`.
-- `.chezmoitemplates/setup-body.sh` — §1 routes VS Code (corp Linux → google3, else Microsoft repo), §6 skips global npm on work macOS, §8 gates the ADB pontisd restart. Container and OS gating inside the body is runtime, not chezmoi data.
+- `.chezmoitemplates/setup-body.sh` — §1 routes VS Code (corp Linux → google3, else Microsoft repo) and gates the corp-only apt packages, §6 skips global npm on work macOS, §8 gates the ADB pontisd restart. Container and OS gating inside the body is runtime, not chezmoi data.
 
 Inspect the current value with `chezmoi data | grep is_work`.
 
@@ -76,7 +76,7 @@ Inspect the current value with `chezmoi data | grep is_work`.
 
 - `.chezmoi.toml.tmpl` — chezmoi config. Computes the single `is_work` flag from the FQDN and pins `sourceDir`. See Layer 1 above.
 - `.chezmoiexternal.toml` — declarative external dependencies (oh-my-zsh, p10k, zsh plugins, `.agents` skills repo, `.gemini` config repo, work-only ADB security repo). All `type = "git-repo"`; the four non-Windows externals pin `--depth=1` clone and `--ff-only` pull, while `.agents`, `.gemini`, and `adb-keys/security` use plain full clones/pulls.
-- `.chezmoidata/packages.yaml` — declarative OS package lists (darwin / linux) plus a cross-platform `npm_global` list of global npm CLIs, consumed by `.chezmoitemplates/setup-body.sh` (*nix) and `.chezmoiscripts/run_onchange_after_setup.ps1.tmpl` (Windows). Adding a package: edit the YAML and run `chezmoi apply` — `run_onchange` sees the changed content and re-runs setup.
+- `.chezmoidata/packages.yaml` — declarative OS package lists (darwin / linux, plus `work_linux` for the corp-only apt packages: google3/Cider, Android, Pontis, and serial-console tooling) and a cross-platform `npm_global` list of global npm CLIs, consumed by `.chezmoitemplates/setup-body.sh` (*nix) and `.chezmoiscripts/run_onchange_after_setup.ps1.tmpl` (Windows). Adding a package: edit the YAML and run `chezmoi apply` — `run_onchange` sees the changed content and re-runs setup.
 - `.chezmoitemplates/setup-body.sh` — shared bash body used by both bootstrap entry points. Contains: OS packages, font cache refresh, chsh, LazyVim install, nvm + node LTS, global npm CLIs, uv, work-only ADB pontisd setup, IBus input method. Each section is internally idempotent.
 - `.chezmoiscripts/run_onchange_after_setup.sh.tmpl` — chezmoi-driven entry. Thin wrapper around `setup-body.sh`, gated by OS. Runs at `chezmoi apply` when rendered content changes.
 - `.chezmoiscripts/run_onchange_after_setup.ps1.tmpl` — Windows-only chezmoi-driven entry (PowerShell). Installs the `npm_global` CLIs (skips if npm absent). Does not share `setup-body.sh` (no bash on Windows). Renders empty on non-Windows so chezmoi skips it.
@@ -133,7 +133,11 @@ zsh additionally loads oh-my-zsh (theme `powerlevel10k`, plugins `git`/`dotenv`/
 
 Two entry points share `.chezmoitemplates/setup-body.sh`. The body opens with an `in_container` helper (`/.dockerenv`, `/run/.containerenv`, `CODESPACES` / `REMOTE_CONTAINERS` / `DEVCONTAINER`) and has nine idempotent sections:
 
-1. **OS packages** — apt + VS Code + Neovim release + lazygit GitHub release on Linux; brew on darwin. Package list lives in `.chezmoidata/packages.yaml`. VS Code install path forks on `is_work`: corp Linux (gLinux) runs `gcert` (only when the LOAS cert expired) then the google3 installer, everyone else adds the public Microsoft apt repo.
+1. **OS packages** — apt-get + VS Code + Neovim release + lazygit GitHub release on Linux; brew on darwin. Package list lives in `.chezmoidata/packages.yaml`. VS Code install path forks on `is_work`: corp Linux (gLinux) runs `gcert` (only when the LOAS cert expired) then the google3 installer, everyone else adds the public Microsoft apt repo. The `gcert` is there for the google3 depot the VS Code installer reads, *not* for apt — the corp apt repos authenticate with the machine certificate, so `apt-get update` never needs it. The corp branch then installs the `work_linux` packages and runs `install-delayed-packages -u` to flush the delayed-install queue.
+
+   **The corp branch installs no VS Code package of its own.** `install_vscode_for_google3.sh` runs `sudo apt install bugged code vscode-google3` itself, behind its own idempotence check, and calls `glinux-add-repo bugged stable` to add the repo `bugged` lives in. That is why `bugged` and `vscode-google3` are *not* in `work_linux`: nothing else adds that repo, so a fresh machine would fail the `apt-get install` before the installer ever ran.
+
+   **Always `apt-get`, never `apt`.** `apt` has no stable CLI interface and prints `WARNING: apt does not have a stable CLI interface` to stderr on every non-tty run, which is exactly how this script executes under `chezmoi apply`. Do not add `--update` to the installs either: the section already ran `apt-get update` before the branch, and `--update` is (per `apt-get(8)`) merely syntactic sugar for `update && install`. A plain `install` still upgrades an already-installed package to the candidate version, so it is not needed for freshness.
 2. **Font cache refresh** — `fc-cache -f` (Linux only).
 3. **Default shell** — `chsh -s zsh`, skipped in containers (`in_container`): the image controls the shell and `chsh` can hang non-interactively.
 4. **LazyVim starter** — `git clone` into `~/.config/nvim` only if absent. Deliberately a script clone (not a chezmoi external) because LazyVim is meant to be customized after first install — an external would re-pull and clobber user edits.

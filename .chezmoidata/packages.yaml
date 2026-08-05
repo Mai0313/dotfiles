@@ -18,6 +18,35 @@ packages:
     - curl
     - ripgrep
     - fd-find
+    - tmux
+    - htop
+    - fastfetch
+    - gh
+  # Corp-only apt packages, all reachable from the repos a gLinux machine has by
+  # default. Deliberately absent: bugged and vscode-google3, which
+  # install_vscode_for_google3.sh installs in section 1. bugged needs
+  # `glinux-add-repo bugged stable` first, so listing it here would fail the
+  # whole script on a fresh machine.
+  work_linux:
+    # google3 / Cider
+    - cogfsd
+    - cidermux
+    # Android and Pixel firmware work
+    - adb
+    - repo
+    # Pontis USB device bridging, see go/pontis/userguide. usbip covers the
+    # devices Pontis cannot bridge as plain adb/fastboot.
+    - pontisd
+    - usbip
+    # Serial console for firmware debugging
+    - minicom
+    - picocom
+    - python3-serial
+    - python3-usb
+    # sshfs backs the ~/linux_kernel mount driven by .local/bin/linux-kernel-mount
+    - sshfs
+    - roadwarrior
+    - jetski-memory
   # Global npm CLIs, installed after nvm sets up node LTS. Skipped on work macOS.
   # npm and corepack ship with node, so they are intentionally excluded.
   npm_global:
