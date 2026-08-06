@@ -19,3 +19,7 @@ setup.sh
 .local/bin/automation-mount
 {{- end }}
 
+{{ if not .is_work -}}
+.config/environment.d/adb.conf
+{{- end }}
+
