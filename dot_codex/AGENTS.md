@@ -29,14 +29,6 @@
     - The test for dropping to the smallest model: would you have to read and judge the result to know it is correct? If yes, do not. It is only for judgement-free execution whose output verifies mechanically (a diff, a re-run, a spot check): running a command and reporting the output, collecting file contents, simple searches, mass renaming, reformatting. Tell it to return the raw result without interpreting it. Analysis, design decisions, debugging, and code that will be committed never qualify.
     - Reasoning effort / thinking budget follows the same test. Lowering it is gentler than dropping model levels, so prefer it. High effort is not free quality either: on a simple task it invites overthinking and second-guesses a correct answer into a worse one.
 
-## Text formatting
-
-- Do not reflow human-written prose.
-- Do not hard-wrap Markdown or documentation text to 72, 80, or 100 columns. IDEs and editors should handle visual wrapping.
-- When modifying documents, make the smallest textual diff possible and preserve the surrounding line structure.
-- A paragraph should usually stay as one logical line unless the existing file consistently uses manual wrapping.
-- Code comments should be short and straightforward; do not include too many details.
-
 ## For GitHub Repositories Only
 
 These rules only apply to repositories hosted on GitHub.
