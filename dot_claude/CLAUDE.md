@@ -33,22 +33,7 @@
 
 These rules only apply to repositories hosted on GitHub.
 
-- When building a plan to develop a project:
-    - Do not forget to include linting, formatting, and testing steps before drafting a PR in the plan.
-    - After making changes, review them with the appropriate skill if one exists.
-    - Open the PR as a draft and keep it that way until all actions pass.
-    - Once they pass, ask if the user wants to mark it ready for review.
+- Read `gh-dev-flow` before starting development work on one. It owns the whole path from a task landing to the change being merged, and it only loads if something makes it, so this line is what tells you to. The rules below are the ones too costly to get wrong on the one run where the skill does not load.
 - Anything published to GitHub must be written in English only, including PR titles and bodies, issue titles and bodies, comments, and review replies.
-- Update the documentation if needed.
-- Feel free to update the plan and the PR body as things change, since plans always do.
-- If a task is large or complex, split it into several focused commits, each one a self-contained logical step.
-    - Everything still lands in a single PR, so the number of commits does not matter; more granular commits just make the changes easier to track, review, and revert.
-- Merge a PR with a merge commit when those commits are each a step worth keeping on the default branch, and squash it when they are not. Never rebase merge: it drops the branch commits onto the default branch with nothing left marking which PR they came from.
-    - Squash review fixups into the step they belong to before merging. What lands on the default branch should be the steps, not the path taken to reach them.
-    - Give a merge commit the subject a squash would have got, `<PR title> (#<number>)`, so both kinds of merge read the same in `git log --first-parent`. GitHub's `Merge pull request #N from <branch>` default says nothing, and `--subject` will not add the number for you.
-- If a change is small, you can ask if the user wants to commit and push it directly to the default branch instead of opening a PR.
-    - Linting, formatting, and testing are still required.
-- Whenever something worth doing later shows up (an improvement idea, a bug that does not belong in the current PR, or any follow-up outside the current scope), ask the user whether to open an issue to track it. The `create-issue` skill owns what goes in it.
-- When you are asked to work on an existing issue, that is when the detailed plan gets written.
-    - Write the plan into the issue body under the placeholder, or post it as a comment, before starting the work.
-    - Keep it updated as the plan changes, so the issue stays a usable trace of what happened.
+- Open the PR as a draft and keep it that way until all actions pass.
+- Never rebase merge: it drops the branch commits onto the default branch with nothing left marking which PR they came from.
