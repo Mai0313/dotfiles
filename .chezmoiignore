@@ -21,5 +21,6 @@ setup.sh
 
 {{ if not .is_work -}}
 .config/environment.d/adb.conf
+setup_adb.sh
 {{- end }}
 

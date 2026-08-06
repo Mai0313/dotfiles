@@ -58,7 +58,7 @@ OS detection comes from chezmoi built-ins: `eq .chezmoi.os "linux"` / `"darwin"`
 **Note**: `.chezmoi.toml.tmpl` runs at `chezmoi init`, not at every `chezmoi apply`, so editing it needs `chezmoi init --force` once to regenerate `~/.config/chezmoi/chezmoi.toml`.
 
 **Current consumers of `is_work`:**
-- `.chezmoiignore` — gates `.local/bin/kgrep` and `.local/bin/linux-kernel-mount` off unless `is_work && linux`. Also gates non-Windows files (`.zshrc`, `.zshenv`, `.zprofile`, `.bashrc`, `.p10k.zsh`, `cleanup.sh`, `setup.sh`, `.config/alacritty`) when `chezmoi.os == "windows"`.
+- `.chezmoiignore` — gates `.local/bin/kgrep`, `.local/bin/linux-kernel-mount` and `.local/bin/automation-mount` off unless `is_work && linux`, and `.config/environment.d/adb.conf` + `setup_adb.sh` off unless `is_work`. Also gates non-Windows files (`.zshrc`, `.zshenv`, `.zprofile`, `.bashrc`, `.p10k.zsh`, `cleanup.sh`, `setup.sh`, `.config/alacritty`) when `chezmoi.os == "windows"`.
 - `.chezmoiexternal.toml` — gates `adb-keys/security` (sso git-repo); gates oh-my-zsh + plugins on `chezmoi.os != "windows"`.
 - `.chezmoitemplates/setup-body.sh` — §1 routes VS Code (corp Linux → google3, else Microsoft repo) and gates the corp-only apt packages, §6 skips global npm on work macOS, §8 gates the ADB pontisd restart. Container and OS gating inside the body is runtime, not chezmoi data.
 
