@@ -27,22 +27,15 @@ sudo install-delayed-packages -u
 
 # Corp Linux (gLinux) gets VS Code from google3, not the Microsoft apt repo.
 # install_vscode_for_google3.sh reads the google3 depot, which needs a valid
-# LOAS certificate. gcert is interactive: it drives the gnubby through
-# ssh-agent, so it fails outright when SSH_AUTH_SOCK is unset, which is the
-# normal case under `chezmoi apply` (and inside tmux, see go/sk-screen-tmux).
-# Only attempt it when it stands a chance, and skip the installer rather than
-# aborting the whole setup when the cert is still missing afterwards. The
+# LOAS certificate, so refresh below 24h and ask for a week; the ssh certs are
+# not used here. `|| true` keeps a failed gcert (no gnubby, non-interactive
+# apply, tmux, see go/sk-screen-tmux) from taking the rest of setup down. The
 # installer pulls in code, bugged and vscode-google3 itself (and adds the
 # bugged repo they need), so do not list any of them here.
-if ! gcertstatus --quiet --check_remaining=1h 2>/dev/null \
-    && [ -t 0 ] && [ -n "${SSH_AUTH_SOCK:-}" ]; then
-    gcert || true
+if ! gcertstatus --check_remaining=24h --quiet 2>/dev/null; then
+    gcert --lifetime=168h --nocorpssh --noprodssh || true
 fi
-if gcertstatus --quiet --check_remaining=1h 2>/dev/null; then
-    /google/src/files/head/depot/google3/devtools/editors/vscode/install_vscode_for_google3.sh
-else
-    echo "No valid LOAS cert, skipping the google3 VS Code setup. Run 'gcert', then ~/setup.sh." >&2
-fi
+/google/src/files/head/depot/google3/devtools/editors/vscode/install_vscode_for_google3.sh
 {{- else -}}
 if [ ! -f /usr/share/keyrings/microsoft.gpg ]; then
     wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > /tmp/microsoft.gpg
