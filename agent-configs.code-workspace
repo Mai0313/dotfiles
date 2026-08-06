@@ -1,0 +1,17 @@
+{
+  "folders": [
+    {
+      "name": "agents",
+      "path": ".agents"
+    },
+    {
+      "name": "gemini",
+      "path": ".gemini"
+    },
+    {
+      "name": "chezmoi",
+      "path": ".local/share/chezmoi"
+    }
+  ],
+  "settings": {}
+}
