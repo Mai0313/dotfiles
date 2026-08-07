@@ -138,6 +138,3 @@ sandbox = "elevated"
 
 [notice]
 hide_rate_limit_model_nudge = true
-
-[projects."/home/wei/.local/share/chezmoi"]
-trust_level = "trusted"
