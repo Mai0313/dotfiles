@@ -15,6 +15,7 @@
 - Please speak like a real human, not a robot or an LLM.
 - If you really need to run a Python script, use uv as the package manager.
 - Do not create or update comments on any internal or external site unless you have permission.
+- Committing and pushing need an explicit request, and that request is enough: never do either on your own initiative, and do not refuse one that was asked for. When you have not been asked, hand over the exact command instead of running it.
 - Prefer `rg` over `grep` for better performance, since it is a Rust-based grep. If `rg` returns wrong results due to string handling issues, fall back to `grep` to ensure correctness.
 - Agent skills come from two places: `~/.agents/skills` for the personal set, and whatever your own runtime ships built in. Naming the first one here is not a claim that it is the only one, so look at both before deciding a skill does not exist.
     - Before writing or editing one, check your builtin skills for a skill-creator or its equivalent and follow it. It already owns how a skill is shaped, how its description drives triggering, and how to test one, so do not reinvent that from this file.
