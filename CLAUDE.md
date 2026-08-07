@@ -116,7 +116,7 @@ md5sum dot_claude/CLAUDE.md dot_codex/AGENTS.md dot_grok/AGENTS.md \
 
 The per-tool settings files sitting next to them (`settings.json`, `config.toml`, `opencode.json`, `private_crush.json`, `private_config.toml`) are **not** shared — each is tool-specific and unrelated to the others. `dot_local/share/crush/` ships only a settings file, no instruction file.
 
-`~/.gemini/GEMINI.md` is a **partial** sibling: it lives in the `.gemini` external repo (not this one, see Externals below) and shares only the `## General` section. The `## For GitHub Repositories Only` section stays out of it because that machine is a corp environment. Changes to `## General` should be carried over there by hand; anything below it should not.
+`~/.gemini/GEMINI.md` is a **partial** sibling: it lives in the `.gemini` external repo (not this one, see Externals below) and shares everything above `## For GitHub Repositories Only` — currently `## General` and `## Self-improvement`, byte-identical. That GitHub section is where it diverges, and stays out of it because that machine is a corp environment; below the divergence GEMINI.md carries its own corp-only sections. Changes to the shared part should be carried over there by hand; anything from `## For GitHub Repositories Only` down should not.
 
 ### Shell Config Structure
 
