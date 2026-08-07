@@ -32,29 +32,9 @@
 
 ## Self-correction
 
-Skills and these instructions were written by someone who could not see the situation you are in now, so a wall you hit is often theirs to fix rather than yours to work around. Updating them is part of the task, not a favour afterwards: the next run hits the same wall otherwise, and it will not be holding the evidence you have right now.
+When a task is wrapping up, ask whether anything you read misled you on the way. The signals are concrete: you retried because the documented form did not work, you guessed at a value the document should have given you, what you observed no longer matched what it described, the short path only appeared after you took a long one, or you hit something nobody had written down at all. Any of those and the repair belongs to this task, because right now you know what you ran and what it printed, and the next session will not.
 
-When a piece of work is done, look back at what actually slowed you down and ask what the document should have said. Act when you can name the correction and you verified it this session; leave it when you only suspect it, because a guess written down with authority is worse than silence, since the next reader cannot tell it apart from the parts that were measured.
-
-Route it by how far the lesson travels:
-
-- A tool's behaviour, a command's trap, the order steps must happen in, a dead end that looks live → the skill that owns it, under `~/.agents/skills`. Finding that nothing owns it is itself worth saying.
-- A working habit that holds regardless of project, tool or language → here, under General.
-- True only of this repo, this bug, or this machine → your memory mechanism, not either of the above.
-
-Where those live, so you never have to ask:
-
-- **Skills** are `~/.agents/skills`, a git repo of its own. Several agents share it, so stage your own paths rather than `git add -A`.
-- **Instructions** are `~/.gemini/GEMINI.md`, also its own git repo, and that file is the full version. Project directories reach it by symlink, so one edit takes effect everywhere at once and there is nothing to copy around. Being outside chezmoi does not mean being unversioned; check for a repo before concluding a file is untracked.
-- **A General-only copy of the instructions** is deployed per agent by chezmoi. `chezmoi managed | rg -i 'agents|claude|copilot|instruction'` lists them. Edit the chezmoi *source* and then `chezmoi apply` the individual target paths, since editing a deployed file directly is undone by the next apply, and applying everything sweeps up unrelated pending changes.
-
-`General` is the one section that must stay identical between `~/.gemini/GEMINI.md` and every chezmoi copy, because it is the part that holds regardless of machine, project or agent, which is why it is duplicated at all. Everything below `General` in `GEMINI.md` is Pixel-specific and lives only there. So a change to `General` touches all of them and a change to anything else touches one.
-
-Write the lesson, not the instance. A correction phrased around the ticket, filename or build id you just touched will not fire next time and will mislead when the state differs; if you cannot state it without those specifics, it belongs in memory instead.
-
-Write for the reader you actually have: an agent, not a person being onboarded. The bar is that you would act correctly on it cold, not that it reads well, and that cuts most of what makes a document long. No tutorial build-up, no restating what `--help` already prints, and no copying a field list or a flag table in from upstream, since that second copy starts going stale the day it is written and the next reader cannot tell which half rotted. Point at the authoritative source instead, and spend the space on what it does not say: the traps, the order things have to happen in, and the decisions that cost someone a debugging session.
-
-Never quietly route around a document you believe is wrong: say what was wrong, show what you ran, fix it. Equally, not every session earns one of these, and inventing a change to look thorough costs more than it gives.
+Read `agent-self-correction` at that point and follow it. It owns the rest of the call: whether the lesson is worth writing at all, whether it belongs in a skill, in these instructions or in memory, where those files actually live, and how to write it so that it still fires when the details differ. Nothing pulls it in for you, so this line is what tells you to.
 
 ## For GitHub Repositories Only
 
