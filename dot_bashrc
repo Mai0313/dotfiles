@@ -162,10 +162,14 @@ case "$__fqdn" in
     alias jetski-cli='/google/bin/releases/jetski-devs/tools/cli'
     alias flash='/google/bin/releases/android/flashstation/cl_flashstation'
     alias recovery='/google/bin/releases/android/flashstation/cl_rom_recovery'
-    alias listd='/google/bin/releases/android/flashstation/list_devices'
+    # list_devices is ~/.local/bin/list_devices, a local adb/fastboot wrapper.
+    # Do not alias over it: the flashstation original lives on binfs, so any
+    # invocation can be the one that goes quiet for minutes while its tool
+    # chain is fetched. That one is still under flashstation/ when its
+    # marketing names or its session log are what you actually want.
+    alias listd='list_devices'
     alias cl_flashstation='/google/bin/releases/android/flashstation/cl_flashstation'
     alias cl_rom_recovery='/google/bin/releases/android/flashstation/cl_rom_recovery'
-    alias list_devices='/google/bin/releases/android/flashstation/list_devices'
     alias fetch='/google/data/ro/projects/android/fetch_artifact'
     alias duckie='/google/bin/releases/gemini-agents-duckie/duckie_cli'
     alias gbrowser='/google/bin/releases/gemini-agents-gbrowser/gbrowser'

@@ -1,0 +1,107 @@
+#!/bin/bash
+# What Pixel boards are attached, and what state each one is in.
+#
+# Stands in for /google/bin/releases/android/flashstation/list_devices for the
+# everyday "which board is this" question. That one is the authority and is still
+# worth reaching for when you want its marketing names or its flashstation
+# session log, but it lives on binfs, so any invocation can be the one that goes
+# quiet for minutes while its tool chain is fetched. This asks adb and fastboot,
+# which are already local, and answers in well under a second.
+#
+# What it adds over plain `adb devices` / `fastboot devices`: the codename, which
+# is how every task names a board, and the running bootloader build, which is
+# almost always the next thing you want to know.
+#
+# The original is still at /google/bin/releases/android/flashstation/list_devices
+# and is not aliased, so reaching for it has to be deliberate.
+
+set -uo pipefail
+
+# A second fastboot against a board that already has one in flight wedges its
+# bootloader: ABL's transport has no timeout, so whichever command loses the USB
+# endpoint blocks forever and the board answers nothing until somebody walks over
+# and holds the power button. Enumerating is not worth that risk, so if any
+# fastboot is already running we report the adb side and say what we skipped.
+fastboot_busy=$(pgrep -x fastboot 2>/dev/null | paste -sd' ' -)
+
+tmp=$(mktemp) || exit 1
+trap 'rm -f "$tmp"' EXIT
+
+rows=""
+add() { rows+="$1"$'\t'"$2"$'\t'"$3"$'\t'"$4"$'\t'"$5"$'\n'; }
+dash() { if [ -n "${1:-}" ]; then printf '%s' "$1"; else printf -- '-'; fi; }
+
+# ---- adb ----
+# adb is safe to talk to freely; it has none of fastboot's blocking behaviour.
+while read -r serial state rest; do
+    [ -z "${serial:-}" ] && continue
+    [ "$serial" = "List" ] && continue
+
+    # `device:` in adb's long listing is the codename. Keep it as the fallback
+    # for a board that is present but not answering a shell (unauthorized,
+    # offline, still booting).
+    codename=$(printf '%s' "${rest:-}" | grep -o 'device:[^ ]*' | cut -d: -f2)
+    bootloader=""
+    buildid=""
+
+    if [ "$state" = "device" ]; then
+        if adb -s "$serial" shell 'getprop ro.product.name; getprop ro.bootloader; getprop ro.build.id' > "$tmp" 2>/dev/null; then
+            name=$(sed -n '1p' "$tmp" | tr -d '\r')
+            bootloader=$(sed -n '2p' "$tmp" | tr -d '\r')
+            buildid=$(sed -n '3p' "$tmp" | tr -d '\r')
+            [ -n "$name" ] && codename=$name
+        fi
+    fi
+
+    add "$(dash "$codename")" "adb/$state" "$serial" "$(dash "$bootloader")" "$(dash "$buildid")"
+done < <(adb devices -l 2>/dev/null)
+
+# ---- fastboot ----
+if [ -n "$fastboot_busy" ]; then
+    echo "list_devices: another fastboot is running (pid $fastboot_busy), skipping the fastboot side" >&2
+    echo "list_devices: probing now would steal its USB endpoint and wedge that board" >&2
+else
+    while read -r serial mode; do
+        [ -z "${serial:-}" ] && continue
+
+        # `ramdump_usb` is a normal state, not a fault, but it is invisible to
+        # `fastboot devices` unless you read this column, and mistaking it for
+        # normal fastboot is the usual way to waste a cycle.
+        [ "${mode:-}" = "ramdump_usb" ] && mode=ramdump
+
+        # Never pipe a fastboot command. Anything downstream that can exit early
+        # sends SIGPIPE mid-reply and leaves the board's fastboot thread blocked
+        # for good. Redirect to a file and read the file.
+        codename=""
+        fastboot -s "$serial" getvar product > "$tmp" 2>&1
+        codename=$(grep -m1 '^product:' "$tmp" | awk '{print $2}')
+
+        bootloader=""
+        fastboot -s "$serial" getvar version-bootloader > "$tmp" 2>&1
+        bootloader=$(grep -m1 '^version-bootloader:' "$tmp" | awk '{print $2}')
+
+        add "$(dash "$codename")" "${mode:-fastboot}" "$serial" "$(dash "$bootloader")" "-"
+    done < <(fastboot devices 2>/dev/null)
+fi
+
+if [ -z "$rows" ]; then
+    # Saying "none attached" would be a lie when the fastboot side was never
+    # looked at; boards in fastboot or ramdump are invisible to adb.
+    if [ -n "$fastboot_busy" ]; then
+        echo "No adb devices. The fastboot side was not probed, so any board in fastboot or ramdump is unaccounted for."
+        exit 0
+    fi
+    echo "No devices attached."
+    exit 1
+fi
+
+echo "Connected devices:"
+{ printf 'CODENAME\tMODE\tSERIAL\tBOOTLOADER\tBUILD\n'; printf '%s' "$rows"; } \
+    | column -t -s $'\t' | sed 's/^/  /'
+
+# Every board needs -s <serial> on every later command, and forgetting it on a
+# multi-board workstation is how the wrong device gets flashed.
+[ "$(printf '%s' "$rows" | grep -c .)" -gt 1 ] && \
+    echo && echo "  More than one board attached: pin every adb/fastboot command with -s <serial>."
+
+exit 0
