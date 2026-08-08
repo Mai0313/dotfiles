@@ -18,6 +18,7 @@ packages:
     - curl
     - ripgrep
     - fd-find
+    - fuse-overlayfs
     - tmux
     - htop
     - gh
