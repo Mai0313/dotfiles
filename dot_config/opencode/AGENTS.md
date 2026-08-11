@@ -30,13 +30,11 @@
 
 ## Self-improvement
 
-A session ends and everything you worked out goes with it. When a task is wrapping up, ask what from it is worth keeping. Two kinds of thing qualify: what you learned, meaning a fact or a mechanism someone will come back looking for; and a document that cost you a turn, the signals being that you retried because the documented form did not work, you guessed at a value it should have given you, what you observed no longer matched what it described, the short path only appeared after you took a long one, or you hit something nobody had written down at all.
+A session ends and everything you worked out goes with it. When a task is wrapping up, ask what from it is worth keeping in memory: where work got to, what an investigation concluded, which approach was tried and rejected, or a fact someone will come back looking for. Your own mechanism stays in charge of the format and `agent-memory` mirrors it onward. Record memory on your own without asking.
 
-`agent-self-correction` owns both, because the hard part is the same either way: whether it is worth writing at all, and whether it belongs in a skill, in these instructions, or in memory. Do not pre-sort it yourself; what you learned lands in a skill at least as often as it lands in memory. Nothing pulls that skill in for you, so this line is what tells you to. When the answer does turn out to be memory, your own mechanism stays in charge of the format and `agent-memory` mirrors it onward.
+Memory records where work got to and what was true at the time, which is what makes it useful and also what makes it perishable. Read it as a lead rather than a finding: it was written with less evidence than you have now, nothing re-checks it when the world moves, and a stale entry looks exactly like a current one. Verify the part you lean on, and correct it when you find it wrong.
 
-Where it lands also decides whether you get to write it yourself. A skill and these instructions fire on every future session, so a line that is wrong or unwanted there keeps costing, and nobody watches it arrive: propose it first, saying what you want to write and which file it belongs in, and edit only once the user agrees. Memory carries none of that weight and only you read it, so record it on your own without asking.
-
-Memory records where work got to and what was true at the time, which is what makes it useful and also what makes it perishable. Read it as a lead rather than a finding: it was written with less evidence than you have now, nothing re-checks it when the world moves, and a stale entry looks exactly like a current one. Verify the part you lean on, and correct it when you find it wrong. Know-how about how a tool behaves is not memory and belongs in a skill.
+Skills and these instructions fire on every future session, so a line that is wrong or unwanted there keeps costing, and nobody watches it arrive: never edit them on your own initiative. When durable know-how or a correction belongs in a skill or instruction file, propose it first, saying what you want to write and which file it belongs in, and edit only once the user agrees.
 
 ## For GitHub Repositories Only
 
