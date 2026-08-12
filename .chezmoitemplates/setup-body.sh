@@ -34,12 +34,12 @@ sudo install-delayed-packages -u
 
 # Corp Linux (gLinux) gets VS Code from google3, not the Microsoft apt repo.
 # install_vscode_for_google3.sh reads the google3 depot, which needs a valid
-# LOAS certificate, so refresh below 24h and ask for a week; the ssh certs are
+# LOAS certificate, so refresh below 1h and ask for a week; the ssh certs are
 # not used here. `|| true` keeps a failed gcert (no gnubby, non-interactive
 # apply, tmux, see go/sk-screen-tmux) from taking the rest of setup down. The
 # installer pulls in code, bugged and vscode-google3 itself (and adds the
 # bugged repo they need), so do not list any of them here.
-if ! gcertstatus --check_remaining=24h --quiet 2>/dev/null; then
+if ! gcertstatus --quiet --check_remaining=1h 2>/dev/null; then
     gcert --lifetime=168h --nocorpssh --noprodssh || true
 fi
 /google/src/files/head/depot/google3/devtools/editors/vscode/install_vscode_for_google3.sh
