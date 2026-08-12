@@ -170,8 +170,7 @@ fi
 # ---------- 9. Input method: fcitx5 (Chinese) ----------
 {{ if eq .chezmoi.os "linux" -}}
 if ! in_container; then
-    sudo apt-get update
-    sudo apt-get install -y fcitx5 fcitx5-chewing fcitx5-config-qt fcitx5-frontend-gtk3 fcitx5-frontend-gtk4 fcitx5-frontend-qt5 fcitx5-frontend-qt6 gnome-shell-extension-kimpanel
+    sudo apt-get install -y {{ range .packages.im_linux }}{{ . }} {{ end }}
     sudo apt-get remove -y ibus-chewing || true
     echo "run_im fcitx5" > "$HOME/.xinputrc"
     if command -v gsettings >/dev/null 2>&1; then
