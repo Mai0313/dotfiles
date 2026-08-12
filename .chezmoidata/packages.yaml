@@ -22,6 +22,9 @@ packages:
     - tmux
     - htop
     - gh
+  # Corp-only macOS packages distributed via Mule (go/mule).
+  work_darwin:
+    - ct-cli
   # Corp-only apt packages, all reachable from the repos a gLinux machine has by
   # default. Deliberately absent: bugged and vscode-google3, which
   # install_vscode_for_google3.sh installs in section 1. bugged needs
@@ -31,6 +34,8 @@ packages:
     # google3 / Cider
     - cogfsd
     - cidermux
+    # Cloudtop CLI
+    - ct-cli
     # Android and Pixel firmware work
     - adb
     - repo

@@ -13,6 +13,13 @@ if ! command -v brew >/dev/null 2>&1; then
 fi
 brew install {{ range .packages.darwin }}{{ . }} {{ end }}
 
+{{ if .is_work -}}
+# Corp-only macOS packages distributed via Mule (go/mule).
+if command -v mule >/dev/null 2>&1 || [ -x /usr/local/bin/mule ]; then
+    sudo mule install {{ range .packages.work_darwin }}{{ . }} {{ end }}
+fi
+{{- end }}
+
 {{ else if eq .chezmoi.os "linux" -}}
 sudo apt-get update
 sudo apt-get install -y {{ range .packages.linux }}{{ . }} {{ end }}
