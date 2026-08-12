@@ -164,18 +164,3 @@ if [ -d "$KEYS_DIR" ] && command -v systemctl >/dev/null 2>&1; then
     systemctl --user restart pontisd 2>/dev/null || true
 fi
 {{- end }}
-
-# ---------- 9. Input method: fcitx5 (Chinese) ----------
-{{ if eq .chezmoi.os "linux" -}}
-if ! in_container; then
-    sudo apt-get install -y {{ range .packages.im_linux }}{{ . }} {{ end }}
-    sudo apt-get remove -y ibus-chewing || true
-    echo "run_im fcitx5" > "$HOME/.xinputrc"
-    if command -v gsettings >/dev/null 2>&1; then
-        gsettings set org.gnome.desktop.input-sources sources "[('xkb', 'us')]" || true
-    fi
-    if command -v gnome-extensions >/dev/null 2>&1; then
-        gnome-extensions enable kimpanel@kde.org 2>/dev/null || true
-    fi
-fi
-{{- end }}
