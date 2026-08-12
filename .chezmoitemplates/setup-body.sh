@@ -167,11 +167,11 @@ if [ -d "$KEYS_DIR" ] && command -v systemctl >/dev/null 2>&1; then
 fi
 {{- end }}
 
-# ---------- 9. Input method: IBus (Chinese) ----------
+# ---------- 9. Input method: fcitx5 (Chinese) ----------
 {{ if eq .chezmoi.os "linux" -}}
 if ! in_container; then
     sudo apt-get update
-    sudo apt-get install -y ibus ibus-gtk ibus-gtk3 ibus-chewing pinyin-database
-    echo "run_im ibus" > "$HOME/.xinputrc"
+    sudo apt-get install -y fcitx5 fcitx5-chewing fcitx5-config-qt fcitx5-frontend-gtk3 fcitx5-frontend-gtk4 fcitx5-frontend-qt5 fcitx5-frontend-qt6
+    echo "run_im fcitx5" > "$HOME/.xinputrc"
 fi
 {{- end }}

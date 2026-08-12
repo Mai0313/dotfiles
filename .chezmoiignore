@@ -24,3 +24,7 @@ setup.sh
 setup_adb.sh
 {{- end }}
 
+{{ if ne .chezmoi.os "linux" -}}
+.config/environment.d/im.conf
+{{- end }}
+
