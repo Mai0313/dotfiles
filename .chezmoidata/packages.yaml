@@ -60,6 +60,7 @@ packages:
     - "@google/gemini-cli"
     - "@mai0313/vct"
     - "@openai/codex"
+    - "@deepseek-ai/dsh"
     - opencode-ai
     - reasonix
     - tree-sitter-cli
