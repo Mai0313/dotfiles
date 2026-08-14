@@ -1,0 +1,13 @@
+ui-onboarding:
+  welcomeNoticeVersion: 2026-08-13.1
+locale:
+  preference: zh
+ui-conversation:
+  busyEnter: steer
+llm-deepseek: {}
+llm-pi-ai:
+  providers:
+    google:
+      apiKeyEnv: GOOGLE_API_KEY
+permission:
+  defaultPreset: danger-full-access
