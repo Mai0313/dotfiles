@@ -28,3 +28,7 @@ setup_adb.sh
 .config/environment.d/im.conf
 {{- end }}
 
+{{ if or (ne .chezmoi.os "linux") .is_work -}}
+.chrome-remote-desktop-session
+{{- end }}
+

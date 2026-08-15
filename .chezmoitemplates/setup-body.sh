@@ -58,6 +58,9 @@ Signed-By: /usr/share/keyrings/microsoft.gpg
 VSCODE
     sudo apt-get update
 fi
+# Outside the guard above: the repo is only added once, but the install has to
+# run every time so a machine that already has the repo still gets code.
+sudo apt-get install -y code
 {{- end }}
 
 # Distro nvim is often too old (or absent) for LazyVim, and the neovim PPA is
