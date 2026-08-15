@@ -6,32 +6,40 @@ in_container() {
     [ -f /.dockerenv ] || [ -f /run/.containerenv ] || [ -n "${CODESPACES:-}" ] || [ -n "${REMOTE_CONTAINERS:-}" ] || [ -n "${DEVCONTAINER:-}" ]
 }
 
+# ============================================================================
+# System layer: every step that needs sudo, kept first and contiguous so one
+# password prompt at the start of a run covers all of them. New steps that
+# need sudo belong in this layer, never below it.
+# ============================================================================
+
 # ---------- 1. OS packages ----------
 {{ if eq .chezmoi.os "darwin" -}}
 if ! command -v brew >/dev/null 2>&1; then
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
 brew install {{ range .packages.darwin }}{{ . }} {{ end }}
-
-{{ if .is_work -}}
+{{ if .is_work }}
 # Corp-only macOS packages distributed via Mule (go/mule).
 if command -v mule >/dev/null 2>&1 || [ -x /usr/local/bin/mule ]; then
     sudo mule install {{ range .packages.work_darwin }}{{ . }} {{ end }}
 fi
-{{- end }}
-
+{{ end }}
 {{ else if eq .chezmoi.os "linux" -}}
 sudo apt-get update
 sudo apt-get install -y {{ range .packages.linux }}{{ . }} {{ end }}
-
-{{ if .is_work -}}
+{{ if .is_work }}
 # In this linux branch, is_work means a corp workstation (roam is macOS).
 # The corp apt repos authenticate with the machine certificate, so these need
-# no LOAS cert and run before anything that does. Some packages land in the
-# delayed-install queue instead of being applied right away, so flush it after.
+# no LOAS cert and must stay ahead of the google3 VS Code installer in
+# section 2, which does. Some packages land in the delayed-install queue
+# instead of being applied right away, so flush it after.
 sudo apt-get install -y {{ range .packages.work_linux }}{{ . }} {{ end }}
 sudo install-delayed-packages -u
-
+{{ end }}
+{{- end }}
+{{ if eq .chezmoi.os "linux" -}}
+# ---------- 2. VS Code ----------
+{{ if .is_work -}}
 # Corp Linux (gLinux) gets VS Code from google3, not the Microsoft apt repo.
 # The installer reads the google3 depot, which needs a LOAS cert; `|| true`
 # keeps a gcert failure (usual under a non-interactive apply) from killing the
@@ -63,6 +71,7 @@ fi
 sudo apt-get install -y code
 {{- end }}
 
+# ---------- 3. Neovim ----------
 # Distro nvim is often too old (or absent) for LazyVim, and the neovim PPA is
 # Ubuntu-only (breaks on Debian/glinux). Install the official release tarball to
 # /opt so it matches the nvim PATH entry in dot_zshrc/dot_bashrc.
@@ -77,7 +86,25 @@ if [ -n "$NVIM_ARCH" ] && ! command -v nvim >/dev/null 2>&1 && [ ! -x "/opt/nvim
     sudo tar -C /opt -xzf /tmp/nvim.tar.gz
     rm -f /tmp/nvim.tar.gz
 fi
+{{ end }}
+# ---------- 4. Set zsh as default shell ----------
+# Skipped in containers: the image controls the shell, chsh can hang
+# non-interactively, and the change does not survive a rebuild.
+ZSH_PATH="$(command -v zsh || true)"
+if ! in_container && [ -n "$ZSH_PATH" ] && [ "${SHELL:-}" != "$ZSH_PATH" ]; then
+    {{ if eq .chezmoi.os "darwin" -}}
+    chsh -s /bin/zsh
+    {{- else }}
+    sudo chsh -s "$ZSH_PATH" "$(whoami)"
+    {{- end }}
+fi
 
+# ============================================================================
+# User layer: everything below installs into $HOME and never needs sudo.
+# ============================================================================
+
+{{ if eq .chezmoi.os "linux" -}}
+# ---------- 5. lazygit ----------
 # lazygit has no apt package on Debian/Ubuntu, fetch from GitHub release.
 if ! command -v lazygit >/dev/null 2>&1; then
     case "$(uname -m)" in
@@ -95,35 +122,20 @@ if ! command -v lazygit >/dev/null 2>&1; then
         rm -f /tmp/lazygit /tmp/lazygit.tar.gz
     fi
 fi
-{{- end }}
 
-# ---------- 2. Refresh font cache ----------
-{{ if eq .chezmoi.os "linux" -}}
+# ---------- 6. Refresh font cache ----------
 if command -v fc-cache >/dev/null 2>&1; then
     fc-cache -f >/dev/null
 fi
-{{- end }}
-
-# ---------- 3. Set zsh as default shell ----------
-# Skipped in containers: the image controls the shell, chsh can hang
-# non-interactively, and the change does not survive a rebuild.
-ZSH_PATH="$(command -v zsh || true)"
-if ! in_container && [ -n "$ZSH_PATH" ] && [ "${SHELL:-}" != "$ZSH_PATH" ]; then
-    {{ if eq .chezmoi.os "darwin" -}}
-    chsh -s /bin/zsh
-    {{- else }}
-    sudo chsh -s "$ZSH_PATH" "$(whoami)"
-    {{- end }}
-fi
-
-# ---------- 4. LazyVim starter ----------
+{{ end }}
+# ---------- 7. LazyVim starter ----------
 NVIM_DIR="$HOME/.config/nvim"
 if [ ! -d "$NVIM_DIR" ]; then
     git clone https://github.com/LazyVim/starter "$NVIM_DIR"
     rm -rf "$NVIM_DIR/.git"
 fi
 
-# ---------- 5. Node version manager (nvm) + default LTS ----------
+# ---------- 8. Node version manager (nvm) + default LTS ----------
 # Shell configs already source ~/.nvm; install it here if missing.
 export NVM_DIR="$HOME/.nvm"
 if [ ! -s "$NVM_DIR/nvm.sh" ]; then
@@ -139,7 +151,7 @@ nvm install --lts
 nvm alias default 'lts/*'
 set -u
 
-# ---------- 6. Global npm CLIs ----------
+# ---------- 9. Global npm CLIs ----------
 # node/npm are on PATH now (nvm loaded above). List lives in packages.yaml.
 # Skipped on work macOS.
 {{ if not (and .is_work (eq .chezmoi.os "darwin")) -}}
@@ -148,7 +160,7 @@ if command -v npm >/dev/null 2>&1; then
 fi
 {{- end }}
 
-# ---------- 7. uv (Python package manager) ----------
+# ---------- 10. uv (Python package manager) ----------
 # Installs to ~/.local/bin, already on PATH in the shell configs.
 # UV_NO_MODIFY_PATH keeps the installer from appending source lines to the
 # chezmoi-managed ~/.zshenv / ~/.bashrc.
@@ -156,7 +168,11 @@ if ! command -v uv >/dev/null 2>&1; then
     curl -LsSf https://astral.sh/uv/install.sh | UV_NO_MODIFY_PATH=1 sh
 fi
 
-# ---------- 8. Work-only: ADB systemd environment + pontisd ----------
+# ============================================================================
+# Work-only tail: service wiring for packages installed above.
+# ============================================================================
+
+# ---------- 11. ADB systemd environment + pontisd ----------
 # The pontisd package itself is installed in section 1; this only points it at
 # the ADB vendor keys and restarts it.
 {{ if and .is_work (eq .chezmoi.os "linux") -}}
