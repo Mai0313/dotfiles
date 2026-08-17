@@ -6,6 +6,7 @@ CLAUDE.md
 .zshrc
 .zshenv
 .zprofile
+.profile
 .bashrc
 .p10k.zsh
 cleanup.sh
