@@ -1,0 +1,37 @@
+#!/bin/bash
+# Toggle switch between Chrome Remote Desktop (crd) and local HDMI display (local)
+
+set -e
+
+STATUS_FILE="/var/lib/goobuntu/current_graphical_session"
+
+if [[ -f "$STATUS_FILE" && -s "$STATUS_FILE" ]]; then
+  CURRENT_MODE=$(cat "$STATUS_FILE")
+else
+  # Fallback to command output
+  CURRENT_OUT=$(switch-graphical-session current 2>/dev/null || true)
+  if [[ "$CURRENT_OUT" =~ crd ]]; then
+    CURRENT_MODE="crd"
+  elif [[ "$CURRENT_OUT" =~ local ]]; then
+    CURRENT_MODE="local"
+  else
+    CURRENT_MODE="unknown"
+  fi
+fi
+
+if [[ "$CURRENT_MODE" == "crd" ]]; then
+  TARGET_MODE="local"
+elif [[ "$CURRENT_MODE" == "local" ]]; then
+  TARGET_MODE="crd"
+else
+  echo "錯誤：無法決定目前的圖形會話模式 ($CURRENT_MODE)。請執行 switch-graphical-session current 確認。"
+  exit 1
+fi
+
+echo "=========================================================="
+echo "目前會話模式 (Current session): ${CURRENT_MODE}"
+echo "目標切換模式 (Target session) : ${TARGET_MODE}"
+echo "=========================================================="
+
+# 傳遞所有參數給 switch-graphical-session (例如 -y 可自動確認略過問答)
+exec sudo switch-graphical-session "$@" "${TARGET_MODE}"
