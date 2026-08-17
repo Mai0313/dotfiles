@@ -24,7 +24,6 @@ setup.sh
 .local/bin/list_devices
 .local/bin/toggle-display
 .local/share/fonts
-.config/gh
 .config/uv
 .config/pip
 {{- end }}
