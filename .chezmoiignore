@@ -18,6 +18,8 @@ setup.sh
 .local/bin/kgrep
 .local/bin/linux-kernel-mount
 .local/bin/automation-mount
+.config/systemd/user/linux-kernel-sshfs.service
+.config/systemd/user/automation-sshfs.service
 {{- end }}
 
 {{ if not .is_work -}}

@@ -1,0 +1,15 @@
+[Unit]
+Description=sshfs mount of mai0313:~/automation
+After=network-online.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/automation-mount daemon
+ExecStop=/bin/fusermount3 -uz %h/automation
+# corpssh certs expire, so keep retrying instead of giving up at boot.
+Restart=always
+RestartSec=30
+
+[Install]
+WantedBy=default.target
