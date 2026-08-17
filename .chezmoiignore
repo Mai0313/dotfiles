@@ -12,10 +12,26 @@ CLAUDE.md
 cleanup.sh
 setup.sh
 .config/alacritty
+.xinputrc
+.config/environment.d
+.config/systemd
+.config/fcitx5
+.config/btop
+.config/htop
+.config/neofetch
+.config/fastfetch
+.config/goobuntu-backups
+.local/bin/list_devices
+.local/bin/toggle-display
+.local/share/fonts
+.config/gh
+.config/uv
+.config/pip
 {{- end }}
 
 {{ if ne .chezmoi.os "windows" -}}
 Documents
+AppData
 {{- end }}
 
 {{ if not (and .is_work (eq .chezmoi.os "linux")) -}}
