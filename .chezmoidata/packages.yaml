@@ -27,7 +27,7 @@ packages:
     - ct-cli
   # Corp-only apt packages, all reachable from the repos a gLinux machine has by
   # default. Deliberately absent: bugged and vscode-google3, which
-  # install_vscode_for_google3.sh installs in section 1. bugged needs
+  # install_vscode_for_google3.sh installs in section 2. bugged needs
   # `glinux-add-repo bugged stable` first, so listing it here would fail the
   # whole script on a fresh machine.
   work_linux:
