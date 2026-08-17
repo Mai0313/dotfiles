@@ -5,7 +5,7 @@
 # module loads after the profile runs, so such a check is always false here.
 # -PredictionSource throws when output is redirected (e.g. `pwsh -c`).
 if (-not [Console]::IsOutputRedirected) {
-    Set-PSReadLineOption -PredictionSource HistoryAndPlugin -PredictionViewStyle ListView
+    Set-PSReadLineOption -PredictionSource HistoryAndPlugin -PredictionViewStyle InlineView
 }
 Set-PSReadLineOption -HistorySearchCursorMovesToEnd
 Set-PSReadLineKeyHandler -Key UpArrow   -Function HistorySearchBackward
