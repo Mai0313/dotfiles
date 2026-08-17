@@ -72,6 +72,18 @@ Inspect the current value with `chezmoi data | grep is_work`.
 
 **Known duplication.** The FQDN pattern `*.c.googlers.com|*.corp.google.com|*.roam.internal` appears in `.chezmoi.toml.tmpl` (Layer 1) plus `dot_zshrc` and `dot_bashrc` (Layer 2). If the pattern ever changes, grep for `c.googlers.com`, `corp.google.com`, and `roam.internal` to find every occurrence.
 
+### Machine Specs
+
+Five machines run this source state, three corp and two personal. One row each; `TBD` means not recorded yet, not "none".
+
+| Machine | Env | CPU | RAM | Storage | GPU | OS | Measured |
+|---|---|---|---|---|---|---|---|
+| `weichenglee-dell7875lin.ntc.corp.google.com` (desktop) | `is_work && linux` | AMD Ryzen Threadripper PRO 7985WX, 64C / 128T, 0.42–5.37 GHz | 250 GiB + 221 GiB swap | KIOXIA XG10d SED 2 TB NVMe (single drive, LVM root ~1.6 TB) | AMD Radeon PRO W6400 (Navi 24) | Debian rodete, kernel 7.1.6 | 2026-08-17 |
+| `mai0313.c.googlers.com` (Cloudtop VM) | `is_work && linux` | AMD EPYC 7B13, 2 sockets × 32C / 128T, KVM guest | 236 GiB + 115 GiB swap | 8 TB PersistentDisk, network-backed (LVM root 7.8 TB) | none (headless, virtio only) | Debian rodete, kernel 6.18.14 | 2026-08-17 |
+| Roam laptop | `is_work && darwin` | TBD | TBD | TBD | TBD | TBD | — |
+| Home desktop | `not is_work` | TBD | TBD | TBD | TBD | TBD | — |
+| Home workstation | `not is_work` | TBD | TBD | TBD | TBD | TBD | — |
+
 ### Key Files
 
 - `.chezmoi.toml.tmpl` — chezmoi config. Computes the single `is_work` flag from the FQDN and pins `sourceDir`. See Layer 1 above.
