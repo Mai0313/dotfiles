@@ -10,3 +10,8 @@ if (-not [Console]::IsOutputRedirected) {
 Set-PSReadLineOption -HistorySearchCursorMovesToEnd
 Set-PSReadLineKeyHandler -Key UpArrow   -Function HistorySearchBackward
 Set-PSReadLineKeyHandler -Key DownArrow -Function HistorySearchForward
+
+# Agent CLI shortcuts, mirroring the aliases in dot_zshrc.
+Set-Alias cc  claude
+Set-Alias cop copilot
+Set-Alias cod codex
