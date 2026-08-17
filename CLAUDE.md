@@ -82,7 +82,7 @@ Five machines run this source state, three corp and two personal. One row each; 
 | `mai0313.c.googlers.com` (Cloudtop VM) | `is_work && linux` | AMD EPYC 7B13, 2 sockets × 32C / 128T, KVM guest | 236 GiB + 115 GiB swap | 8 TB PersistentDisk, network-backed (LVM root 7.8 TB) | none (headless, virtio only) | Debian rodete, kernel 6.18.14 | 2026-08-17 |
 | Roam laptop | `is_work && darwin` | TBD | TBD | TBD | TBD | TBD | — |
 | `WEI` (Home desktop, ASUS ROG MAXIMUS Z790 HERO) | `not is_work` | Intel Core i9-13900K, 24C (8P + 16E) / 32T, base 3.0 GHz | 48 GiB (2 × 24 GB DDR5-4200) + 3 GiB pagefile | 7 drives, ~8.3 TB total — NVMe: Samsung 990 PRO 2 TB (`C:`), 980 PRO 2 TB, Lexar NM1090 PRO 2 TB, Samsung 970 PRO 512 GB; SATA: Samsung 860 EVO 500 GB, Crucial BX500 1 TB, WD10EZEX 1 TB HDD | NVIDIA GeForce RTX 5090, 32 GB VRAM (driver 610.88) | Windows 11 Pro 25H2, build 26200.9168 | 2026-08-18 |
-| Home workstation | `not is_work` | TBD | TBD | TBD | TBD | TBD | — |
+| `mai0313` (Home workstation, ASUS ROG MAXIMUS XI HERO (WI-FI)) | `not is_work` | Intel Core i9-9900K, 8C / 16T, 0.8–5.0 GHz | 62 GiB + 2 GiB swapfile | 2 drives, ~2.4 TB total — NVMe: Lexar NM620 2 TB (root), Intel 600p 512 GB (`/mnt/nfs`) | Intel UHD Graphics 630 (integrated, CoffeeLake-S GT2), no discrete GPU | Ubuntu 24.04.4 LTS (noble), kernel 6.8.0-136 | 2026-08-18 |
 
 ### Key Files
 
