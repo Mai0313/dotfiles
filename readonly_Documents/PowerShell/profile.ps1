@@ -1,9 +1,11 @@
 # CurrentUserAllHosts profile: applies to every host, not just ConsoleHost.
 
-# ~/.local/bin, where setup drops binaries that come from a GitHub release
-# rather than a package manager (fastfetch). Mirrors the PATH entry in
-# dot_zshrc; Windows has no equivalent by default.
-$env:PATH = "$HOME\.local\bin;$env:PATH"
+# The entries from the dot_zshrc PATH line that exist on Windows too: setup
+# drops release binaries (fastfetch) in ~/.local/bin, and Go and rustup use the
+# same two paths here as on *nix. Nothing puts them on PATH by default; rustup
+# does add ~/.cargo/bin to the user environment, so that one may end up listed
+# twice, which is harmless.
+$env:PATH = "$HOME\.local\bin;$HOME\go\bin;$HOME\.cargo\bin;$env:PATH"
 
 # PSReadLine: inline history suggestions (zsh-autosuggestions equivalent) and
 # prefix search on arrow keys. Not guarded by `Get-Module PSReadLine` -- the

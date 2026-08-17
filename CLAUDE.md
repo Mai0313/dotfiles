@@ -135,13 +135,15 @@ The per-tool settings files sitting next to them (`settings.json`, `config.toml`
 ### Shell Config Structure
 
 Both `dot_zshrc` and `dot_bashrc` cover the same ground, with a few zsh-only pieces called out:
-1. PATH extensions (`.local/bin`, Go, Cargo, Miniconda, Neovim, OpenOCD)
+1. PATH extensions (`.local/bin`, Go, Cargo, Neovim, OpenOCD)
 2. NVM loading — zsh lazy-loads via the oh-my-zsh `nvm` plugin (`zstyle ':omz:plugins:nvm' lazy yes`); bash sources `~/.nvm/nvm.sh` eagerly
 3. Common aliases (`cc='claude'`, `cop='copilot'`, `cod='codex'`)
 4. Runtime-gated environment blocks — three FQDN `case` arms: work (`*.c.googlers.com|*.corp.google.com|*.roam.internal` → `sshping`, `ADB_VENDOR_KEYS`, `CORP_SSH_HELPER_OVERRIDES`), roam-only (`*.roam.internal` → `agy`, `jetski-cli`), and Cloudtop (`*.c.googlers.com|*.corp.google.com` → sources `g4d` + `dc_setup.sh`, plus `gemini`/`agy`/`jetski`/`flash`/`recovery`/`listd`/`fetch`/`duckie` aliases). No-op on personal machines.
 5. Editor selection (zsh only: vim over SSH, nvim locally)
 
 zsh additionally loads oh-my-zsh (theme `powerlevel10k`, plugins `git`/`dotenv`/`nvm`/`zsh-autosuggestions`/`zsh-syntax-highlighting`); bash does not.
+
+**Windows has a third copy of the PATH list.** `readonly_Documents/PowerShell/profile.ps1` prepends the three entries from item 1 that exist on Windows too (`~/.local/bin`, `~/go/bin`, `~/.cargo/bin`); the rest are *nix-only paths. Changing the PATH line in `dot_zshrc` / `dot_bashrc` means checking whether the new entry belongs there as well.
 
 ### Bootstrap Architecture
 
