@@ -19,7 +19,6 @@ setup.sh
 .config/btop
 .config/htop
 .config/neofetch
-.config/fastfetch
 .config/goobuntu-backups
 .local/bin/list_devices
 .local/bin/toggle-display

@@ -3,7 +3,7 @@ chezmoi-driven Windows bootstrap. Auto-runs during `chezmoi apply` when this
 rendered content changes (e.g., editing .chezmoidata/packages.yaml).
 
 Windows has no bash, so it cannot share .chezmoitemplates/setup-body.sh. This
-script only installs the global npm CLIs.
+script installs the global npm CLIs and fastfetch.
 
 node/npm are assumed to be installed already (nvm-windows / winget / manual);
 the npm block is skipped with a message when npm is absent.
@@ -18,5 +18,26 @@ if (Get-Command npm -ErrorAction SilentlyContinue) {
     npm install -g {{ range .packages.npm_global }}{{ . }} {{ end }}
 } else {
     Write-Host 'npm not found on PATH, skipping global npm CLI install.'
+}
+
+# ---------- fastfetch ----------
+# Same GitHub release and same ~/.local/bin as section 11 of setup-body.sh, so
+# every machine ends up with one binary in one place. Checked by path, not by
+# Get-Command: profile.ps1 is what puts ~/.local/bin on PATH, and this script
+# runs outside any profile. The DLLs ship with fastfetch.exe and have to sit
+# next to it.
+$fastfetchBin = Join-Path $HOME '.local\bin'
+if (-not (Test-Path (Join-Path $fastfetchBin 'fastfetch.exe'))) {
+    $arch = if ($env:PROCESSOR_ARCHITECTURE -eq 'ARM64') { 'aarch64' } else { 'amd64' }
+    $zip = Join-Path $env:TEMP 'fastfetch.zip'
+    $unpacked = Join-Path $env:TEMP 'fastfetch'
+    # Invoke-WebRequest redraws a progress bar per chunk on PowerShell 5.1,
+    # which stretches an 18 MB download into minutes.
+    $ProgressPreference = 'SilentlyContinue'
+    Invoke-WebRequest -Uri "https://github.com/fastfetch-cli/fastfetch/releases/latest/download/fastfetch-windows-$arch.zip" -OutFile $zip
+    Expand-Archive -Path $zip -DestinationPath $unpacked -Force
+    New-Item -ItemType Directory -Force -Path $fastfetchBin | Out-Null
+    Copy-Item -Path "$unpacked\fastfetch.exe", "$unpacked\*.dll" -Destination $fastfetchBin -Force
+    Remove-Item -Path $zip, $unpacked -Recurse -Force
 }
 {{- end -}}

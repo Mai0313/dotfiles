@@ -11,7 +11,7 @@ Bootstrap has two entry points that share the same body via `.chezmoitemplates/s
 - **chezmoi-driven** (`.chezmoiscripts/run_onchange_after_setup.sh.tmpl`) — runs automatically as part of `chezmoi apply`, gated by OS.
 - **manual** (`executable_setup.sh.tmpl` → `~/setup.sh`) — deployed to home for opt-in manual execution; not deployed on Windows.
 
-Windows has no bash, so it does not share this body. A separate `.chezmoiscripts/run_onchange_after_setup.ps1.tmpl` runs on Windows only: it installs the global npm CLIs, but skips the *nix-only setup.
+Windows has no bash, so it does not share this body. A separate `.chezmoiscripts/run_onchange_after_setup.ps1.tmpl` runs on Windows only: it installs the global npm CLIs and fastfetch, but skips the *nix-only setup.
 
 ## Common Commands
 
@@ -91,7 +91,7 @@ Five machines run this source state, three corp and two personal. One row each; 
 - `.chezmoidata/packages.yaml` — declarative OS package lists (darwin / linux, plus `work_darwin` for Mule packages, `work_linux` for corp apt packages: google3/Cider, Android, Pontis, and serial-console tooling) and a cross-platform `npm_global` list of global npm CLIs, consumed by `.chezmoitemplates/setup-body.sh` (*nix) and `.chezmoiscripts/run_onchange_after_setup.ps1.tmpl` (Windows). Adding a package: edit the YAML and run `chezmoi apply` — `run_onchange` sees the changed content and re-runs setup.
 - `.chezmoitemplates/setup-body.sh` — shared bash body used by both bootstrap entry points. Contains a sudo system layer (OS packages, VS Code, Neovim, default shell), a no-sudo user layer (lazygit, font cache, LazyVim, nvm + node LTS, global npm CLIs, uv), and a work-only tail (ADB pontisd setup). Each section is internally idempotent.
 - `.chezmoiscripts/run_onchange_after_setup.sh.tmpl` — chezmoi-driven entry. Thin wrapper around `setup-body.sh`, gated by OS. Runs at `chezmoi apply` when rendered content changes.
-- `.chezmoiscripts/run_onchange_after_setup.ps1.tmpl` — Windows-only chezmoi-driven entry (PowerShell). Installs the `npm_global` CLIs (skips if npm absent). Does not share `setup-body.sh` (no bash on Windows). Renders empty on non-Windows so chezmoi skips it.
+- `.chezmoiscripts/run_onchange_after_setup.ps1.tmpl` — Windows-only chezmoi-driven entry (PowerShell). Installs the `npm_global` CLIs (skips if npm absent) and fastfetch into `~/.local/bin`. Does not share `setup-body.sh` (no bash on Windows). Renders empty on non-Windows so chezmoi skips it.
 - `executable_setup.sh.tmpl` — manual entry, deployed to `~/setup.sh`. Same body, no gates (user runs it intentionally). Not deployed on Windows (`.chezmoiignore`).
 - `.chezmoiignore` — keeps `install.sh`, READMEs, `CLAUDE.md` from being deployed; OS- and env-gated exclusions.
 - `.chezmoiversion` — minimum chezmoi version needed to apply this source state (`2.40.0`, the oldest release verified to handle everything here). An older chezmoi aborts with `source state requires chezmoi version ... or later` instead of silently degrading. Raise it only when the repo starts using a newer feature.
@@ -100,7 +100,7 @@ Five machines run this source state, three corp and two personal. One row each; 
 - `private_dot_profile` — POSIX login-shell profile (`0600`). Currently byte-identical to the Debian `/etc/skel/.profile`; tracked so a fresh machine gets `~/.local/bin` on PATH without depending on what the distro's skel happens to contain.
 - `dot_p10k.zsh` — Powerlevel10k prompt theme (lean style, NerdFont).
 - `dot_claude/`, `dot_codex/`, `dot_copilot/`, `dot_grok/`, `dot_config/opencode/`, `dot_local/share/crush/`, `private_dot_hermes/` — per-tool agent/IDE config. Each ships a settings file (`settings.json` / `config.toml` / `opencode.json` / `private_crush.json` / `private_config.toml`) plus a shared instruction file (`CLAUDE.md` / `AGENTS.md` / `copilot-instructions.md` / `SOUL.md`) carrying the same coding-guideline body — these must stay byte-identical, see Shared Agent Instruction Files below; `dot_claude` also ships a statusline script. Gemini's equivalent config (`GEMINI.md`, `settings.json`, statusline, sidecars) no longer lives here — it is tracked as the `.gemini` external repo, see Externals below.
-- `dot_config/*` — terminal and CLI tool configs (`alacritty.toml`, `btop`, `htop`, `neofetch`, `pip.conf`, `uv.toml`, git `ignore`).
+- `dot_config/*` — terminal and CLI tool configs (`alacritty.toml`, `btop`, `htop`, `fastfetch`, `neofetch`, `pip.conf`, `uv.toml`, git `ignore`).
 - `dot_local/share/fonts/meslo/` — MesloLGS NF (NerdFont) TTFs used by the p10k prompt.
 - `dot_local/bin/` — work-Linux-only helpers for the sshfs-mounted kernel tree at `~/linux_kernel`: `linux-kernel-mount` (mount/umount/remount/status, plus a `daemon` mode for the systemd user service) and `kgrep` (runs ripgrep on the remote host instead of pulling file contents over the mount). Host and paths are overridable via `LINUX_KERNEL_HOST` / `LINUX_KERNEL_REMOTE_DIR` / `LINUX_KERNEL_LOCAL_DIR`. Ignored unless `is_work && linux`.
 - `dot_config/systemd/user/` — the two systemd user units that drive the `dot_local/bin/` mount helpers at login: `linux-kernel-sshfs.service` and `automation-sshfs.service`, each running its helper's `daemon` mode with `Restart=always` (corpssh certs expire, so retrying beats giving up at boot). Ignored unless `is_work && linux`. **chezmoi deploys the unit files but cannot enable them** — the `default.target.wants/` symlinks are systemd state, not dotfiles, so a fresh machine still needs `systemctl --user enable --now linux-kernel-sshfs automation-sshfs` once.
@@ -145,7 +145,7 @@ zsh additionally loads oh-my-zsh (theme `powerlevel10k`, plugins `git`/`dotenv`/
 
 ### Bootstrap Architecture
 
-Two entry points share `.chezmoitemplates/setup-body.sh`. The body opens with an `in_container` helper (`/.dockerenv`, `/run/.containerenv`, `CODESPACES` / `REMOTE_CONTAINERS` / `DEVCONTAINER`) and runs eleven idempotent sections in three groups: a system layer (§1–4, everything that needs sudo, kept first and contiguous so one password prompt at the start covers the run), a user layer (§5–10, installs into `$HOME`, no sudo), and a work-only tail (§11).
+Two entry points share `.chezmoitemplates/setup-body.sh`. The body opens with an `in_container` helper (`/.dockerenv`, `/run/.containerenv`, `CODESPACES` / `REMOTE_CONTAINERS` / `DEVCONTAINER`) and runs twelve idempotent sections in three groups: a system layer (§1–4, everything that needs sudo, kept first and contiguous so one password prompt at the start covers the run), a user layer (§5–11, installs into `$HOME`, no sudo), and a work-only tail (§12).
 
 1. **OS packages** — brew on darwin (plus corp Mule packages when `is_work`); apt-get on Linux. Package list lives in `.chezmoidata/packages.yaml`. Corp Linux (gLinux) also installs the `work_linux` packages and flushes the delayed-install queue with `install-delayed-packages -u`.
 
@@ -167,7 +167,8 @@ Two entry points share `.chezmoitemplates/setup-body.sh`. The body opens with an
 8. **nvm + default LTS** — installs nvm into `~/.nvm` (mac/linux) via the official installer if absent, then `nvm install --lts` and `nvm alias default 'lts/*'`. Runs with `PROFILE=/dev/null` so the installer does not append source lines to the chezmoi-managed `~/.zshrc` / `~/.bashrc` (those already load `~/.nvm`).
 9. **Global npm CLIs** — `npm install -g` over the `npm_global` list in `packages.yaml`. Runs right after nvm so node/npm are on PATH. Installs latest (no version pins); npm re-install is a no-op when already current, so re-runs are cheap. Gated by `{{ if not (and .is_work (eq .chezmoi.os "darwin")) }}` — work macOS (Roam laptops) still gets nvm + node LTS from §8, but no global CLIs.
 10. **uv** — installs the Astral installer script if `uv` is absent. Runs with `UV_NO_MODIFY_PATH=1` so it does not append source lines to the chezmoi-managed shell configs; `~/.local/bin` (its install target) is already on PATH there.
-11. **Work-only ADB systemd env + pontisd restart** — gated by `{{ if and .is_work (eq .chezmoi.os "linux") }}`, renders to nothing elsewhere.
+11. **fastfetch** — GitHub release tarball into `~/.local/bin`, on Linux and darwin alike. Deliberately not a package: Ubuntu 24.04's apt has no fastfetch, so a `packages.yaml` entry would break `mai0313` under `set -e`, and brew and Debian's apt would each land a different version. Tracks `latest`, no version pin. The tarball unpacks under a `usr/bin` prefix, hence `--strip-components=3`. Windows gets the same binary from §Entry point 3.
+12. **Work-only ADB systemd env + pontisd restart** — gated by `{{ if and .is_work (eq .chezmoi.os "linux") }}`, renders to nothing elsewhere.
 
 **The input method (fcitx5) is deliberately not a section here.** It used to be the last section and was removed: installing it needs `sudo apt-get`, setup reaches that point long after the sudo timestamp has expired, and so a re-run with nothing to do still stopped to ask for a password. fcitx5 is installed and set up by hand now. `dot_config/environment.d/im.conf` (the `GTK_IM_MODULE` / `QT_IM_MODULE` / `XMODIFIERS` trio) stays tracked because it is a dotfile rather than an install step — that is not an invitation to put the packages back into `packages.yaml`.
 
@@ -189,7 +190,9 @@ Always deployed (except Windows). Contains only `{{ template "setup-body.sh" . }
 
 #### Entry point 3: Windows (`.chezmoiscripts/run_onchange_after_setup.ps1.tmpl`)
 
-Windows-only, PowerShell. Cannot share `setup-body.sh` (no bash), so it only installs the `npm_global` CLIs (skipped with a message if npm is not on PATH — node/npm are assumed pre-installed). Wrapped in `{{ if eq .chezmoi.os "windows" }}`, so it renders empty (and chezmoi skips it) on macOS/Linux. Windows PowerShell 5.1 compatible.
+Windows-only, PowerShell. Cannot share `setup-body.sh` (no bash), so it reimplements the two sections that apply: the `npm_global` CLIs (skipped with a message if npm is not on PATH — node/npm are assumed pre-installed) and fastfetch. Wrapped in `{{ if eq .chezmoi.os "windows" }}`, so it renders empty (and chezmoi skips it) on macOS/Linux. Windows PowerShell 5.1 compatible.
+
+The fastfetch block mirrors §11 of `setup-body.sh` — same release, same `~/.local/bin` — with two Windows-only wrinkles. The zip is flat and ships `libqjs-0.dll` and `lua55.dll` next to `fastfetch.exe`, so all three are copied; dropping the DLLs leaves an exe that will not start. And the idempotence check is `Test-Path` on the exe, not `Get-Command`: `~/.local/bin` only reaches PATH through `readonly_Documents/PowerShell/profile.ps1`, which this script never loads, so a `Get-Command` check would reinstall on every run.
 
 #### Why share via `.chezmoitemplates`?
 
