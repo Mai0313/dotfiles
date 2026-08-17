@@ -143,7 +143,7 @@ Both `dot_zshrc` and `dot_bashrc` cover the same ground, with a few zsh-only pie
 
 zsh additionally loads oh-my-zsh (theme `powerlevel10k`, plugins `git`/`dotenv`/`nvm`/`zsh-autosuggestions`/`zsh-syntax-highlighting`); bash does not.
 
-**Windows has a third copy of the PATH list.** `readonly_Documents/PowerShell/profile.ps1` prepends the three entries from item 1 that exist on Windows too (`~/.local/bin`, `~/go/bin`, `~/.cargo/bin`); the rest are *nix-only paths. Changing the PATH line in `dot_zshrc` / `dot_bashrc` means checking whether the new entry belongs there as well.
+**Windows has a third copy of the PATH list.** `readonly_Documents/PowerShell/profile.ps1` prepends seven entries. The first three are the ones from item 1 that exist on Windows too (`~/.local/bin`, `~/go/bin`, `~/.cargo/bin`); the rest of item 1 is *nix-only paths. The other four are Windows-only tool directories with no `dot_zshrc` counterpart (`~/.grok/bin`, `~/.local/bin/adb`, `~/AppData/Local/agy/bin`, `~/AppData/Local/Programs/obsidian`). Changing the PATH line in `dot_zshrc` / `dot_bashrc` means checking whether the new entry belongs there as well.
 
 ### Bootstrap Architecture
 
