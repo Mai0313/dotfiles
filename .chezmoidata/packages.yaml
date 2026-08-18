@@ -61,6 +61,7 @@ packages:
     - "@mai0313/vct"
     - "@openai/codex"
     - "@deepseek-ai/dsh"
+    - "@earendil-works/pi-coding-agent"
     - opencode-ai
     - reasonix
     - tree-sitter-cli
