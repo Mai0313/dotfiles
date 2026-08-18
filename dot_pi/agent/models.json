@@ -1,0 +1,39 @@
+{
+  "providers": {
+    "anthropic": {
+      "baseUrl": "https://api.mai0313.com",
+      "apiKey": "$OPENAI_API_KEY",
+      "headers": {
+        "x-litellm-end-user-id": "pi-cli"
+      }
+    },
+    "deepseek": {
+      "baseUrl": "https://api.mai0313.com/v1",
+      "apiKey": "$OPENAI_API_KEY",
+      "headers": {
+        "x-litellm-end-user-id": "pi-cli"
+      }
+    },
+    "google": {
+      "baseUrl": "https://api.mai0313.com/v1beta",
+      "apiKey": "$OPENAI_API_KEY",
+      "headers": {
+        "x-litellm-end-user-id": "pi-cli"
+      }
+    },
+    "openai": {
+      "baseUrl": "https://api.mai0313.com/v1",
+      "apiKey": "$OPENAI_API_KEY",
+      "headers": {
+        "x-litellm-end-user-id": "pi-cli"
+      }
+    },
+    "xai": {
+      "baseUrl": "https://api.mai0313.com/v1",
+      "apiKey": "$OPENAI_API_KEY",
+      "headers": {
+        "x-litellm-end-user-id": "pi-cli"
+      }
+    }
+  }
+}

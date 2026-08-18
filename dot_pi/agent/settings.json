@@ -1,0 +1,22 @@
+{
+  "lastChangelogVersion": "0.84.2",
+  "theme": "dark",
+  "defaultProvider": "google",
+  "defaultModel": "gemini-3.7-flash",
+  "showHardwareCursor": true,
+  "autocompleteMaxVisible": 10,
+  "terminal": {
+    "showTerminalProgress": true
+  },
+  "steeringMode": "all",
+  "followUpMode": "all",
+  "showCacheMissNotices": false,
+  "collapseChangelog": true,
+  "quietStartup": true,
+  "enableInstallTelemetry": false,
+  "defaultProjectTrust": "always",
+  "treeFilterMode": "default",
+  "tuiMode": "fullscreen",
+  "fullscreenExitOutput": "transcript",
+  "fullscreenScrollbar": "auto"
+}
