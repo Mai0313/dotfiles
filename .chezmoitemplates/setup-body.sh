@@ -70,24 +70,8 @@ fi
 # run every time so a machine that already has the repo still gets code.
 sudo apt-get install -y code
 {{- end }}
-
-# ---------- 3. Neovim ----------
-# Distro nvim is often too old (or absent) for LazyVim, and the neovim PPA is
-# Ubuntu-only (breaks on Debian/glinux). Install the official release tarball to
-# /opt so it matches the nvim PATH entry in dot_zshrc/dot_bashrc.
-case "$(uname -m)" in
-    x86_64)  NVIM_ARCH=x86_64 ;;
-    aarch64) NVIM_ARCH=arm64 ;;
-    *) echo "Unsupported arch for neovim: $(uname -m), skipping"; NVIM_ARCH= ;;
-esac
-if [ -n "$NVIM_ARCH" ] && ! command -v nvim >/dev/null 2>&1 && [ ! -x "/opt/nvim-linux-${NVIM_ARCH}/bin/nvim" ]; then
-    curl -Lo /tmp/nvim.tar.gz "https://github.com/neovim/neovim/releases/latest/download/nvim-linux-${NVIM_ARCH}.tar.gz"
-    sudo rm -rf "/opt/nvim-linux-${NVIM_ARCH}"
-    sudo tar -C /opt -xzf /tmp/nvim.tar.gz
-    rm -f /tmp/nvim.tar.gz
-fi
 {{ end }}
-# ---------- 4. Set zsh as default shell ----------
+# ---------- 3. Set zsh as default shell ----------
 # Skipped in containers: the image controls the shell, chsh can hang
 # non-interactively, and the change does not survive a rebuild.
 ZSH_PATH="$(command -v zsh || true)"
@@ -104,7 +88,40 @@ fi
 # ============================================================================
 
 {{ if eq .chezmoi.os "linux" -}}
-# ---------- 5. lazygit ----------
+# ---------- 4. Refresh font cache ----------
+if command -v fc-cache >/dev/null 2>&1; then
+    fc-cache -f >/dev/null
+fi
+
+# ---------- 5. Neovim ----------
+# Distro nvim is often too old (or absent) for LazyVim, and the neovim PPA is
+# Ubuntu-only (breaks on Debian/glinux). Upstream's INSTALL.md unpacks to /opt,
+# but the tarball is relocatable (nvim derives $VIMRUNTIME from its own path),
+# so unpacking under $HOME keeps this out of the sudo layer above. The symlink
+# is what puts it on PATH; ~/.local/bin is already there.
+case "$(uname -m)" in
+    x86_64)  NVIM_ARCH=x86_64 ;;
+    aarch64) NVIM_ARCH=arm64 ;;
+    *) echo "Unsupported arch for neovim: $(uname -m), skipping"; NVIM_ARCH= ;;
+esac
+if [ -n "$NVIM_ARCH" ] && ! command -v nvim >/dev/null 2>&1 && [ ! -x "$HOME/.nvim/bin/nvim" ]; then
+    curl -Lo /tmp/nvim.tar.gz "https://github.com/neovim/neovim/releases/latest/download/nvim-linux-${NVIM_ARCH}.tar.gz"
+    rm -rf "$HOME/.nvim"
+    mkdir -p "$HOME/.nvim" "$HOME/.local/bin"
+    tar -C "$HOME/.nvim" --strip-components=1 -xzf /tmp/nvim.tar.gz
+    rm -f /tmp/nvim.tar.gz
+    ln -sf "$HOME/.nvim/bin/nvim" "$HOME/.local/bin/nvim"
+fi
+{{ end }}
+# ---------- 6. LazyVim starter ----------
+NVIM_DIR="$HOME/.config/nvim"
+if [ ! -d "$NVIM_DIR" ]; then
+    git clone https://github.com/LazyVim/starter "$NVIM_DIR"
+    rm -rf "$NVIM_DIR/.git"
+fi
+
+{{ if eq .chezmoi.os "linux" -}}
+# ---------- 7. lazygit ----------
 # lazygit has no apt package on Debian/Ubuntu, fetch from GitHub release.
 if ! command -v lazygit >/dev/null 2>&1; then
     case "$(uname -m)" in
@@ -122,19 +139,7 @@ if ! command -v lazygit >/dev/null 2>&1; then
         rm -f /tmp/lazygit /tmp/lazygit.tar.gz
     fi
 fi
-
-# ---------- 6. Refresh font cache ----------
-if command -v fc-cache >/dev/null 2>&1; then
-    fc-cache -f >/dev/null
-fi
 {{ end }}
-# ---------- 7. LazyVim starter ----------
-NVIM_DIR="$HOME/.config/nvim"
-if [ ! -d "$NVIM_DIR" ]; then
-    git clone https://github.com/LazyVim/starter "$NVIM_DIR"
-    rm -rf "$NVIM_DIR/.git"
-fi
-
 # ---------- 8. Node version manager (nvm) + default LTS ----------
 # Shell configs already source ~/.nvm; install it here if missing.
 export NVM_DIR="$HOME/.nvm"
