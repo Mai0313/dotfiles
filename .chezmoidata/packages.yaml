@@ -20,8 +20,6 @@ packages:
     - fd-find
     - fuse-overlayfs
     - tmux
-    - htop
-    - gh
   # Corp-only macOS packages distributed via Mule (go/mule).
   work_darwin:
     - ct-cli
