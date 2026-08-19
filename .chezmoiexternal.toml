@@ -46,6 +46,25 @@
         args = ["--ff-only"]
 {{- end }}
 
+{{ if eq .chezmoi.os "linux" -}}
+# Deliberately not apt packages: noble ships both far behind upstream.
+{{ $gh := (gitHubLatestRelease "cli/cli").TagName | trimPrefix "v" -}}
+[".local/bin/gh"]
+    type = "archive-file"
+    url = "https://github.com/cli/cli/releases/download/v{{ $gh }}/gh_{{ $gh }}_linux_{{ .chezmoi.arch }}.tar.gz"
+    path = "gh_{{ $gh }}_linux_{{ .chezmoi.arch }}/bin/gh"
+    executable = true
+    refreshPeriod = "168h"
+
+[".local/bin/gdu"]
+    type = "archive-file"
+    url = "https://github.com/dundee/gdu/releases/latest/download/gdu_linux_{{ .chezmoi.arch }}.tgz"
+    path = "gdu_linux_{{ .chezmoi.arch }}"
+    executable = true
+    refreshPeriod = "168h"
+
+{{- end }}
+
 {{ if .is_work -}}
 ["adb-keys/security"]
     type = "git-repo"
