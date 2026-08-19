@@ -90,6 +90,7 @@ Five machines run this source state, three corp and two personal. One row each; 
 - `.chezmoiexternal.toml` — declarative external dependencies (oh-my-zsh, p10k, zsh plugins, `.agents` skills repo, `.gemini` config repo, work-only ADB security repo). All `type = "git-repo"`; the four non-Windows externals pin `--depth=1` clone and `--ff-only` pull, while `.agents`, `.gemini`, and `adb-keys/security` use plain full clones/pulls.
 - `.chezmoidata/packages.yaml` — declarative OS package lists (darwin / linux, plus `work_darwin` for Mule packages, `work_linux` for corp apt packages: google3/Cider, Android, Pontis, and serial-console tooling) and a cross-platform `npm_global` list of global npm CLIs, consumed by `.chezmoitemplates/setup-body.sh` (*nix) and `.chezmoiscripts/run_onchange_after_setup.ps1.tmpl` (Windows). Adding a package: edit the YAML and run `chezmoi apply` — `run_onchange` sees the changed content and re-runs setup.
 - `.chezmoitemplates/setup-body.sh` — shared bash body used by both bootstrap entry points. Contains a sudo system layer (OS packages, VS Code, Neovim, default shell), a no-sudo user layer (lazygit, font cache, LazyVim, nvm + node LTS, global npm CLIs, uv), and a work-only tail (ADB pontisd setup). Each section is internally idempotent.
+- `.chezmoitemplates/agent-instructions.md` — the single copy of the agent coding guidelines, included by all seven per-tool instruction files. **This is the file to edit when the guidelines change.** See Shared Agent Instruction Files below.
 - `.chezmoiscripts/run_onchange_after_setup.sh.tmpl` — chezmoi-driven entry. Thin wrapper around `setup-body.sh`, gated by OS. Runs at `chezmoi apply` when rendered content changes.
 - `.chezmoiscripts/run_onchange_after_setup.ps1.tmpl` — Windows-only chezmoi-driven entry (PowerShell). Installs the `npm_global` CLIs (skips if npm absent) and fastfetch into `~/.local/bin`. Does not share `setup-body.sh` (no bash on Windows). Renders empty on non-Windows so chezmoi skips it.
 - `executable_setup.sh.tmpl` — manual entry, deployed to `~/setup.sh`. Same body, no gates (user runs it intentionally). Not deployed on Windows (`.chezmoiignore`).
@@ -99,7 +100,7 @@ Five machines run this source state, three corp and two personal. One row each; 
 - `dot_zshenv` / `dot_zprofile` — zsh startup hooks, currently comment-only placeholders. `.zshenv` is read by every zsh (scripts included), `.zprofile` only by login shells, before `.zshrc`. Also plain files so `re-add` works.
 - `private_dot_profile` — POSIX login-shell profile (`0600`). Currently byte-identical to the Debian `/etc/skel/.profile`; tracked so a fresh machine gets `~/.local/bin` on PATH without depending on what the distro's skel happens to contain.
 - `dot_p10k.zsh` — Powerlevel10k prompt theme (lean style, NerdFont).
-- `dot_claude/`, `dot_codex/`, `dot_copilot/`, `dot_grok/`, `dot_config/opencode/`, `dot_local/share/crush/`, `dot_dsh/`, `private_dot_hermes/` — per-tool agent/IDE config. Each ships a settings file (`settings.json` / `config.toml` / `opencode.json` / `private_crush.json` / `private_settings.yaml` / `private_config.toml`); most also ship a shared instruction file (`CLAUDE.md` / `AGENTS.md` / `copilot-instructions.md` / `SOUL.md`) carrying the same coding-guideline body — these must stay byte-identical, see Shared Agent Instruction Files below. `dot_claude` also ships two statusline scripts (main session and subagent). Gemini's equivalent config (`GEMINI.md`, `settings.json`, statusline, sidecars) no longer lives here — it is tracked as the `.gemini` external repo, see Externals below.
+- `dot_claude/`, `dot_codex/`, `dot_copilot/`, `dot_grok/`, `dot_config/opencode/`, `dot_local/share/crush/`, `dot_dsh/`, `dot_pi/`, `private_dot_hermes/` — per-tool agent/IDE config. Each ships a settings file (`settings.json` / `config.toml` / `opencode.json` / `private_crush.json` / `private_settings.yaml` / `private_config.toml`, plus `models.json` under `dot_pi/agent/`); most also ship an instruction file (`CLAUDE.md` / `AGENTS.md` / `copilot-instructions.md` / `SOUL.md`) that is a one-line include of the shared coding-guideline body, see Shared Agent Instruction Files below. `dot_claude` also ships two statusline scripts (main session and subagent). Gemini's equivalent config (`GEMINI.md`, `settings.json`, statusline, sidecars) no longer lives here — it is tracked as the `.gemini` external repo, see Externals below.
 - `agent-configs.code-workspace` — VS Code workspace deployed to `~`, opening `.agents`, `.gemini` and `.local/share/chezmoi` side by side. Not ignored anywhere, so it lands on every platform.
 - `dot_config/*` — terminal and CLI tool configs (`alacritty/` with its imported theme, `btop`, `htop`, `fastfetch`, `neofetch`, `pip.conf`, `uv.toml`, `fcitx5/`, `environment.d/`, `goobuntu-backups/exclude`, git `ignore`).
 
@@ -117,24 +118,29 @@ Five machines run this source state, three corp and two personal. One row each; 
 
 ### Shared Agent Instruction Files
 
-Every agent CLI reads a different filename, but they must all get the same instructions. **These six files are byte-identical copies of one body. Editing any one of them means editing all six in the same commit — never let them drift.**
+Every agent CLI reads a different filename, but they must all get the same instructions. **The body lives in exactly one place, `.chezmoitemplates/agent-instructions.md`. Edit that file — the seven deployed copies are one-line templates that include it, so they cannot drift.**
 
 | Path | Deployed to | Read by |
 |---|---|---|
-| `dot_claude/CLAUDE.md` | `~/.claude/CLAUDE.md` | Claude Code |
-| `dot_codex/AGENTS.md` | `~/.codex/AGENTS.md` | Codex |
-| `dot_grok/AGENTS.md` | `~/.grok/AGENTS.md` | Grok CLI |
-| `dot_config/opencode/AGENTS.md` | `~/.config/opencode/AGENTS.md` | opencode |
-| `dot_copilot/copilot-instructions.md` | `~/.copilot/copilot-instructions.md` | GitHub Copilot CLI |
-| `private_dot_hermes/SOUL.md` | `~/.hermes/SOUL.md` | Hermes |
+| `dot_claude/CLAUDE.md.tmpl` | `~/.claude/CLAUDE.md` | Claude Code |
+| `dot_codex/AGENTS.md.tmpl` | `~/.codex/AGENTS.md` | Codex |
+| `dot_grok/AGENTS.md.tmpl` | `~/.grok/AGENTS.md` | Grok CLI |
+| `dot_config/opencode/AGENTS.md.tmpl` | `~/.config/opencode/AGENTS.md` | opencode |
+| `dot_copilot/copilot-instructions.md.tmpl` | `~/.copilot/copilot-instructions.md` | GitHub Copilot CLI |
+| `private_dot_hermes/SOUL.md.tmpl` | `~/.hermes/SOUL.md` | Hermes |
+| `dot_pi/agent/AGENTS.md.tmpl` | `~/.pi/agent/AGENTS.md` | pi |
 
-Verify after any edit — all six checksums must match:
+Each of those seven is the same single line, mirroring how the two bootstrap entry points include `setup-body.sh`:
 
-```bash
-md5sum dot_claude/CLAUDE.md dot_codex/AGENTS.md dot_grok/AGENTS.md \
-       dot_config/opencode/AGENTS.md dot_copilot/copilot-instructions.md \
-       private_dot_hermes/SOUL.md
 ```
+{{ template "agent-instructions.md" . -}}
+```
+
+The trailing `-}}` trims the newline after the action, so the rendered file ends exactly where the body does. Adding an eighth tool means one more such file, not another copy.
+
+**The body must stay free of Go template syntax.** Everything under `.chezmoitemplates/` is rendered, so a literal `{{` in the instructions would be parsed as an action and fail the apply. If the instructions ever need to show one, escape it (`{{ "{{" }}`).
+
+**`chezmoi re-add` does not work on these any more** — it cannot reverse-merge a rendered file back through a template. Edit the source file in this repo and run `chezmoi apply`; that is the direction this layout is built for. Note this is the opposite call from `dot_zshrc` / `dot_bashrc` (see Environment Detection Layer 2), which stay plain files *because* they are edited in `$HOME` and synced back.
 
 The per-tool settings files sitting next to them (`settings.json`, `config.toml`, `opencode.json`, `private_crush.json`, `private_config.toml`) are **not** shared — each is tool-specific and unrelated to the others. `dot_local/share/crush/` ships only a settings file, no instruction file.
 
