@@ -3,6 +3,7 @@
   "theme": "dark",
   "defaultProvider": "google",
   "defaultModel": "gemini-3.7-flash",
+  "defaultThinkingLevel": "high",
   "showHardwareCursor": true,
   "autocompleteMaxVisible": 10,
   "terminal": {
@@ -10,7 +11,7 @@
   },
   "steeringMode": "all",
   "followUpMode": "all",
-  "showCacheMissNotices": false,
+  "showCacheMissNotices": true,
   "collapseChangelog": true,
   "quietStartup": true,
   "enableInstallTelemetry": false,
