@@ -47,7 +47,10 @@
 {{- end }}
 
 {{ if eq .chezmoi.os "linux" -}}
-# Deliberately not apt packages: noble ships both far behind upstream.
+# Linux only, and deliberately not apt packages: noble freezes at release, so it
+# still offers gh 2.45 and gdu 5.25 against upstream's 2.97 and 5.37. brew and
+# winget both track upstream within a day or two, so darwin and windows take
+# these from packages.yaml instead.
 {{ $gh := (gitHubLatestRelease "cli/cli").TagName | trimPrefix "v" -}}
 [".local/bin/gh"]
     type = "archive-file"

@@ -10,6 +10,8 @@ packages:
     - fd
     - lazygit
     - fastfetch
+    - gh
+    - gdu
   linux:
     - zsh
     - vim
@@ -21,12 +23,15 @@ packages:
     - fd-find
     - fuse-overlayfs
     - tmux
-  # winget packages, installed by run_onchange_after_setup.ps1.tmpl. Names are
-  # matched by search, the form upstream documents, so a name that ever becomes
-  # ambiguous will fail the install; pin it as `--exact --id <PackageIdentifier>`
-  # in the script if that happens.
+  # winget packages, installed by run_onchange_after_setup.ps1.tmpl. Each entry
+  # is whatever that project's own docs tell you to type, which is why some are
+  # bare names and gh is an identifier. The script passes them through unchanged
+  # and winget matches a name, moniker or id alike. A bare name that ever goes
+  # ambiguous fails the install; the fix is to swap in its PackageIdentifier.
   windows:
     - fastfetch
+    - GitHub.cli
+    - gdu
   # Corp-only macOS packages distributed via Mule (go/mule).
   work_darwin:
     - ct-cli
