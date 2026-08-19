@@ -97,8 +97,8 @@ fi
 # Distro nvim is often too old (or absent) for LazyVim, and the neovim PPA is
 # Ubuntu-only (breaks on Debian/glinux). Upstream's INSTALL.md unpacks to /opt,
 # but the tarball is relocatable (nvim derives $VIMRUNTIME from its own path),
-# so unpacking under $HOME keeps this out of the sudo layer above. The symlink
-# is what puts it on PATH; ~/.local/bin is already there.
+# so unpacking under $HOME keeps this out of the sudo layer above. Its bin/ is
+# on PATH via dot_zshrc/dot_bashrc.
 case "$(uname -m)" in
     x86_64)  NVIM_ARCH=x86_64 ;;
     aarch64) NVIM_ARCH=arm64 ;;
@@ -107,10 +107,9 @@ esac
 if [ -n "$NVIM_ARCH" ] && ! command -v nvim >/dev/null 2>&1 && [ ! -x "$HOME/.nvim/bin/nvim" ]; then
     curl -Lo /tmp/nvim.tar.gz "https://github.com/neovim/neovim/releases/latest/download/nvim-linux-${NVIM_ARCH}.tar.gz"
     rm -rf "$HOME/.nvim"
-    mkdir -p "$HOME/.nvim" "$HOME/.local/bin"
+    mkdir -p "$HOME/.nvim"
     tar -C "$HOME/.nvim" --strip-components=1 -xzf /tmp/nvim.tar.gz
     rm -f /tmp/nvim.tar.gz
-    ln -sf "$HOME/.nvim/bin/nvim" "$HOME/.local/bin/nvim"
 fi
 {{ end }}
 # ---------- 6. LazyVim starter ----------
@@ -127,7 +126,6 @@ if ! command -v lazygit >/dev/null 2>&1; then
     case "$(uname -m)" in
         x86_64)  LAZYGIT_ARCH=x86_64 ;;
         aarch64) LAZYGIT_ARCH=arm64 ;;
-        armv7l)  LAZYGIT_ARCH=armv6 ;;
         *) echo "Unsupported arch for lazygit: $(uname -m), skipping"; LAZYGIT_ARCH= ;;
     esac
     if [ -n "$LAZYGIT_ARCH" ]; then
