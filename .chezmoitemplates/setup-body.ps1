@@ -1,0 +1,31 @@
+$ErrorActionPreference = 'Stop'
+
+# ---------- Global npm CLIs ----------
+# node/npm are assumed to be installed already (nvm-windows / winget / manual).
+if (Get-Command npm -ErrorAction SilentlyContinue) {
+    npm install -g {{ range .packages.npm_global }}{{ . }} {{ end }}
+} else {
+    Write-Host 'npm not found on PATH, skipping global npm CLI install.'
+}
+
+# ---------- winget packages ----------
+# winget ships with Windows 11 (App Installer), so unlike scoop or choco there
+# is nothing to bootstrap first. IDs live in packages.yaml.
+#
+# winget exits non-zero for "already installed, nothing to do" as well as for
+# real failures, and $ErrorActionPreference does not cover native exit codes on
+# PowerShell 5.1 anyway, so each install is checked explicitly: `winget list`
+# first, and only the codes that mean a genuine failure are raised.
+if (Get-Command winget -ErrorAction SilentlyContinue) {
+{{- range .packages.windows }}
+    winget install {{ . }} --silent --disable-interactivity `
+        --accept-source-agreements --accept-package-agreements
+    # 0 installed, 0x8A15002B already installed, 0x8A150061 no applicable upgrade.
+    if ($LASTEXITCODE -notin 0, -1978335189, -1978335135) {
+        throw "winget install {{ . }} failed with $LASTEXITCODE"
+    }
+{{- end }}
+    $global:LASTEXITCODE = 0
+} else {
+    Write-Host 'winget not found on PATH, skipping package install.'
+}

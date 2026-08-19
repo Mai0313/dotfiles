@@ -6,12 +6,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Chezmoi-managed dotfiles repo (`Mai0313/dotfiles`). Deploys shell configs, IDE settings, fonts, and bootstraps the dev toolchain (oh-my-zsh, Powerlevel10k, plugins, LazyVim, OS packages) across personal machines, Google Cloudtop (work), Roam laptops, and GitHub Codespaces.
 
-Bootstrap has two entry points that share the same body via `.chezmoitemplates/setup-body.sh`:
+Bootstrap has the same two entry points on every platform, each pair sharing one body under `.chezmoitemplates/`:
 
-- **chezmoi-driven** (`.chezmoiscripts/run_onchange_after_setup.sh.tmpl`) — runs automatically as part of `chezmoi apply`, gated by OS.
-- **manual** (`executable_setup.sh.tmpl` → `~/setup.sh`) — deployed to home for opt-in manual execution; not deployed on Windows.
+- **chezmoi-driven** (`run_onchange_after_setup.sh.tmpl` / `.ps1.tmpl` under `.chezmoiscripts/`) — runs automatically as part of `chezmoi apply`, gated by OS.
+- **manual** (`executable_setup.sh.tmpl` → `~/setup.sh`, `setup.ps1.tmpl` → `~/setup.ps1`) — deployed to home for opt-in manual execution; `.chezmoiignore` deploys only the one matching the OS.
 
-Windows has no bash, so it does not share this body. A separate `.chezmoiscripts/run_onchange_after_setup.ps1.tmpl` runs on Windows only: it installs the global npm CLIs and the `windows` winget packages, but skips the *nix-only setup.
+Windows has no bash, so its pair shares `setup-body.ps1` rather than `setup-body.sh`. That body installs the global npm CLIs and the `windows` winget packages, and has no counterpart to the *nix-only sections.
 
 ## Common Commands
 
@@ -58,7 +58,7 @@ OS detection comes from chezmoi built-ins: `eq .chezmoi.os "linux"` / `"darwin"`
 **Note**: `.chezmoi.toml.tmpl` runs at `chezmoi init`, not at every `chezmoi apply`, so editing it needs `chezmoi init --force` once to regenerate `~/.config/chezmoi/chezmoi.toml`.
 
 **Current consumers of `is_work`:**
-- `.chezmoiignore` — gates `.local/bin/kgrep`, `.local/bin/linux-kernel-mount`, `.local/bin/automation-mount` and the two `.config/systemd/user/*-sshfs.service` units off unless `is_work && linux`; `.config/environment.d/adb.conf` + `setup_adb.sh` off unless `is_work`; and `.chrome-remote-desktop-session` off unless `linux && not is_work`. The OS gates in the same file are independent of `is_work`: Windows drops the whole *nix set (`.zshrc`, `.zshenv`, `.zprofile`, `.profile`, `.bashrc`, `.p10k.zsh`, `cleanup.sh`, `setup.sh`, `.xinputrc`, `.config/{alacritty,environment.d,systemd,fcitx5,btop,htop,goobuntu-backups,uv,pip}`, `.local/share/fonts`, `.local/bin/{list_devices,toggle-display}`), non-Windows drops `Documents` + `AppData`, and non-Linux drops `.config/environment.d/im.conf`.
+- `.chezmoiignore` — gates `.local/bin/kgrep`, `.local/bin/linux-kernel-mount`, `.local/bin/automation-mount` and the two `.config/systemd/user/*-sshfs.service` units off unless `is_work && linux`; `.config/environment.d/adb.conf` + `setup_adb.sh` off unless `is_work`; and `.chrome-remote-desktop-session` off unless `linux && not is_work`. The OS gates in the same file are independent of `is_work`: Windows drops the whole *nix set (`.zshrc`, `.zshenv`, `.zprofile`, `.profile`, `.bashrc`, `.p10k.zsh`, `cleanup.sh`, `setup.sh`, `.xinputrc`, `.config/{alacritty,environment.d,systemd,fcitx5,btop,htop,goobuntu-backups,uv,pip}`, `.local/share/fonts`, `.local/bin/{list_devices,toggle-display}`), non-Windows drops `Documents`, `AppData` + `setup.ps1`, and non-Linux drops `.config/environment.d/im.conf`.
 - `.chezmoiexternal.toml` — gates `adb-keys/security` (sso git-repo); gates oh-my-zsh + plugins on `chezmoi.os != "windows"` and the two CLI binaries on `chezmoi.os == "linux"`, neither of which depends on `is_work`.
 - `.chezmoitemplates/setup-body.sh` — §1 gates the corp-only apt packages, §2 routes VS Code (corp Linux → google3, else Microsoft repo), §9 skips global npm on work macOS, §11 gates the ADB pontisd restart. Container and OS gating inside the body is runtime, not chezmoi data.
 
@@ -92,7 +92,8 @@ Only the files whose purpose is not obvious from opening them. Everything else i
 |---|---|
 | `.chezmoi.toml.tmpl` | The only chezmoi data. See Environment Detection Layer 1. |
 | `.chezmoidata/packages.yaml` | Package lists per OS. Editing it re-triggers setup, because `run_onchange` hashes rendered content. |
-| `.chezmoitemplates/setup-body.sh` | The bootstrap body. See Bootstrap Architecture. |
+| `.chezmoitemplates/setup-body.sh` | The *nix bootstrap body. See Bootstrap Architecture. |
+| `.chezmoitemplates/setup-body.ps1` | The Windows bootstrap body, shared by that platform's two entry points the same way. |
 | `.chezmoitemplates/agent-instructions.md` | **The one copy of the agent guidelines.** Edit here, never the seven deployed files. See Shared Agent Instruction Files. |
 | `.chezmoiversion` | `2.40.0`, the oldest release verified against this source state. An older chezmoi aborts rather than silently degrading. Raise it only when the repo starts using a newer feature. |
 | `dot_zshrc` / `dot_bashrc` / `dot_zshenv` / `dot_zprofile` | Plain, non-`.tmpl`, so `chezmoi re-add` works. See Environment Detection Layer 2 before changing that. |
@@ -122,7 +123,7 @@ Every agent CLI reads a different filename, but they must all get the same instr
 | `private_dot_hermes/SOUL.md.tmpl` | `~/.hermes/SOUL.md` | Hermes |
 | `dot_pi/agent/AGENTS.md.tmpl` | `~/.pi/agent/AGENTS.md` | pi |
 
-Each of those seven is the same single line, mirroring how the two bootstrap entry points include `setup-body.sh`:
+Each of those seven is the same single line, mirroring how each pair of bootstrap entry points includes its body:
 
 ```
 {{ template "agent-instructions.md" . -}}
@@ -153,7 +154,7 @@ zsh additionally loads oh-my-zsh (theme `powerlevel10k`, plugins `git`/`dotenv`/
 
 ### Bootstrap Architecture
 
-Two entry points share `.chezmoitemplates/setup-body.sh`. The body opens with an `in_container` helper (`/.dockerenv`, `/run/.containerenv`, `CODESPACES` / `REMOTE_CONTAINERS` / `DEVCONTAINER`) and runs eleven idempotent sections in three groups: a system layer (§1–3, everything that needs sudo, kept first and contiguous so one password prompt at the start covers the run), a user layer (§4–10, installs into `$HOME`, no sudo), and a work-only tail (§11).
+The *nix pair shares `.chezmoitemplates/setup-body.sh`. That body opens with an `in_container` helper (`/.dockerenv`, `/run/.containerenv`, `CODESPACES` / `REMOTE_CONTAINERS` / `DEVCONTAINER`) and runs eleven idempotent sections in three groups: a system layer (§1–3, everything that needs sudo, kept first and contiguous so one password prompt at the start covers the run), a user layer (§4–10, installs into `$HOME`, no sudo), and a work-only tail (§11).
 
 Within those groups the order is topical: fonts before the editor that uses them, neovim next to the LazyVim starter that configures it. That ordering only works because no user-layer step needs sudo, so **a new step that needs sudo goes in §1–3, never below** — adding one lower down splits the password prompt in two and the grouping stops meaning anything.
 
@@ -173,12 +174,23 @@ Within those groups the order is topical: fonts before the editor that uses them
 
 #### Entry points
 
-Three, each a thin wrapper: `.chezmoiscripts/run_onchange_after_setup.sh.tmpl` (auto, during `chezmoi apply`), `executable_setup.sh.tmpl` → `~/setup.sh` (manual, run it yourself), and `.chezmoiscripts/run_onchange_after_setup.ps1.tmpl` (Windows, PowerShell 5.1). The first two include `setup-body.sh` and must stay byte-identical, which is the whole reason the body lives in `.chezmoitemplates`:
+Four, in two matching pairs, each a thin wrapper: an auto one under `.chezmoiscripts/` that runs during `chezmoi apply`, and a manual one deployed to `$HOME` to run yourself. Both members of a pair include the same body and must stay byte-identical, which is the whole reason the bodies live in `.chezmoitemplates`:
 
 ```bash
 diff <(chezmoi execute-template < .chezmoiscripts/run_onchange_after_setup.sh.tmpl) \
      <(chezmoi execute-template < executable_setup.sh.tmpl)   # expect no output
 ```
+
+The `.ps1` pair cannot be checked that way from Linux, since the auto one renders empty off Windows. Rewrite the built-in into a data key first:
+
+```bash
+sed 's/\.chezmoi\.os/.tos/g' .chezmoiscripts/run_onchange_after_setup.ps1.tmpl > /tmp/probe.tmpl
+printf 'sourceDir = "%s"\n[data]\ntos = "windows"\n' "$PWD" > /tmp/cfg.toml
+diff <(chezmoi --config=/tmp/cfg.toml execute-template < /tmp/probe.tmpl) \
+     <(chezmoi --config=/tmp/cfg.toml execute-template < setup.ps1.tmpl)   # expect no output
+```
+
+Note `setup.ps1.tmpl` carries no `executable_` prefix: Windows has no execute bit for chezmoi to set, and the file deploys nowhere else.
 
 `run_onchange_` alone gives run-once-then-quiet: it re-runs only when the *rendered* content changes. There is no `is_setup` sentinel and none is needed.
 
