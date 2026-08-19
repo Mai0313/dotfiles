@@ -86,35 +86,27 @@ Five machines run this source state, three corp and two personal. One row each; 
 
 ### Key Files
 
-- `.chezmoi.toml.tmpl` — chezmoi config. Computes the single `is_work` flag from the FQDN and pins `sourceDir`. See Layer 1 above.
-- `.chezmoiexternal.toml` — declarative external dependencies (oh-my-zsh, p10k, zsh plugins, `.agents` skills repo, `.gemini` config repo, work-only ADB security repo, plus two single-binary CLIs on Linux). The repos are `type = "git-repo"`; the four non-Windows ones pin `--depth=1` clone and `--ff-only` pull, while `.agents`, `.gemini`, and `adb-keys/security` use plain full clones/pulls. The CLIs are `archive-file`.
-- `.chezmoidata/packages.yaml` — declarative OS package lists (darwin / linux, plus `work_darwin` for Mule packages, `work_linux` for corp Linux apt packages, `windows` for winget packages) and a cross-platform `npm_global` list of global npm CLIs, consumed by `.chezmoitemplates/setup-body.sh` (*nix) and `.chezmoiscripts/run_onchange_after_setup.ps1.tmpl` (Windows). Adding a package: edit the YAML and run `chezmoi apply` — `run_onchange` sees the changed content and re-runs setup.
-- `.chezmoitemplates/setup-body.sh` — shared bash body used by both bootstrap entry points. Contains a sudo system layer (OS packages, VS Code, default shell), a no-sudo user layer (font cache, Neovim, LazyVim, lazygit, nvm + node LTS, global npm CLIs, uv), and a work-only tail (ADB pontisd setup). Each section is internally idempotent.
-- `.chezmoitemplates/agent-instructions.md` — the single copy of the agent coding guidelines, included by all seven per-tool instruction files. **This is the file to edit when the guidelines change.** See Shared Agent Instruction Files below.
-- `.chezmoiscripts/run_onchange_after_setup.sh.tmpl` — chezmoi-driven entry. Thin wrapper around `setup-body.sh`, gated by OS. Runs at `chezmoi apply` when rendered content changes.
-- `.chezmoiscripts/run_onchange_after_setup.ps1.tmpl` — Windows-only chezmoi-driven entry (PowerShell). Installs the `npm_global` CLIs (skips if npm absent) and the `windows` package list through winget (skips if winget absent). Does not share `setup-body.sh` (no bash on Windows). Renders empty on non-Windows so chezmoi skips it.
-- `executable_setup.sh.tmpl` — manual entry, deployed to `~/setup.sh`. Same body, no gates (user runs it intentionally). Not deployed on Windows (`.chezmoiignore`).
-- `.chezmoiignore` — keeps `install.sh`, READMEs, `CLAUDE.md` from being deployed; OS- and env-gated exclusions.
-- `.chezmoiversion` — minimum chezmoi version needed to apply this source state (`2.40.0`, the oldest release verified to handle everything here). An older chezmoi aborts with `source state requires chezmoi version ... or later` instead of silently degrading. Raise it only when the repo starts using a newer feature.
-- `dot_zshrc` / `dot_bashrc` — shell configs. Plain (non-`.tmpl`) so `chezmoi re-add` works.
-- `dot_zshenv` / `dot_zprofile` — zsh startup hooks, currently comment-only placeholders. `.zshenv` is read by every zsh (scripts included), `.zprofile` only by login shells, before `.zshrc`. Also plain files so `re-add` works.
-- `private_dot_profile` — POSIX login-shell profile (`0600`). Currently byte-identical to the Debian `/etc/skel/.profile`; tracked so a fresh machine gets `~/.local/bin` on PATH without depending on what the distro's skel happens to contain.
-- `dot_p10k.zsh` — Powerlevel10k prompt theme (lean style, NerdFont).
-- `dot_claude/`, `dot_codex/`, `dot_copilot/`, `dot_grok/`, `dot_config/opencode/`, `dot_local/share/crush/`, `dot_dsh/`, `dot_pi/`, `private_dot_hermes/` — per-tool agent/IDE config. Each ships a settings file (`settings.json` / `config.toml` / `opencode.json` / `private_crush.json` / `private_settings.yaml` / `private_config.toml`, plus `models.json` under `dot_pi/agent/`); most also ship an instruction file (`CLAUDE.md` / `AGENTS.md` / `copilot-instructions.md` / `SOUL.md`) that is a one-line include of the shared coding-guideline body, see Shared Agent Instruction Files below. `dot_claude` also ships two statusline scripts (main session and subagent). Gemini's equivalent config (`GEMINI.md`, `settings.json`, statusline, sidecars) no longer lives here — it is tracked as the `.gemini` external repo, see Externals below.
-- `agent-configs.code-workspace` — VS Code workspace deployed to `~`, opening `.agents`, `.gemini` and `.local/share/chezmoi` side by side. Not ignored anywhere, so it lands on every platform.
-- `dot_config/*` — terminal and CLI tool configs (`alacritty/` with its imported theme, `btop`, `htop`, `fastfetch`, `pip.conf`, `uv.toml`, `fcitx5/`, `environment.d/`, `goobuntu-backups/exclude`, git `ignore`).
+Only the files whose purpose is not obvious from opening them. Everything else in the tree is what it looks like.
 
-  **alacritty is not installed by the bootstrap, on purpose.** The tracked config uses the `[general] import` form, which needs alacritty ≥ 0.14; Ubuntu noble's apt candidate is 0.13.2 and would reject it outright, so there is no `packages.yaml` entry and no `setup-body.sh` section. The binary is installed by hand into `~/.local/bin`; like the fcitx5 note under Bootstrap Architecture, the omission is deliberate rather than an oversight.
-- `dot_xinputrc` + `dot_chrome-remote-desktop-session` + `dot_config/environment.d/im.conf` — fcitx5 input-method wiring, in three places because nothing covers both sessions: `.xinputrc` (`run_im fcitx5`) and `im.conf` drive the physical session, and the Chrome Remote Desktop session reads neither, so `.chrome-remote-desktop-session` repeats the `GTK_IM_MODULE` / `QT_IM_MODULE` / `XMODIFIERS` trio (plus a `DBUS_SESSION_BUS_ADDRESS`) itself. `.chezmoiignore` deploys that last one on personal Linux only — corp Linux drives its graphical session through goobuntu (`switch-graphical-session`, wrapped by `dot_local/bin/toggle-display`) instead.
-- `readonly_Documents/PowerShell/` — the two pwsh profiles, deployed under `~/Documents` on Windows: `profile.ps1` (CurrentUserAllHosts — PATH, PSReadLine, agent aliases) and `Microsoft.PowerShell_profile.ps1` (CurrentUserCurrentHost, VS Code python activation). Ignored on non-Windows.
-- `AppData/` — Windows-native config paths: Windows Terminal `settings.json`, `Roaming/pip/pip.ini`, `Roaming/uv/uv.toml`. **The pip and uv files are byte-identical copies of `dot_config/pip/pip.conf` and `dot_config/uv/uv.toml`** — Windows looks for them under AppData, so `.chezmoiignore` drops the `.config` pair there and ships these instead. Editing one side means editing the other. Ignored on non-Windows.
-- `executable_setup_adb.sh` — corp-only, deployed as `~/setup_adb.sh`. Points `ADB_VENDOR_KEYS` at the `adb-keys/security` external and restarts the adb server / pontisd. Ignored unless `is_work`.
-- `private_dot_gdu.yaml` / `private_dot_npmrc` — small single-purpose tool state (gdu colors, npm flags).
-- `dot_local/share/fonts/meslo/` — MesloLGS NF (NerdFont) TTFs used by the p10k prompt.
-- `dot_local/bin/` — five scripts, split across two different gates. Three are ignored unless `is_work && linux`: `linux-kernel-mount` (mount/umount/remount/status of the sshfs kernel tree at `~/linux_kernel`, plus a `daemon` mode for the systemd user service; overridable via `LINUX_KERNEL_HOST` / `LINUX_KERNEL_REMOTE_DIR` / `LINUX_KERNEL_LOCAL_DIR`), `automation-mount` (same shape for `~/automation`, with `AUTOMATION_*` overrides) and `kgrep` (runs ripgrep on the remote host instead of pulling file contents over the mount). The other two are only ignored on Windows, so they deploy on personal machines too even though they are corp tools: `list_devices` (attached Pixel boards via adb/fastboot, a fast local stand-in for flashstation's own `list_devices`) and `toggle-display` (switches the goobuntu graphical session between Chrome Remote Desktop and local HDMI).
-- `dot_config/systemd/user/` — the two systemd user units that drive the `dot_local/bin/` mount helpers at login: `linux-kernel-sshfs.service` and `automation-sshfs.service`, each running its helper's `daemon` mode with `Restart=always` (corpssh certs expire, so retrying beats giving up at boot). Ignored unless `is_work && linux`. **chezmoi deploys the unit files but cannot enable them** — the `default.target.wants/` symlinks are systemd state, not dotfiles, so a fresh machine still needs `systemctl --user enable --now linux-kernel-sshfs automation-sshfs` once.
-- `executable_cleanup.sh` — ad-hoc cleanup utility (NOT auto-run; deployed as `~/cleanup.sh` for manual use).
-- `install.sh` — Codespace bootstrap one-liner; runs `chezmoi init --apply`. Not deployed to `$HOME`.
+| Path | Note |
+|---|---|
+| `.chezmoi.toml.tmpl` | The only chezmoi data. See Environment Detection Layer 1. |
+| `.chezmoidata/packages.yaml` | Package lists per OS. Editing it re-triggers setup, because `run_onchange` hashes rendered content. |
+| `.chezmoitemplates/setup-body.sh` | The bootstrap body. See Bootstrap Architecture. |
+| `.chezmoitemplates/agent-instructions.md` | **The one copy of the agent guidelines.** Edit here, never the seven deployed files. See Shared Agent Instruction Files. |
+| `.chezmoiversion` | `2.40.0`, the oldest release verified against this source state. An older chezmoi aborts rather than silently degrading. Raise it only when the repo starts using a newer feature. |
+| `dot_zshrc` / `dot_bashrc` / `dot_zshenv` / `dot_zprofile` | Plain, non-`.tmpl`, so `chezmoi re-add` works. See Environment Detection Layer 2 before changing that. |
+| `private_dot_profile` | Byte-identical to Debian's `/etc/skel/.profile`. Tracked anyway, so `~/.local/bin` lands on PATH regardless of what a distro's skel contains. |
+| `dot_claude/`, `dot_codex/`, `dot_copilot/`, `dot_grok/`, `dot_config/opencode/`, `dot_local/share/crush/`, `dot_dsh/`, `dot_pi/`, `private_dot_hermes/` | Per-tool agent config: a settings file each, plus an instruction file that only includes the shared body. Gemini's equivalent is not here, it is the `.gemini` external. |
+| `dot_local/bin/` | Five scripts under two different gates: `kgrep`, `linux-kernel-mount`, `automation-mount` need `is_work && linux`; `list_devices` and `toggle-display` are corp tools but only gated off Windows, so they land on personal machines too. |
+| `install.sh` | Codespace one-liner. Not deployed to `$HOME`. |
+
+Four couplings that break quietly if you touch one side only:
+
+- **`AppData/Roaming/{pip,uv}` are byte-identical copies of `dot_config/{pip,uv}`.** Windows reads them from AppData, so `.chezmoiignore` drops the `.config` pair there and ships these instead. Editing one side means editing the other.
+- **fcitx5 wiring lives in three files** because nothing covers both sessions: `.xinputrc` and `environment.d/im.conf` drive the physical session, and the Chrome Remote Desktop session reads neither, so `.chrome-remote-desktop-session` repeats the `GTK_IM_MODULE` / `QT_IM_MODULE` / `XMODIFIERS` trio itself. That last one deploys on personal Linux only; corp Linux goes through goobuntu's `switch-graphical-session` instead.
+- **chezmoi deploys the `dot_config/systemd/user/` units but cannot enable them.** The `default.target.wants/` symlinks are systemd state, not dotfiles, so a fresh machine still needs `systemctl --user enable --now linux-kernel-sshfs automation-sshfs` once.
+- **alacritty is deliberately not installed by the bootstrap.** The tracked config uses the `[general] import` form, which needs ≥ 0.14, and noble's apt candidate is 0.13.2 — a `packages.yaml` entry would deploy a config the binary rejects. Installed by hand into `~/.local/bin`.
 
 ### Shared Agent Instruction Files
 
@@ -165,73 +157,34 @@ Two entry points share `.chezmoitemplates/setup-body.sh`. The body opens with an
 
 Within those groups the order is topical: fonts before the editor that uses them, neovim next to the LazyVim starter that configures it. That ordering only works because no user-layer step needs sudo, so **a new step that needs sudo goes in §1–3, never below** — adding one lower down splits the password prompt in two and the grouping stops meaning anything.
 
-1. **OS packages** — brew on darwin (plus corp Mule packages when `is_work`); apt-get on Linux. Package list lives in `.chezmoidata/packages.yaml`. Corp Linux (gLinux) also installs the `work_linux` packages and flushes the delayed-install queue with `install-delayed-packages -u`.
+§1 OS packages, §2 VS Code, §3 default shell | §4 font cache, §5 neovim, §6 LazyVim starter, §7 lazygit, §8 nvm + node LTS, §9 global npm CLIs, §10 uv | §11 ADB/pontisd. **Each section carries its own comment explaining itself; read the script for what a section does.** What follows is only what the script cannot tell you.
 
-   **Nothing needing a LOAS cert may run before the apt work.** The corp apt repos authenticate with the *machine* certificate, so `apt-get` never needs `gcert` — only the google3 depot the §2 VS Code installer reads does. That is why the `work_linux` install sits in §1, ahead of it.
+**Ordering constraints.** Nothing needing a LOAS cert may run before §1: corp apt repos authenticate with the *machine* cert, so `apt-get` never needs `gcert`, but the google3 depot §2 reads does — hence `work_linux` installs in §1, ahead of it. §9 must follow §8, which is what puts node on PATH.
 
-   **Always `apt-get`, never `apt`.** `apt` has no stable CLI interface and prints `WARNING: apt does not have a stable CLI interface` to stderr on every non-tty run, which is exactly how this script executes under `chezmoi apply`. Do not add `--update` to the installs either: §1 already ran `apt-get update`, and `--update` is (per `apt-get(8)`) merely syntactic sugar for `update && install`. A plain `install` still upgrades an already-installed package to the candidate version, so it is not needed for freshness.
-2. **VS Code** (Linux only) — forks on `is_work`: corp Linux runs the google3 VS Code installer, everyone else adds the public Microsoft apt repo and installs `code`.
+**Corp `gcert` (§2).** It is interactive, driving the gnubby over `ssh-agent`, so it fails whenever `SSH_AUTH_SOCK` is unset — the normal case under a non-interactive apply, and inside tmux (go/sk-screen-tmux). Do not put `--lifetime` back; the cert only has to outlive this run. **Never let a failing `gcert` be the last command of a list**, or `set -e` takes nvm, npm and uv down with it. The installer after it runs unconditionally on purpose: with no cert it fails loudly, which is the intended "go run gcert and re-run" signal, so do not add a `gcertstatus` gate there.
 
-   The google3 installer needs a LOAS cert. `gcert` is interactive: it drives the gnubby over `ssh-agent` and fails immediately when `SSH_AUTH_SOCK` is unset, which is the normal case under a non-interactive `chezmoi apply`, and also inside tmux (go/sk-screen-tmux). Hence `gcertstatus --quiet --check_remaining=1h` guarding `gcert --nocorpssh --noprodssh || true`: refresh only below an hour, and take whatever lifetime the policy hands out — the cert just has to outlive this run, so do not put `--lifetime` back. **Never let a failing `gcert` be the last command of a list** — under `set -e` that kills the whole setup, nvm, npm and uv included.
+**Always `apt-get`, never `apt`.** `apt` has no stable CLI interface and warns on every non-tty run, which is how this script always executes. Do not add `--update` either: §1 already ran `apt-get update`, and a plain `install` still upgrades to the candidate version.
 
-   The installer then runs unconditionally. This is deliberate: with no cert it fails and `set -e` stops setup there, which is the intended signal to go run `gcert` and re-run, rather than having setup quietly skip VS Code. Do not reintroduce a `gcertstatus` gate around the installer.
+**Deliberately not sections here**, and each will look like an oversight to someone who does not read this:
 
-   **The corp branch installs no VS Code package of its own.** `install_vscode_for_google3.sh` runs `sudo apt install bugged code vscode-google3` itself, behind its own idempotence check, and calls `glinux-add-repo bugged stable` to add the repo `bugged` lives in. That is why `bugged` and `vscode-google3` are *not* in `work_linux`: nothing else adds that repo, so a fresh machine would fail the `apt-get install` before the installer ever ran.
-3. **Default shell** — `chsh -s zsh`, skipped in containers (`in_container`): the image controls the shell and `chsh` can hang non-interactively.
-4. **Font cache refresh** — `fc-cache -f` (Linux only).
-5. **Neovim** (Linux only) — official release tarball unpacked into `~/.nvim`: distro nvim is often too old (or absent) for LazyVim, and the neovim PPA is Ubuntu-only. darwin gets neovim from brew in §1.
+- **fastfetch** — a package everywhere it can be: `packages.darwin` (brew), `packages.work_linux` (the gLinux repos have it, which is why it sits in a list otherwise full of corp-only tooling), `packages.windows` (winget). The gap is personal Ubuntu: noble has no fastfetch at all, so a `packages.linux` entry would fail `apt-get` and take the run down under `set -e`. Left to the user, who installs the upstream PPA by hand until 25.04+ makes it unnecessary. **That PPA must not go into the script** — it publishes for Ubuntu series only, so `add-apt-repository` on the corp Debian machines leaves a repo with no matching series and the next `apt-get update` fails. Same reason §5 does not use the neovim PPA.
+- **fcitx5** — installing it needs `sudo apt-get` from the user layer, long after the sudo timestamp expired, so a no-op re-run still stopped for a password. Installed by hand now. `dot_config/environment.d/im.conf` stays tracked because it is a dotfile, not an install step.
+- **alacritty** — see its note under Key Files.
 
-   **Upstream's `INSTALL.md` says `/opt`, and this deliberately does not follow it.** The tarball is relocatable — nvim derives `$VIMRUNTIME` from its own resolved path — so unpacking under `$HOME` costs nothing and is what keeps this section out of the sudo layer, which in turn is what lets §4 and §5 sit below §3. Putting it back under `/opt` would drag `sudo` below the system layer and break that grouping. It has to be the whole tree, not just `bin/nvim`: a lone binary in `~/.local/bin` computes its runtime as `~/.local/share/nvim/runtime`, which is where lazy.nvim and mason keep *their* data, and nvim then falls back to the build machine's paths and fails to start.
-6. **LazyVim starter** — `git clone` into `~/.config/nvim` only if absent. Deliberately a script clone (not a chezmoi external) because LazyVim is meant to be customized after first install — an external would re-pull and clobber user edits.
-7. **lazygit** (Linux only) — GitHub release binary into `~/.local/bin` (no apt package on Debian/Ubuntu). darwin gets lazygit from brew in §1.
-8. **nvm + default LTS** — installs nvm into `~/.nvm` (mac/linux) via the official installer if absent, then `nvm install --lts` and `nvm alias default 'lts/*'`. Runs with `PROFILE=/dev/null` so the installer does not append source lines to the chezmoi-managed `~/.zshrc` / `~/.bashrc` (those already load `~/.nvm`).
-9. **Global npm CLIs** — `npm install -g` over the `npm_global` list in `packages.yaml`. Runs right after nvm so node/npm are on PATH. Installs latest (no version pins); npm re-install is a no-op when already current, so re-runs are cheap. Gated by `{{ if not (and .is_work (eq .chezmoi.os "darwin")) }}` — work macOS (Roam laptops) still gets nvm + node LTS from §8, but no global CLIs.
-10. **uv** — installs the Astral installer script if `uv` is absent. Runs with `UV_NO_MODIFY_PATH=1` so it does not append source lines to the chezmoi-managed shell configs; `~/.local/bin` (its install target) is already on PATH there.
-11. **Work-only ADB systemd env + pontisd restart** — gated by `{{ if and .is_work (eq .chezmoi.os "linux") }}`, renders to nothing elsewhere.
+#### Entry points
 
-**fastfetch has no section here, and that is the current answer rather than an oversight.** It is a package everywhere it can be: `packages.darwin` (brew), `packages.work_linux` (the gLinux repos have it, which is why it sits in a list otherwise full of corp-only tooling), and `packages.windows` (winget). The gap is personal Ubuntu — noble has no fastfetch at all, so a `packages.linux` entry would fail `apt-get` and take the whole run down under `set -e`. That gap is deliberately left to the user, the way alacritty and fcitx5 are: 25.04 and later carry the package, and before that the upstream PPA covers it (`add-apt-repository ppa:zhangsongcui3371/fastfetch`, installed by hand on `mai0313`).
-
-**Do not put that PPA into the script.** It publishes for Ubuntu series only (jammy, noble, and later), so `add-apt-repository` on the corp Debian machines adds a repo with no matching series and the next `apt-get update` fails. This is the same reason §5 does not use the neovim PPA. A GitHub-release tarball would work on every Linux, and there was one here until the package route covered enough machines to make it dead weight; reach for it again only if a Linux machine appears that has neither the package nor the PPA.
-
-**The input method (fcitx5) is deliberately not a section here.** It used to be the last section and was removed: installing it needs `sudo apt-get`, setup reaches that point long after the sudo timestamp has expired, and so a re-run with nothing to do still stopped to ask for a password. fcitx5 is installed and set up by hand now. `dot_config/environment.d/im.conf` (the `GTK_IM_MODULE` / `QT_IM_MODULE` / `XMODIFIERS` trio) stays tracked because it is a dotfile rather than an install step — that is not an invitation to put the packages back into `packages.yaml`.
-
-#### Entry point 1: chezmoi-driven (`.chezmoiscripts/run_onchange_after_setup.sh.tmpl`)
-
-Auto-runs as part of `chezmoi apply`. Wrapped in:
-
-```
-{{- if ne .chezmoi.os "windows" -}}
-{{ template "setup-body.sh" . }}
-{{- end -}}
-```
-
-`run_onchange_` re-runs the script whenever its rendered content changes — editing `packages.yaml` or switching OS / work env. It runs once on a fresh machine and stays quiet afterwards; each body section is idempotent, so a re-run only installs what changed. There is no `is_setup` flag or sentinel: `run_onchange` alone gives the run-once, re-run-on-change behavior.
-
-#### Entry point 2: manual (`executable_setup.sh.tmpl` → `~/setup.sh`)
-
-Always deployed (except Windows). Contains only `{{ template "setup-body.sh" . }}`. Run it yourself to bootstrap (or re-bootstrap) a machine without invoking chezmoi.
-
-#### Entry point 3: Windows (`.chezmoiscripts/run_onchange_after_setup.ps1.tmpl`)
-
-Windows-only, PowerShell. Cannot share `setup-body.sh` (no bash), so it does the two things that apply: the `npm_global` CLIs (skipped with a message if npm is not on PATH — node/npm are assumed pre-installed) and the `packages.windows` list through winget. Wrapped in `{{ if eq .chezmoi.os "windows" }}`, so it renders empty (and chezmoi skips it) on macOS/Linux. Windows PowerShell 5.1 compatible.
-
-**winget rather than scoop or choco** because it ships with Windows 11 as part of App Installer, so there is nothing to bootstrap before the first package. Names are matched by search, the form upstream documents; if one ever goes ambiguous winget refuses with `Multiple packages found matching input criteria` and the fix is `--exact --id <PackageIdentifier>` from the package's manifest.
-
-**Its exit codes need handling that a bash `set -e` habit does not prepare you for.** winget returns non-zero for "already installed, nothing to do" (`0x8A15002B`) as well as for real failures, so a re-run would look like a break; the script allows that code and `0x8A150061` and throws on anything else. And `$ErrorActionPreference = 'Stop'` does not cover native command exit codes on PowerShell 5.1, so `$LASTEXITCODE` has to be tested by hand — it is also reset at the end, or a tolerated non-zero leaks out as the script's own status. None of this is verifiable from a Linux machine; check it on `WEI` after changing the block.
-
-#### Why share via `.chezmoitemplates`?
-
-The chezmoi-driven and manual paths must stay byte-identical. Putting body in `.chezmoitemplates/setup-body.sh` and including from both entries prevents drift. Verify with:
+Three, each a thin wrapper: `.chezmoiscripts/run_onchange_after_setup.sh.tmpl` (auto, during `chezmoi apply`), `executable_setup.sh.tmpl` → `~/setup.sh` (manual, run it yourself), and `.chezmoiscripts/run_onchange_after_setup.ps1.tmpl` (Windows, PowerShell 5.1). The first two include `setup-body.sh` and must stay byte-identical, which is the whole reason the body lives in `.chezmoitemplates`:
 
 ```bash
 diff <(chezmoi execute-template < .chezmoiscripts/run_onchange_after_setup.sh.tmpl) \
-     <(chezmoi execute-template < executable_setup.sh.tmpl)
-# Expected: no output (identical) on non-Windows.
+     <(chezmoi execute-template < executable_setup.sh.tmpl)   # expect no output
 ```
 
-#### Shebang trim caveat
+`run_onchange_` alone gives run-once-then-quiet: it re-runs only when the *rendered* content changes. There is no `is_setup` sentinel and none is needed.
 
-The chezmoi-driven script gate uses `{{- if ... -}}` (with both `-`) so the body's `#!/usr/bin/env bash` lands on line 1 of the rendered file. A leading newline causes `fork/exec` to fail with `exec format error` because the kernel doesn't see `#!` at byte 0. Always check `chezmoi execute-template < <script>.tmpl | head -c 2` returns `#!` after editing the gate.
+**Shebang at byte 0.** The `.sh.tmpl` gate uses `{{- if ... -}}` with both dashes so `#!/usr/bin/env bash` lands on line 1. A leading newline makes `fork/exec` fail with `exec format error`. After touching the gate, check `chezmoi execute-template < <script>.tmpl | head -c 2` returns `#!`.
+
+**Windows uses winget** rather than scoop or choco, because it ships with Windows 11 and needs no bootstrap of its own. Two things there have no bash equivalent to reason from: winget returns non-zero for "already installed" (`0x8A15002B`) as well as for real failures, and PowerShell 5.1's `$ErrorActionPreference = 'Stop'` does not cover native exit codes at all — so `$LASTEXITCODE` is tested by hand, tolerated codes are allow-listed, and it is reset at the end so a tolerated non-zero does not leak out as the script's status. **None of this is verifiable from Linux; check on `WEI` after changing that block.** Package names are matched by search (the form upstream documents); if one ever goes ambiguous, switch it to `--exact --id <PackageIdentifier>`.
 
 ### Externals (`.chezmoiexternal.toml`)
 
@@ -247,14 +200,10 @@ The chezmoi-driven script gate uses `{{- if ... -}}` (with both `-`) so the body
 | `.local/bin/gh` | `cli/cli` release | 168h | linux |
 | `.local/bin/gdu` | `dundee/gdu` release | 168h | linux |
 
-The last two are `type = "archive-file"`, not repos: single binaries pulled straight out of a release tarball into `~/.local/bin`. They are here rather than in `packages.yaml` because noble ships both years behind upstream, and rather than in `setup-body.sh` because an external re-checks on `refreshPeriod` while the script's `command -v` guards never upgrade anything already installed. Deploying them on corp machines too is deliberate; they are general-purpose tools.
+Everything except the last two is `type = "git-repo"`; oh-my-zsh, p10k and the two plugins pin `--depth=1` clone and `--ff-only` pull, the rest use plain full clones. `refreshPeriod` does apply to `git-repo` externals (it throttles the `git pull`) even though upstream docs only document it for `file` and `archive` — do not remove it. Pulling on chezmoi's schedule coexists with oh-my-zsh's own self-update, so leave that enabled.
 
-Both are linux-gated only because that is where they are wanted; each also publishes macOS and Windows builds, so widening one is a URL change rather than a redesign.
+`gh` and `gdu` are `type = "archive-file"`: one binary lifted out of a release tarball into `~/.local/bin`. They are not in `packages.yaml` because noble ships both years behind, and not in `setup-body.sh` because an external re-checks on `refreshPeriod` while the script's `command -v` guards never upgrade what is already installed. Linux-gated only because that is where they are wanted; both also publish macOS and Windows builds.
 
-Adding a third is where it gets fiddly, and the trap is assuming the naming lines up. **`.chezmoi.arch` is Go's `GOARCH`** (`amd64` / `arm64`) and `.chezmoi.os` is `GOOS` (`linux` / `darwin` / `windows`). `gh` and `gdu` match on arch because both are Go projects released by GoReleaser, but only `gdu` matches on OS — `gh` spells it `macOS`. Projects outside that toolchain generally match neither: `btop` uses LLVM target triples (`x86_64` / `aarch64`, linux only, no macOS or Windows build at all) and `fastfetch` mixes the two conventions (`amd64` but `aarch64`, and `macos` not `darwin`). Anything that does not line up needs a `dict` to translate.
+**Adding a third: assume nothing about the naming.** `.chezmoi.arch` is `GOARCH` (`amd64` / `arm64`) and `.chezmoi.os` is `GOOS` (`linux` / `darwin` / `windows`). `gh` and `gdu` match on arch only because they are Go projects released by GoReleaser, and even then `gh` spells the OS `macOS`. Outside that toolchain nothing lines up: `btop` uses LLVM target triples and has no macOS or Windows build at all, `fastfetch` mixes both conventions (`amd64` but `aarch64`, `macos` not `darwin`). Translate with a `dict`.
 
-Three more things that only show up when you try it. **`gh` repeats its version inside the archive path**, so it resolves the tag with `gitHubLatestRelease` instead of using the `releases/latest/download/` redirect `gdu` can. **A `path` must match the archive member byte for byte**, `./` prefix included — btop's tar carries one and omitting it fails with `path not found`. **`archive-file` extracts exactly one file**, so a tool shipping its binary next to required DLLs (fastfetch on Windows) needs one entry per file or a different type. Verify any new entry by applying it against a throwaway `--destination`, never by reading the asset list.
-
-Adding one of these means checking `packages.yaml` for the same name: an apt copy still installs, then loses to `~/.local/bin` on PATH and just wastes the download. `gh` and `htop` were exactly that and were removed.
-
-Everything above those two is `type = "git-repo"`. The four non-Windows ones (oh-my-zsh, p10k, and the two zsh plugins) pin `--depth=1` clone and `--ff-only` pull; `.agents`, `.gemini`, and `adb-keys/security` use plain full clones/pulls. `.gemini` deploys the whole `~/.gemini` directory (GEMINI.md, settings, statusline, babysitter sidecars); the gemini CLI's own runtime state (oauth creds, logs, tmp) is `.gitignore`d in that repo, so it coexists with the working copy just like oh-my-zsh's cache does. Pulling on chezmoi's schedule is compatible with oh-my-zsh's own `git pull`-based self-update — no need to disable oh-my-zsh auto-update. Externals refresh independently of the setup script's `run_onchange_` hash. `refreshPeriod` does apply to `git-repo` externals (it throttles the `git pull`), even though upstream docs only mention it under `file` and `archive` — do not remove it from the entries here.
+Three more that only surface when you try it. `gh` repeats its version *inside* the archive path, so it resolves the tag with `gitHubLatestRelease` rather than using the `releases/latest/download/` redirect. A `path` must match the archive member byte for byte, `./` prefix included. `archive-file` extracts exactly one file, so a binary shipping beside required DLLs needs one entry per file. **Verify by applying against a throwaway `--destination`, never by reading the asset list.** And check `packages.yaml` for the same name first: an apt copy still installs, then loses to `~/.local/bin` on PATH and wastes the download — `gh` and `htop` were exactly that, and were removed.

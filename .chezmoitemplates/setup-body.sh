@@ -113,6 +113,10 @@ if [ -n "$NVIM_ARCH" ] && ! command -v nvim >/dev/null 2>&1 && [ ! -x "$HOME/.nv
 fi
 {{ end }}
 # ---------- 6. LazyVim starter ----------
+# Deliberately a clone here rather than a chezmoi external: the starter is a
+# seed you are meant to edit afterwards, and an external would re-pull on its
+# refreshPeriod and clobber those edits. Dropping .git and guarding on the
+# directory is what makes it a one-time seed.
 NVIM_DIR="$HOME/.config/nvim"
 if [ ! -d "$NVIM_DIR" ]; then
     git clone https://github.com/LazyVim/starter "$NVIM_DIR"
