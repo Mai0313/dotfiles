@@ -11,7 +11,7 @@
     "sessionUrl": false
   },
   "permissions": {
-    "defaultMode": "bypassPermissions"
+    "defaultMode": "auto"
   },
   "skillOverrides": {
     "buganizer-cli": "name-only",
