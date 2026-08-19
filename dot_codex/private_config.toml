@@ -113,6 +113,9 @@ enabled = true
 [plugins."superpowers@openai-curated-remote"]
 enabled = false
 
+[plugins."codex-app-tools@openai-bundled"]
+enabled = true
+
 [desktop]
 show-context-window-usage = true
 followUpQueueMode = "steer"
