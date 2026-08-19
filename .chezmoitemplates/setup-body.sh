@@ -171,33 +171,11 @@ if ! command -v uv >/dev/null 2>&1; then
     curl -LsSf https://astral.sh/uv/install.sh | UV_NO_MODIFY_PATH=1 sh
 fi
 
-# ---------- 11. fastfetch ----------
-# Deliberately not a package: Ubuntu 24.04 has no fastfetch in apt, and brew and
-# Debian's apt would each land a different version. The GitHub release puts the
-# same binary in ~/.local/bin on every machine, Windows included (see
-# run_onchange_after_setup.ps1.tmpl). The tarball carries a usr/bin prefix.
-if ! command -v fastfetch >/dev/null 2>&1; then
-    case "$(uname -s)-$(uname -m)" in
-        Linux-x86_64)  FASTFETCH_TARGET=linux-amd64 ;;
-        Linux-aarch64) FASTFETCH_TARGET=linux-aarch64 ;;
-        Darwin-arm64)  FASTFETCH_TARGET=macos-aarch64 ;;
-        Darwin-x86_64) FASTFETCH_TARGET=macos-amd64 ;;
-        *) echo "Unsupported platform for fastfetch: $(uname -s)-$(uname -m), skipping"; FASTFETCH_TARGET= ;;
-    esac
-    if [ -n "$FASTFETCH_TARGET" ]; then
-        curl -Lo /tmp/fastfetch.tar.gz "https://github.com/fastfetch-cli/fastfetch/releases/latest/download/fastfetch-${FASTFETCH_TARGET}.tar.gz"
-        tar xf /tmp/fastfetch.tar.gz -C /tmp --strip-components=3 "fastfetch-${FASTFETCH_TARGET}/usr/bin/fastfetch"
-        mkdir -p "$HOME/.local/bin"
-        install /tmp/fastfetch "$HOME/.local/bin"
-        rm -f /tmp/fastfetch /tmp/fastfetch.tar.gz
-    fi
-fi
-
 # ============================================================================
 # Work-only tail: service wiring for packages installed above.
 # ============================================================================
 
-# ---------- 12. ADB systemd environment + pontisd ----------
+# ---------- 11. ADB systemd environment + pontisd ----------
 # The pontisd package itself is installed in section 1; this only points it at
 # the ADB vendor keys and restarts it.
 {{ if and .is_work (eq .chezmoi.os "linux") -}}
