@@ -99,6 +99,7 @@
   "autoMemoryEnabled": true,
   "autoMemoryDirectory": "~/.claude/memories",
   "skipDangerousModePermissionPrompt": true,
+  "skipWorkflowUsageWarning": true,
   "theme": "auto",
   "editorMode": "normal",
   "preferredNotifChannel": "auto",
@@ -109,10 +110,8 @@
   "showTurnDuration": true,
   "terminalProgressBarEnabled": true,
   "teammateMode": "auto",
-  "remoteControlAtStartup": true,
   "inputNeededNotifEnabled": false,
   "agentPushNotifEnabled": false,
   "skipAutoPermissionPrompt": true,
-  "useAutoModeDuringPlan": true,
-  "skipWorkflowUsageWarning": true
+  "useAutoModeDuringPlan": true
 }
