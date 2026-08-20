@@ -1,21 +1,5 @@
 {
   "providers": {
-    "deepseek": {
-      "baseUrl": "https://api.mai0313.com",
-      "api": "openai-completions",
-      "apiKey": "$OPENAI_API_KEY",
-      "headers": {
-        "x-litellm-end-user-id": "pi-cli"
-      }
-    },
-    "google": {
-      "baseUrl": "https://api.mai0313.com",
-      "api": "google-generative-ai",
-      "apiKey": "$OPENAI_API_KEY",
-      "headers": {
-        "x-litellm-end-user-id": "pi-cli"
-      }
-    },
     "openai": {
       "baseUrl": "https://api.mai0313.com",
       "api": "openai-responses",
