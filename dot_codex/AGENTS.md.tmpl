@@ -1,1 +1,1 @@
-{{ template "agent-instructions.md" . -}}
+{{ if .is_work }}{{ template "agent-instructions.work.md" . }}{{ else }}{{ template "agent-instructions.md" . }}{{ end -}}
