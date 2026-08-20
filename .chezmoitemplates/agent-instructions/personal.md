@@ -1,4 +1,4 @@
-{{ template "agent-instructions.common.md" . }}
+{{ template "agent-instructions/common.md" . }}
 ## For GitHub Repositories Only
 
 These rules only apply to repositories hosted on GitHub.

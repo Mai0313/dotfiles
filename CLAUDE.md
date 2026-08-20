@@ -95,7 +95,7 @@ Only the files whose purpose is not obvious from opening them. Everything else i
 | `.chezmoidata/packages.yaml` | Package lists per OS. Editing it re-triggers setup, because `run_onchange` hashes rendered content. |
 | `.chezmoitemplates/setup-body.sh` | The *nix bootstrap body. See Bootstrap Architecture. |
 | `.chezmoitemplates/setup-body.ps1` | The Windows bootstrap body, shared by that platform's two entry points the same way. |
-| `.chezmoitemplates/agent-instructions{,.work,.common}.md` | **The only copies of the agent guidelines**, split common / personal / work. Edit here, never the seven deployed files. See Shared Agent Instruction Files. |
+| `.chezmoitemplates/agent-instructions/` | **The only copies of the agent guidelines**, split `common.md` / `personal.md` / `work.md`. Edit here, never the seven deployed files. See Shared Agent Instruction Files. |
 | `.chezmoiversion` | `2.40.0`, the oldest release verified against this source state. An older chezmoi aborts rather than silently degrading. Raise it only when the repo starts using a newer feature. |
 | `dot_zshrc` / `dot_bashrc` / `dot_zshenv` / `dot_zprofile` | Plain, non-`.tmpl`, so `chezmoi re-add` works. See Environment Detection Layer 2 before changing that. |
 | `private_dot_profile` | Byte-identical to Debian's `/etc/skel/.profile`. Tracked anyway, so `~/.local/bin` lands on PATH regardless of what a distro's skel contains. |
@@ -112,17 +112,19 @@ Four couplings that break quietly if you touch one side only:
 
 ### Shared Agent Instruction Files
 
-Every agent CLI reads a different filename, but they must all get the same instructions. **The body lives under `.chezmoitemplates/` and nowhere else. Edit it there — the seven deployed copies are one-line templates that include it, so they cannot drift.**
+Every agent CLI reads a different filename, but they must all get the same instructions. **The body lives in `.chezmoitemplates/agent-instructions/` and nowhere else. Edit it there — the seven deployed copies are one-line templates that include it, so they cannot drift.**
 
-Three body files, because corp and personal machines need different tails:
+Three body files in that directory, because corp and personal machines need different tails:
 
 | Body | Contents | Used when |
 |---|---|---|
-| `agent-instructions.common.md` | `## General`, `## Self-improvement` | included by both variants, never selected directly |
-| `agent-instructions.md` | common + `## For GitHub Repositories Only` | `not is_work` |
-| `agent-instructions.work.md` | common + the corp sections (gpar, Critique, Buganizer, Android Build, devices, TF-A / RF-A, TFTF) | `is_work` |
+| `common.md` | `## General`, `## Self-improvement` | included by both variants, never selected directly |
+| `personal.md` | common + `## For GitHub Repositories Only` | `not is_work` |
+| `work.md` | common + the corp sections (gpar, Critique, Buganizer, Android Build, devices, TF-A / RF-A, TFTF) | `is_work` |
 
-Anything that applies everywhere goes in `agent-instructions.common.md`. The other two hold only what their own environment needs.
+Anything that applies everywhere goes in `common.md`. The other two hold only what their own environment needs, and `work.md` deliberately has no GitHub section: corp machines are not where that work happens.
+
+`.chezmoitemplates` is walked recursively and a template's name is its path relative to that directory, so the subdirectory is part of the name (`agent-instructions/common.md`, not `common.md`). Nothing here is deployed to `$HOME`, so moving files around inside it is a plain `git mv` with no `chezmoi add` / `forget` involved.
 
 | Path | Deployed to | Read by |
 |---|---|---|
@@ -137,12 +139,12 @@ Anything that applies everywhere goes in `agent-instructions.common.md`. The oth
 Each of those seven is the same single line, mirroring how each pair of bootstrap entry points includes its body:
 
 ```
-{{ if .is_work }}{{ template "agent-instructions.work.md" . }}{{ else }}{{ template "agent-instructions.md" . }}{{ end -}}
+{{ if .is_work }}{{ template "agent-instructions/work.md" . }}{{ else }}{{ template "agent-instructions/personal.md" . }}{{ end -}}
 ```
 
 The trailing `-}}` trims the newline after the action, so the rendered file ends exactly where the body does. Adding an eighth tool means one more such file, not another copy.
 
-Each variant's first line is `{{ template "agent-instructions.common.md" . }}` with no blank line under it: the include already ends in a newline, so the source newline after the action is what produces the blank line before the first heading of the tail. Adding a blank line there puts two in the rendered file.
+Each variant's first line is `{{ template "agent-instructions/common.md" . }}` with no blank line under it: the include already ends in a newline, so the source newline after the action is what produces the blank line before the first heading of the tail. Adding a blank line there puts two in the rendered file.
 
 **The body must stay free of Go template syntax.** Everything under `.chezmoitemplates/` is rendered, so a literal `{{` in the instructions would be parsed as an action and fail the apply. If the instructions ever need to show one, escape it (`{{ "{{" }}`).
 
@@ -150,7 +152,7 @@ Each variant's first line is `{{ template "agent-instructions.common.md" . }}` w
 
 The per-tool settings files sitting next to them (`settings.json`, `config.toml`, `opencode.json`, `private_crush.json`, `private_config.toml`) are **not** shared — each is tool-specific and unrelated to the others. `dot_local/share/crush/` ships only a settings file, no instruction file.
 
-`~/.gemini/GEMINI.md` is the **eighth** copy, and the one this repo does not deploy: it lives in the `.gemini` external repo (see Externals below), which owns it. It is byte-identical to what `agent-instructions.work.md` renders to, because that file was seeded from it. Nothing keeps the two in sync, so a change to the work body or to the common one has to be carried over there by hand.
+`~/.gemini/GEMINI.md` is the **eighth** copy, and the one this repo does not deploy: it lives in the `.gemini` external repo (see Externals below), which owns it. It is byte-identical to what `work.md` renders to, because that file was seeded from it and is meant to stay that way. Nothing enforces it, so a change to `work.md` or to `common.md` has to be carried over there by hand.
 
 ### Shell Config Structure
 
