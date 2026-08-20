@@ -135,14 +135,17 @@ case "$__fqdn" in
     export ADB_VENDOR_KEYS="$HOME/adb-keys/security/adb"
     # adb server only reads ADB_VENDOR_KEYS at startup, so it has to be restarted.
     alias fixadb='export ADB_VENDOR_KEYS="$HOME/adb-keys/security/adb"; adb kill-server; adb devices'
-    # list_devices is ~/.local/bin/list_devices, a local adb/fastboot wrapper.
-    # Do not alias over it: the flashstation original lives on binfs, so any
-    # invocation can be the one that goes quiet for minutes while its tool
-    # chain is fetched. That one is still under flashstation/ when its
-    # marketing names or its session log are what you actually want.
+    # ~/.local/bin/list_devices, a local adb/fastboot wrapper. Do not alias over
+    # it: the flashstation original lives on binfs and can go quiet for minutes
+    # while it fetches. Call that one directly for marketing names or its log.
     alias listd='list_devices'
     # https://yaqs.corp.google.com/eng/q/2346264355185623040
     export CORP_SSH_HELPER_OVERRIDES="relay=sup-ssh-relay.corp.google.com"
+    ;;
+esac
+case "$__fqdn" in
+  *.c.googlers.com)
+    # Cloudtop VM only, not the corp desktop.
     # For getting 7 days auth, we can use these commands from b/540327136
     # `gcert --lifetime=168h --nocorpssh --noprodssh && gcert --noloas2 --reuse_sso_cookie`
     # `rw <hostname> --remote_gcert_args="--lifetime=168h --nocorpssh --noprodssh"`
