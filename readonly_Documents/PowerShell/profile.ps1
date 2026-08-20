@@ -22,3 +22,7 @@ Set-PSReadLineKeyHandler -Key DownArrow -Function HistorySearchForward
 Set-Alias cc  claude
 Set-Alias cop copilot
 Set-Alias cod codex
+
+# The cu alias from dot_zshrc. Set-Alias cannot carry arguments, so it is a
+# function here; @args forwards anything extra to chezmoi.
+function cu { chezmoi update --refresh-externals=always --force @args }

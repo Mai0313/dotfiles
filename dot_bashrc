@@ -125,6 +125,7 @@ export PATH=$HOME/.local/bin:$HOME/go/bin:$HOME/.cargo/bin:/usr/local/go/bin:$HO
 alias cc='claude'
 alias cop='copilot'
 alias cod='codex'
+alias cu='chezmoi update --refresh-externals=always --force'
 
 # Environment-specific settings, gated at runtime via FQDN.
 # Work patterns mirror is_work in .chezmoi.toml.tmpl; cloudtop/roam split is runtime-only.
