@@ -124,6 +124,8 @@ Three body files in that directory, because corp and personal machines need diff
 
 Anything that applies everywhere goes in `common.md`. The other two hold only what their own environment needs, and `work.md` deliberately has no GitHub section: corp machines are not where that work happens.
 
+**All three are plain markdown and must stay that way.** No `{{ }}`, no chezmoi syntax, nothing that needs rendering to be read. They do not know about each other and never include each other; assembling common + tail is the deployed template's job, below. Keeping them inert is what lets you read one as the instructions it is, and it removes the whole class of apply failures where a stray `{{` in prose gets parsed as an action.
+
 `.chezmoitemplates` is walked recursively and a template's name is its path relative to that directory, so the subdirectory is part of the name (`agent-instructions/common.md`, not `common.md`). Nothing here is deployed to `$HOME`, so moving files around inside it is a plain `git mv` with no `chezmoi add` / `forget` involved.
 
 | Path | Deployed to | Read by |
@@ -136,17 +138,18 @@ Anything that applies everywhere goes in `common.md`. The other two hold only wh
 | `private_dot_hermes/SOUL.md.tmpl` | `~/.hermes/SOUL.md` | Hermes |
 | `dot_pi/agent/AGENTS.md.tmpl` | `~/.pi/agent/AGENTS.md` | pi |
 
-Each of those seven is the same single line, mirroring how each pair of bootstrap entry points includes its body:
+Each of those seven is the same two lines, and this is the only place the assembly happens:
 
 ```
+{{ template "agent-instructions/common.md" . }}
 {{ if .is_work }}{{ template "agent-instructions/work.md" . }}{{ else }}{{ template "agent-instructions/personal.md" . }}{{ end -}}
 ```
 
-The trailing `-}}` trims the newline after the action, so the rendered file ends exactly where the body does. Adding an eighth tool means one more such file, not another copy.
+Adding an eighth tool means one more such file, not another copy.
 
-Each variant's first line is `{{ template "agent-instructions/common.md" . }}` with no blank line under it: the include already ends in a newline, so the source newline after the action is what produces the blank line before the first heading of the tail. Adding a blank line there puts two in the rendered file.
+Both lines are load-bearing on whitespace. `common.md` already ends in a newline, so the source newline after the first action is what produces the blank line between the last common paragraph and the tail's first heading; putting a blank line between the two template lines gives you two. The trailing `-}}` trims the source file's own final newline, so the rendered file ends exactly where the tail does.
 
-**The body must stay free of Go template syntax.** Everything under `.chezmoitemplates/` is rendered, so a literal `{{` in the instructions would be parsed as an action and fail the apply. If the instructions ever need to show one, escape it (`{{ "{{" }}`).
+**The bodies must stay free of Go template syntax.** Everything under `.chezmoitemplates/` is rendered, so a literal `{{` in the instructions would be parsed as an action and fail the apply. If the instructions ever need to show one, escape it (`{{ "{{" }}`).
 
 **`chezmoi re-add` does not work on these any more** — it cannot reverse-merge a rendered file back through a template. Edit the source file in this repo and run `chezmoi apply`; that is the direction this layout is built for. Note this is the opposite call from `dot_zshrc` / `dot_bashrc` (see Environment Detection Layer 2), which stay plain files *because* they are edited in `$HOME` and synced back.
 
