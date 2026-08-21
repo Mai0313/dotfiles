@@ -45,7 +45,11 @@ while read -r serial state rest; do
     buildid=""
 
     if [ "$state" = "device" ]; then
-        if adb -s "$serial" shell 'getprop ro.product.name; getprop ro.bootloader; getprop ro.build.id' > "$tmp" 2>/dev/null; then
+        # `< /dev/null` is load-bearing: `adb shell` forwards stdin to the device
+        # even with a command attached, and this loop's stdin is the listing it is
+        # iterating, so without it the first board swallows every line after its
+        # own and the rest of the boards silently vanish from the output.
+        if adb -s "$serial" shell 'getprop ro.product.name; getprop ro.bootloader; getprop ro.build.id' > "$tmp" 2>/dev/null < /dev/null; then
             name=$(sed -n '1p' "$tmp" | tr -d '\r')
             bootloader=$(sed -n '2p' "$tmp" | tr -d '\r')
             buildid=$(sed -n '3p' "$tmp" | tr -d '\r')
