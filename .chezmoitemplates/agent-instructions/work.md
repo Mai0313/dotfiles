@@ -27,7 +27,7 @@ This is different with Gerrit, the prefix will be `cl/xxxx`; you can use critiqu
 
 ## Leaving Comments on a Review
 
-Applies to Gerrit and Critique alike. **Every comment you leave stays a draft.** Publishing is a separate decision that belongs to the user and needs their explicit agreement each time, because a published comment reaches the CL owner and cannot be withdrawn quietly. Drafting without being asked is fine; publishing without being asked is not, and being asked to write a comment is not the same as being asked to publish it.
+Applies to Gerrit and Critique alike. Writing the comment text out in the conversation is always fine, and is usually what was actually wanted. Putting it onto the review system is a separate thing, and it is two decisions rather than one: creating the draft there, then publishing it. Both belong to the user and each needs their explicit agreement at the time it happens, because a draft is already a write to someone else's review, and a published comment reaches the CL owner and cannot be withdrawn quietly. So being asked to write a comment is not being asked to draft it on the CL, and being asked to draft it is not being asked to publish it. "Draft the comments" said about wording already on screen is ambiguous: show the text and ask which they meant rather than guessing. Voting a label is never implied by any of it.
 
 ## About Buganizer
 
