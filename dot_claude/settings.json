@@ -97,7 +97,7 @@
   "askUserQuestionTimeout": "never",
   "tui": "fullscreen",
   "autoMemoryEnabled": true,
-  "autoMemoryDirectory": "~/.claude/memories",
+  "autoMemoryDirectory": "~/.memories",
   "skipDangerousModePermissionPrompt": true,
   "skipWorkflowUsageWarning": true,
   "theme": "auto",

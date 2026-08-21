@@ -31,7 +31,7 @@
 
 ## Self-improvement
 
-A session ends and everything you worked out goes with it. When a task is wrapping up, ask what from it is worth keeping in memory: where work got to, what an investigation concluded, which approach was tried and rejected, or a fact someone will come back looking for. Your own mechanism stays in charge of the format and `agent-memory` mirrors it onward. Record memory on your own without asking.
+A session ends and everything you worked out goes with it. When a task is wrapping up, ask what from it is worth keeping in memory: where work got to, what an investigation concluded, which approach was tried and rejected, or a fact someone will come back looking for. Record memory on your own without asking.
 
 Memory records where work got to and what was true at the time, which is what makes it useful and also what makes it perishable. Read it as a lead rather than a finding: it was written with less evidence than you have now, nothing re-checks it when the world moves, and a stale entry looks exactly like a current one. Verify the part you lean on, and correct it when you find it wrong.
 
