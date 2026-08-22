@@ -13,6 +13,19 @@
   "permissions": {
     "defaultMode": "auto"
   },
+  "hooks": {
+    "PermissionRequest": [
+      {
+        "matcher": "ExitPlanMode",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{\"hookSpecificOutput\": {\"hookEventName\": \"PermissionRequest\", \"decision\": {\"behavior\": \"allow\"}}}'"
+          }
+        ]
+      }
+    ]
+  },
   "skillOverrides": {
     "buganizer-cli": "name-only",
     "critique": "name-only",
