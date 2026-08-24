@@ -1,6 +1,7 @@
 install.sh
 README.md
 CLAUDE.md
+LICENSE
 
 {{ if eq .chezmoi.os "windows" -}}
 .zshrc
