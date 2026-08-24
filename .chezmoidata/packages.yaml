@@ -64,6 +64,15 @@ packages:
     - sshfs
     - roadwarrior
     - jetski-memory
+    # Git-on-Borg
+    - git-remote-google
+    # Code style & Google3 dev tools
+    - google-clang-tools
+    - pyformat
+    - gpylint
+    - glaze
+    - glint
+    - google-f1-sql
     # Not corp-specific, just absent from noble. Installing it here in §1 makes
     # the §11 tarball fall through on corp machines.
     - fastfetch
