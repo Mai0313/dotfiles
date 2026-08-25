@@ -8,7 +8,6 @@ packages:
     - neovim
     - ripgrep
     - fd
-    - lazygit
     - fastfetch
     - gh
     - gdu

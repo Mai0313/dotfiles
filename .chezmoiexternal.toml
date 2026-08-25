@@ -44,6 +44,29 @@
         args = ["--depth=1"]
     [".oh-my-zsh/custom/plugins/zsh-syntax-highlighting".pull]
         args = ["--ff-only"]
+
+# nvm's own installer is a git clone plus a tag checkout, so an external does
+# the same work with no version lookup against api.github.com. Deliberately a
+# release tag and not the default branch: nvm.sh is sourced into every shell,
+# and nvm cuts a release every few months, so tracking its development branch
+# buys nothing and risks all of them. Bumping the version below is the whole
+# maintenance, and an existing ~/.nvm sitting on an older tag fast-forwards
+# onto the new one by itself.
+#
+# A tag means a detached HEAD, where a bare `git pull` refuses and fails the
+# apply, hence naming the remote and ref explicitly. Installed node versions
+# and the default alias live under paths nvm gitignores (`v*`, `alias`), so
+# neither the clone nor the pull touches them. Windows is excluded because
+# setup-body.ps1 assumes node is already there.
+{{ $nvm := "v0.40.7" -}}
+[".nvm"]
+    type = "git-repo"
+    url = "https://github.com/nvm-sh/nvm"
+    refreshPeriod = "168h"
+    [".nvm".clone]
+        args = ["--branch", "{{ $nvm }}"]
+    [".nvm".pull]
+        args = ["--ff-only", "origin", "{{ $nvm }}"]
 {{- end }}
 
 {{ if eq .chezmoi.os "linux" -}}
@@ -51,13 +74,24 @@
 # still offers gh 2.45 and gdu 5.25 against upstream's 2.97 and 5.37. brew and
 # winget both track upstream within a day or two, so darwin and windows take
 # these from packages.yaml instead.
-{{ $gh := (gitHubLatestRelease "cli/cli").TagName | trimPrefix "v" -}}
+#
+# gh spells the version inside both its URL and its archive path, so unlike gdu
+# below it needs the number up front. It comes from github.com's own redirect
+# rather than `gitHubLatestRelease`, because unauthenticated api.github.com is
+# 60/hr per IP and a shared-egress runner (Claude Code Cloud) burns that long
+# before chezmoi gets a turn — which failed the whole apply while reading this
+# file, setup script and all. A failed probe yields an empty string instead,
+# and the entry then renders away; an external that vanishes leaves an
+# already-installed ~/.local/bin/gh alone.
+{{ $gh := output "sh" "-c" "curl -fs -o /dev/null -w '%{redirect_url}' https://github.com/cli/cli/releases/latest | sed 's|.*/tag/v||'" | trim -}}
+{{ if $gh -}}
 [".local/bin/gh"]
     type = "archive-file"
     url = "https://github.com/cli/cli/releases/download/v{{ $gh }}/gh_{{ $gh }}_linux_{{ .chezmoi.arch }}.tar.gz"
     path = "gh_{{ $gh }}_linux_{{ .chezmoi.arch }}/bin/gh"
     executable = true
     refreshPeriod = "168h"
+{{- end }}
 
 [".local/bin/gdu"]
     type = "archive-file"

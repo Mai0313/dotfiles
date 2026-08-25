@@ -123,34 +123,12 @@ if [ ! -d "$NVIM_DIR" ]; then
     rm -rf "$NVIM_DIR/.git"
 fi
 
-{{ if eq .chezmoi.os "linux" -}}
-# ---------- 7. lazygit ----------
-# lazygit has no apt package on Debian/Ubuntu, fetch from GitHub release.
-if ! command -v lazygit >/dev/null 2>&1; then
-    case "$(uname -m)" in
-        x86_64)  LAZYGIT_ARCH=x86_64 ;;
-        aarch64) LAZYGIT_ARCH=arm64 ;;
-        *) echo "Unsupported arch for lazygit: $(uname -m), skipping"; LAZYGIT_ARCH= ;;
-    esac
-    if [ -n "$LAZYGIT_ARCH" ]; then
-        LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "v\K[^"]*')
-        curl -Lo /tmp/lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_${LAZYGIT_ARCH}.tar.gz"
-        tar xf /tmp/lazygit.tar.gz -C /tmp lazygit
-        mkdir -p "$HOME/.local/bin"
-        install /tmp/lazygit "$HOME/.local/bin"
-        rm -f /tmp/lazygit /tmp/lazygit.tar.gz
-    fi
-fi
-{{ end }}
-# ---------- 8. Node version manager (nvm) + default LTS ----------
-# Shell configs already source ~/.nvm; install it here if missing.
+# ---------- 7. Node LTS via nvm ----------
+# nvm itself is a chezmoi external, which lands before this script runs; its
+# own installer is skipped entirely, which also removes the reason the old one
+# needed PROFILE=/dev/null (it appends source lines to the chezmoi-managed
+# ~/.zshrc / ~/.bashrc). Shell configs already source ~/.nvm.
 export NVM_DIR="$HOME/.nvm"
-if [ ! -s "$NVM_DIR/nvm.sh" ]; then
-    NVM_VERSION=$(curl -s "https://api.github.com/repos/nvm-sh/nvm/releases/latest" | grep -Po '"tag_name": "\K[^"]*')
-    # PROFILE=/dev/null tells nvm's installer NOT to touch chezmoi-managed
-    # ~/.zshrc / ~/.bashrc (otherwise it appends source lines and causes drift).
-    curl -fsSL "https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_VERSION}/install.sh" | PROFILE=/dev/null bash
-fi
 # Load nvm into this non-interactive shell, then ensure latest LTS is default.
 set +u
 \. "$NVM_DIR/nvm.sh"
@@ -158,7 +136,7 @@ nvm install --lts
 nvm alias default 'lts/*'
 set -u
 
-# ---------- 9. Global npm CLIs ----------
+# ---------- 8. Global npm CLIs ----------
 # node/npm are on PATH now (nvm loaded above). List lives in packages.yaml.
 # Skipped on work macOS.
 {{ if not (and .is_work (eq .chezmoi.os "darwin")) -}}
@@ -167,7 +145,7 @@ if command -v npm >/dev/null 2>&1; then
 fi
 {{- end }}
 
-# ---------- 10. uv (Python package manager) ----------
+# ---------- 9. uv (Python package manager) ----------
 # Installs to ~/.local/bin, already on PATH in the shell configs.
 # UV_NO_MODIFY_PATH keeps the installer from appending source lines to the
 # chezmoi-managed ~/.zshenv / ~/.bashrc.
@@ -179,7 +157,7 @@ fi
 # Work-only tail: service wiring for packages installed above.
 # ============================================================================
 
-# ---------- 11. ADB systemd environment + pontisd ----------
+# ---------- 10. ADB systemd environment + pontisd ----------
 # The pontisd package itself is installed in section 1; this only points it at
 # the ADB vendor keys and restarts it.
 {{ if and .is_work (eq .chezmoi.os "linux") -}}
