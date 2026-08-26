@@ -141,6 +141,11 @@ set -u
 # Skipped on work macOS.
 {{ if not (and .is_work (eq .chezmoi.os "darwin")) -}}
 if command -v npm >/dev/null 2>&1; then
+    # The npm bundled with node LTS is usually a release or two behind, which is
+    # what prints the "New version of npm available" notice on a fresh install.
+    # Kept out of npm_global and ahead of it: npm rewriting its own install in
+    # the same command that resolves the rest of the list is the untested path.
+    npm install -g npm@latest
     npm install -g {{ range .packages.npm_global }}{{ . }} {{ end }}
 fi
 {{- end }}
