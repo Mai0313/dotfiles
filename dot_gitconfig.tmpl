@@ -1,0 +1,28 @@
+{{- /* The corp machines' `[repo]` section (superprojectChoice*) is state the  */ -}}
+{{- /* `repo` tool writes and re-writes on its own expiry, so it stays out.    */ -}}
+[user]
+{{- if .is_work }}
+	name = Wei Cheng Lee
+	email = weichenglee@google.com
+{{- else }}
+	name = mai0313
+	email = mai@mai0313.com
+{{- end }}
+[init]
+	defaultBranch = main
+[filter "lfs"]
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+	clean = git-lfs clean -- %f
+[credential]
+	helper = store
+[credential "https://github.com"]
+	helper = !gh auth git-credential
+[credential "https://gist.github.com"]
+	helper = !gh auth git-credential
+[fetch]
+	pruneTags = true
+	recurseSubmodules = on-demand
+[color]
+	ui = auto

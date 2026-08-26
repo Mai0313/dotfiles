@@ -62,6 +62,7 @@ OS detection comes from chezmoi built-ins: `eq .chezmoi.os "linux"` / `"darwin"`
 - `.chezmoiexternal.toml` — gates `adb-keys/security` (sso git-repo); gates oh-my-zsh + plugins on `chezmoi.os != "windows"` and the two CLI binaries on `chezmoi.os == "linux"`, neither of which depends on `is_work`.
 - `.chezmoitemplates/setup-body.sh` — §1 gates the corp-only apt packages, §2 routes VS Code (corp Linux → google3, else Microsoft repo), §8 skips global npm on work macOS, §11 gates the ADB pontisd restart. Container and OS gating inside the body is runtime, not chezmoi data.
 - The seven agent instruction templates — pick between the work and personal body. See Shared Agent Instruction Files.
+- `dot_gitconfig.tmpl` — picks the `[user]` name/email pair. Everything else in that file is shared, and the corp machines' `[repo]` section is deliberately absent: `repo` writes `superprojectChoice` with an expiry and rewrites both on its own, so tracking them would fight the tool.
 
 Inspect the current value with `chezmoi data | grep is_work`.
 
