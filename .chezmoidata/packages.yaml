@@ -62,7 +62,6 @@ packages:
     # sshfs backs the ~/linux_kernel mount driven by .local/bin/linux-kernel-mount
     - sshfs
     - roadwarrior
-    - jetski-memory
     # Git-on-Borg
     - git-remote-google
     # Code style & Google3 dev tools
