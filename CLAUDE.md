@@ -11,7 +11,7 @@ Bootstrap has the same two entry points on every platform, each pair sharing one
 - **chezmoi-driven** (`run_onchange_after_setup.sh.tmpl` / `.ps1.tmpl` under `.chezmoiscripts/`) — runs automatically as part of `chezmoi apply`, gated by OS.
 - **manual** (`executable_setup.sh.tmpl` → `~/setup.sh`, `setup.ps1.tmpl` → `~/setup.ps1`) — deployed to home for opt-in manual execution; `.chezmoiignore` deploys only the one matching the OS.
 
-Windows has no bash, so its pair shares `setup-body.ps1` rather than `setup-body.sh`. That body installs the global npm CLIs and the `windows` winget packages, and has no counterpart to the *nix-only sections.
+Windows has no bash, so its pair shares `setup-body.ps1` rather than `setup-body.sh`. That body installs the global npm CLIs and the `windows` winget packages, links the agent skills the way §10 of the *nix body does (with junctions, which need no Developer Mode), and has no counterpart to the remaining *nix-only sections.
 
 ## Common Commands
 
@@ -60,7 +60,7 @@ OS detection comes from chezmoi built-ins: `eq .chezmoi.os "linux"` / `"darwin"`
 **Current consumers of `is_work`:**
 - `.chezmoiignore` — gates `.local/bin/kgrep`, `.local/bin/linux-kernel-mount`, `.local/bin/automation-mount` and the two `.config/systemd/user/*-sshfs.service` units off unless `is_work && linux`; `.config/environment.d/adb.conf` + `setup_adb.sh` off unless `is_work`; and `.chrome-remote-desktop-session` off unless `linux && not is_work`. The OS gates in the same file are independent of `is_work`: Windows drops the whole *nix set (`.zshrc`, `.zshenv`, `.zprofile`, `.profile`, `.bashrc`, `.p10k.zsh`, `cleanup.sh`, `setup.sh`, `.xinputrc`, `.config/{alacritty,environment.d,systemd,fcitx5,btop,htop,goobuntu-backups,uv,pip}`, `.local/share/fonts`, `.local/bin/{list_devices,toggle-display}`), non-Windows drops `Documents`, `AppData` + `setup.ps1`, and non-Linux drops `.config/environment.d/im.conf`.
 - `.chezmoiexternal.toml` — gates `adb-keys/security` (sso git-repo); gates oh-my-zsh + plugins on `chezmoi.os != "windows"` and the two CLI binaries on `chezmoi.os == "linux"`, neither of which depends on `is_work`.
-- `.chezmoitemplates/setup-body.sh` — §1 gates the corp-only apt packages, §2 routes VS Code (corp Linux → google3, else Microsoft repo), §8 skips global npm on work macOS, §10 gates the ADB pontisd restart. Container and OS gating inside the body is runtime, not chezmoi data.
+- `.chezmoitemplates/setup-body.sh` — §1 gates the corp-only apt packages, §2 routes VS Code (corp Linux → google3, else Microsoft repo), §8 skips global npm on work macOS, §11 gates the ADB pontisd restart. Container and OS gating inside the body is runtime, not chezmoi data.
 - The seven agent instruction templates — pick between the work and personal body. See Shared Agent Instruction Files.
 
 Inspect the current value with `chezmoi data | grep is_work`.
@@ -173,11 +173,11 @@ zsh additionally loads oh-my-zsh (theme `powerlevel10k`, plugins `git`/`dotenv`/
 
 ### Bootstrap Architecture
 
-The *nix pair shares `.chezmoitemplates/setup-body.sh`. That body opens with an `in_container` helper (`/.dockerenv`, `/run/.containerenv`, `CODESPACES` / `REMOTE_CONTAINERS` / `DEVCONTAINER`) and runs ten idempotent sections in three groups: a system layer (§1–3, everything that needs sudo, kept first and contiguous so one password prompt at the start covers the run), a user layer (§4–9, installs into `$HOME`, no sudo), and a work-only tail (§10).
+The *nix pair shares `.chezmoitemplates/setup-body.sh`. That body opens with an `in_container` helper (`/.dockerenv`, `/run/.containerenv`, `CODESPACES` / `REMOTE_CONTAINERS` / `DEVCONTAINER`) and runs eleven idempotent sections in three groups: a system layer (§1–3, everything that needs sudo, kept first and contiguous so one password prompt at the start covers the run), a user layer (§4–10, installs into `$HOME`, no sudo), and a work-only tail (§11).
 
 Within those groups the order is topical: fonts before the editor that uses them, neovim next to the LazyVim starter that configures it. That ordering only works because no user-layer step needs sudo, so **a new step that needs sudo goes in §1–3, never below** — adding one lower down splits the password prompt in two and the grouping stops meaning anything.
 
-§1 OS packages, §2 VS Code, §3 default shell | §4 font cache, §5 neovim, §6 LazyVim starter, §7 node LTS, §8 global npm CLIs, §9 uv | §10 ADB/pontisd. **Each section carries its own comment explaining itself; read the script for what a section does.** What follows is only what the script cannot tell you.
+§1 OS packages, §2 VS Code, §3 default shell | §4 font cache, §5 neovim, §6 LazyVim starter, §7 node LTS, §8 global npm CLIs, §9 uv, §10 agent skills symlinks | §11 ADB/pontisd. **Each section carries its own comment explaining itself; read the script for what a section does.** What follows is only what the script cannot tell you.
 
 **Ordering constraints.** Nothing needing a LOAS cert may run before §1: corp apt repos authenticate with the *machine* cert, so `apt-get` never needs `gcert`, but the google3 depot §2 reads does — hence `work_linux` installs in §1, ahead of it. §8 must follow §7, which is what puts node on PATH. §7 no longer installs nvm — the `.nvm` external does — so it now depends on chezmoi having deployed externals first. That holds for both entry points: externals land with the rest of the source state, and `run_onchange_after_` scripts are named to run after it (verified with a throwaway `--destination`). The manual `~/setup.sh` inherits the same assumption harmlessly, since chezmoi is what put that file in `$HOME` to begin with.
 

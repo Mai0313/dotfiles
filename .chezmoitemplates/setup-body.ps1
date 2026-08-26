@@ -29,3 +29,28 @@ if (Get-Command winget -ErrorAction SilentlyContinue) {
 } else {
     Write-Host 'winget not found on PATH, skipping package install.'
 }
+
+# ---------- Agent skills links ----------
+# ~/.agents is the skills external; each agent CLI looks for the same set under
+# its own path, so link rather than keep copies. Junctions, not symlinks: a
+# symlink needs Developer Mode or an elevated shell, a junction needs neither
+# and both ends are local directories. A real directory at the target is
+# somebody else's collection and is left alone.
+$skillsSrc = Join-Path $HOME '.agents\skills'
+$skillsLinks = @(
+    Join-Path $HOME '.claude\skills'
+    Join-Path $HOME '.gemini\config\skills'
+)
+if (Test-Path -LiteralPath $skillsSrc -PathType Container) {
+    foreach ($skillsLink in $skillsLinks) {
+        $existing = Get-Item -LiteralPath $skillsLink -Force -ErrorAction SilentlyContinue
+        if ($existing -and -not ($existing.Attributes -band [IO.FileAttributes]::ReparsePoint)) {
+            continue
+        }
+        # .Delete() removes the reparse point only; Remove-Item -Recurse on a
+        # junction is the one that walks into the target and deletes its files.
+        if ($existing) { $existing.Delete() }
+        New-Item -ItemType Directory -Path (Split-Path -Parent $skillsLink) -Force | Out-Null
+        New-Item -ItemType Junction -Path $skillsLink -Target $skillsSrc | Out-Null
+    }
+}

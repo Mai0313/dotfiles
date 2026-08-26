@@ -158,11 +158,29 @@ if ! command -v uv >/dev/null 2>&1; then
     curl -LsSf https://astral.sh/uv/install.sh | UV_NO_MODIFY_PATH=1 sh
 fi
 
+# ---------- 10. Agent skills symlinks ----------
+# ~/.agents is the skills external; each agent CLI looks for the same set under
+# its own path, so link rather than keep copies. A real directory at the target
+# is somebody else's collection and is left alone.
+SKILLS_SRC="$HOME/.agents/skills"
+SKILLS_LINKS=(
+    "$HOME/.claude/skills"
+    "$HOME/.gemini/config/skills"
+)
+if [ -d "$SKILLS_SRC" ]; then
+    for skills_link in "${SKILLS_LINKS[@]}"; do
+        if [ ! -e "$skills_link" ] || [ -L "$skills_link" ]; then
+            mkdir -p "$(dirname "$skills_link")"
+            ln -sfn "$SKILLS_SRC" "$skills_link"
+        fi
+    done
+fi
+
 # ============================================================================
 # Work-only tail: service wiring for packages installed above.
 # ============================================================================
 
-# ---------- 10. ADB systemd environment + pontisd ----------
+# ---------- 11. ADB systemd environment + pontisd ----------
 # The pontisd package itself is installed in section 1; this only points it at
 # the ADB vendor keys and restarts it.
 {{ if and .is_work (eq .chezmoi.os "linux") -}}
