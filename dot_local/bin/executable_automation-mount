@@ -5,7 +5,7 @@ set -u
 
 # Remote path is relative to the remote home; the ssh user comes from ~/.ssh/config.
 # CLOUDTOP_HOST is shared with kgrep and linux-kernel-mount.
-REMOTE_HOST="${CLOUDTOP_HOST:-weichenglee.c.googlers.com}"
+REMOTE_HOST="${CLOUDTOP_HOST:-wcl.c.googlers.com}"
 REMOTE_DIR="${AUTOMATION_REMOTE_DIR:-automation}"
 LOCAL_DIR="${AUTOMATION_LOCAL_DIR:-$HOME/automation}"
 
