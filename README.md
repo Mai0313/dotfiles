@@ -67,3 +67,20 @@ the identical body. Run it yourself to bootstrap without invoking chezmoi.
 
 `~/cleanup.sh` is an ad-hoc utility (not run automatically) for clearing
 stray hidden caches like `.ipython`, `.dotnet`, `.pki`. Use as needed.
+
+### Some Useful Examples
+
+SSH Login (one time effort)
+
+```bash
+ssh-keygen -t ed25519
+ssh-copy-id xxx@host.example.com
+```
+
+Example for migrating Cloudtop
+
+```bash
+sudo glinux-updater && sudo apt update && sudo apt upgrade && sudo apt install gh && BROWSER=false gh auth login
+sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin" init --apply Mai0313/dotfiles
+ctop migrate --allow_cloudtop_source --shortname=<cloudtop_name> --skip_create --exclude_files=linux_kernel/
+```

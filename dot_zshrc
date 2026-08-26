@@ -181,7 +181,3 @@ case "$__fqdn" in
     ;;
 esac
 unset __fqdn
-
-# Example for ssh login (one time effort)
-# ssh-keygen -t ed25519
-# ssh-copy-id xxx@host.example.com
