@@ -1,14 +1,15 @@
 #!/bin/bash
-# Run ripgrep on mai0313 instead of dragging file contents over sshfs.
+# Run ripgrep on the cloudtop instead of dragging file contents over sshfs.
 # Paths come out relative to ~/linux_kernel, which is the mount point here and the
-# real directory on mai0313, so prepend that to open a hit from anywhere else.
+# real directory on the cloudtop, so prepend that to open a hit from anywhere else.
 #
 #   kgrep <rg args...>              search the whole ~/linux_kernel
 #   kgrep -t c cpuidle_enter kernel_mbu_staging/kernel/aosp/drivers
 
 set -u
 
-REMOTE_HOST="${LINUX_KERNEL_HOST:-mai0313.c.googlers.com}"
+# CLOUDTOP_HOST is shared with linux-kernel-mount and automation-mount.
+REMOTE_HOST="${CLOUDTOP_HOST:-weichenglee.c.googlers.com}"
 REMOTE_DIR="${LINUX_KERNEL_REMOTE_DIR:-linux_kernel}"
 
 if [ $# -eq 0 ]; then
@@ -21,7 +22,7 @@ case "$REMOTE_DIR" in
     *)  LOCAL_PATH="$HOME/$REMOTE_DIR" ;;
 esac
 
-# On mai0313 itself the tree is just a local directory, so searching it over ssh
+# On the cloudtop itself the tree is just a local directory, so searching it over ssh
 # would be a pointless round trip back to this host. The stdin redirect still
 # applies: a caller's pipe would otherwise send rg off searching stdin.
 if [ "$(hostname -s)" = "${REMOTE_HOST%%.*}" ]; then

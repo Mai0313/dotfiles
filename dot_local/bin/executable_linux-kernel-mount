@@ -1,11 +1,12 @@
 #!/bin/bash
-# Mount ~/linux_kernel from mai0313.c.googlers.com over sshfs.
+# Mount ~/linux_kernel from the cloudtop over sshfs.
 # The kernel tree is read-only here: this box is only used to look up code.
 
 set -u
 
 # Remote path is relative to the remote home; the ssh user comes from ~/.ssh/config.
-REMOTE_HOST="${LINUX_KERNEL_HOST:-mai0313.c.googlers.com}"
+# CLOUDTOP_HOST is shared with kgrep and automation-mount.
+REMOTE_HOST="${CLOUDTOP_HOST:-weichenglee.c.googlers.com}"
 REMOTE_DIR="${LINUX_KERNEL_REMOTE_DIR:-linux_kernel}"
 LOCAL_DIR="${LINUX_KERNEL_LOCAL_DIR:-$HOME/linux_kernel}"
 

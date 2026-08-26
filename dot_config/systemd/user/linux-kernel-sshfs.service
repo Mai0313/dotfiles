@@ -1,5 +1,5 @@
 [Unit]
-Description=sshfs mount of mai0313:~/linux_kernel
+Description=sshfs mount of the cloudtop's ~/linux_kernel
 After=network-online.target
 StartLimitIntervalSec=0
 

@@ -80,7 +80,7 @@ Five machines run this source state, three corp and two personal. One row each; 
 | Machine | Env | CPU | RAM | Storage | GPU | OS | Measured |
 |---|---|---|---|---|---|---|---|
 | `weichenglee-dell7875lin.ntc.corp.google.com` (desktop) | `is_work && linux` | AMD Ryzen Threadripper PRO 7985WX, 64C / 128T | 250 GiB + 221 GiB swap | KIOXIA XG10d SED 2 TB NVMe (single drive, LVM root ~1.6 TB) | AMD Radeon PRO W6400 (Navi 24) | Debian rodete, kernel 7.1.6 | 2026-08-17 |
-| `mai0313.c.googlers.com` (Cloudtop VM) | `is_work && linux` | AMD EPYC 7B13, 2 sockets × 32C / 128T, KVM guest | 236 GiB + 115 GiB swap | 8 TB PersistentDisk, network-backed (LVM root 7.8 TB) | none (headless, virtio only) | Debian rodete, kernel 6.18.14 | 2026-08-17 |
+| `weichenglee.c.googlers.com` (Cloudtop VM) | `is_work && linux` | TBD | TBD | TBD | TBD | TBD | TBD |
 | `weichenglee-mac.roam.internal` (Roam laptop, MacBook Pro Mac16,7) | `is_work && darwin` | Apple M4 Pro, 14C (10P + 4E) | 48 GiB unified memory | Apple SSD AP0512Z 512 GB NVMe (APFS root ~460 GiB) | Apple M4 Pro (20-core GPU, integrated) | macOS 26.6.2 (build 25G83), kernel 25.6.0 | 2026-08-20 |
 | `WEI` (Home desktop, ASUS ROG MAXIMUS Z790 HERO) | `not is_work` | Intel Core i9-13900K, 24C (8P + 16E) / 32T | 48 GiB (2 × 24 GB DDR5-4200) + 3 GiB pagefile | 7 drives, ~8.3 TB total — NVMe: Samsung 990 PRO 2 TB (`C:`), 980 PRO 2 TB, Lexar NM1090 PRO 2 TB, Samsung 970 PRO 512 GB; SATA: Samsung 860 EVO 500 GB, Crucial BX500 1 TB, WD10EZEX 1 TB HDD | NVIDIA GeForce RTX 5090, 32 GB VRAM (driver 610.88) | Windows 11 Pro 25H2, build 26200.9168 | 2026-08-18 |
 | `mai0313` (Home workstation, ASUS ROG MAXIMUS XI HERO (WI-FI)) | `not is_work` | Intel Core i9-9900K, 8C / 16T | 62 GiB + 2 GiB swapfile | 2 drives, ~2.4 TB total — NVMe: Lexar NM620 2 TB (root), Intel 600p 512 GB (`/mnt/nfs`) | Intel UHD Graphics 630 (integrated, CoffeeLake-S GT2), no discrete GPU | Ubuntu 24.04.4 LTS (noble), kernel 6.8.0-136 | 2026-08-18 |
@@ -103,11 +103,12 @@ Only the files whose purpose is not obvious from opening them. Everything else i
 | `dot_local/bin/` | Five scripts under two different gates: `kgrep`, `linux-kernel-mount`, `automation-mount` need `is_work && linux`; `list_devices` and `toggle-display` are corp tools but only gated off Windows, so they land on personal machines too. |
 | `install.sh` | Codespace one-liner. Not deployed to `$HOME`. |
 
-Four couplings that break quietly if you touch one side only:
+Five couplings that break quietly if you touch one side only:
 
 - **`AppData/Roaming/{pip,uv}` are byte-identical copies of `dot_config/{pip,uv}`.** Windows reads them from AppData, so `.chezmoiignore` drops the `.config` pair there and ships these instead. Editing one side means editing the other.
 - **fcitx5 wiring lives in three files** because nothing covers both sessions: `.xinputrc` and `environment.d/im.conf` drive the physical session, and the Chrome Remote Desktop session reads neither, so `.chrome-remote-desktop-session` repeats the `GTK_IM_MODULE` / `QT_IM_MODULE` / `XMODIFIERS` trio itself. That last one deploys on personal Linux only; corp Linux goes through goobuntu's `switch-graphical-session` instead.
 - **chezmoi deploys the `dot_config/systemd/user/` units but cannot enable them.** The `default.target.wants/` symlinks are systemd state, not dotfiles, so a fresh machine still needs `systemctl --user enable --now linux-kernel-sshfs automation-sshfs` once.
+- **The cloudtop hostname is a default in three scripts, not something a shell can export.** `kgrep`, `linux-kernel-mount` and `automation-mount` all read `${CLOUDTOP_HOST:-<host>}`, but the two `*-sshfs.service` units run the mount scripts from the systemd user manager, which never sees a `.zshrc` export. Exporting `CLOUDTOP_HOST` therefore moves `kgrep` alone and leaves the mounts on the old machine, which is the one failure that puts two different trees under one path without erroring. Moving to a new cloudtop means editing all three defaults, then `systemctl --user restart linux-kernel-sshfs automation-sshfs`.
 - **alacritty is deliberately not installed by the bootstrap.** The tracked config uses the `[general] import` form, which needs ≥ 0.14, and noble's apt candidate is 0.13.2 — a `packages.yaml` entry would deploy a config the binary rejects. Installed by hand into `~/.local/bin`.
 
 ### Shared Agent Instruction Files
