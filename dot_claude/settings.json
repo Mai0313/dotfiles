@@ -124,8 +124,8 @@
   "showTurnDuration": true,
   "terminalProgressBarEnabled": true,
   "teammateMode": "auto",
-  "inputNeededNotifEnabled": false,
-  "agentPushNotifEnabled": false,
+  "inputNeededNotifEnabled": true,
+  "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
   "useAutoModeDuringPlan": true
 }
