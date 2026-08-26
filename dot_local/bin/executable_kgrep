@@ -9,7 +9,7 @@
 set -u
 
 # CLOUDTOP_HOST is shared with linux-kernel-mount and automation-mount.
-REMOTE_HOST="${CLOUDTOP_HOST:-wcl.c.googlers.com}"
+REMOTE_HOST="${CLOUDTOP_HOST:-wei0313.c.googlers.com}"
 REMOTE_DIR="${LINUX_KERNEL_REMOTE_DIR:-linux_kernel}"
 
 if [ $# -eq 0 ]; then

@@ -4,8 +4,8 @@ Host mai0313.c
 	HostName mai0313.c.googlers.com
     User weichenglee
 
-Host wcl.c
-	HostName wcl.c.googlers.com
+Host wei0313.c
+	HostName wei0313.c.googlers.com
     User weichenglee
 
 Host *.c
