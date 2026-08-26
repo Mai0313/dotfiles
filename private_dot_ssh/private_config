@@ -4,6 +4,10 @@ Host mai0313.c
 	HostName mai0313.c.googlers.com
     User weichenglee
 
+Host wcl.c
+	HostName wcl.c.googlers.com
+    User weichenglee
+
 Host *.c
     HostName %h.googlers.com
 
