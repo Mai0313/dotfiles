@@ -151,6 +151,6 @@ When a small experiment should exercise only a specific TF-A / RF-A code path in
 
 ## Commit Message & Pushing CLs to gpar
 
-Read `create-gpar-cl` before drafting a commit message or assembling a push command in any repo whose remote points at `googleplex-polygon-android`. Nothing pulls it in for you, so reaching for it is a decision you have to make.
+Read `pixel-gpar-cl` before drafting a commit message or assembling a push command in any repo whose remote points at `googleplex-polygon-android`. Nothing pulls it in for you, so reaching for it is a decision you have to make.
 
 An upstream uprev is the exception to what that skill says about push targets. Merging an upstream LTS tag or release branch into an internal fork (an "uprev", an "upstream drop", or just "merge lts-v2.12.14") lands on the branch the previous uprev landed on, often in a different gerrit project, so the usual branch resolution gives the wrong answer. Read `pixel-upstream-uprev` before picking the target branch or the ref to merge.
