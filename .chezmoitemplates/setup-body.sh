@@ -129,11 +129,15 @@ fi
 # needed PROFILE=/dev/null (it appends source lines to the chezmoi-managed
 # ~/.zshrc / ~/.bashrc). Shell configs already source ~/.nvm.
 export NVM_DIR="$HOME/.nvm"
-# Load nvm into this non-interactive shell, then ensure latest LTS is default.
+# Pinned to one release rather than tracking lts/*: a moving alias re-downloads
+# node and reinstalls every global CLI whenever the LTS line cuts a patch.
+# Bumping this line is the whole maintenance; it must stay an LTS release.
+NODE_VERSION="24.19.0"
+# Load nvm into this non-interactive shell, then make that version the default.
 set +u
 \. "$NVM_DIR/nvm.sh"
-nvm install --lts
-nvm alias default 'lts/*'
+nvm install "$NODE_VERSION"
+nvm alias default "$NODE_VERSION"
 set -u
 
 # ---------- 8. Global npm CLIs ----------
