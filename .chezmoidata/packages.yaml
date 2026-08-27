@@ -34,6 +34,7 @@ packages:
   # Corp-only macOS packages distributed via Mule (go/mule).
   work_darwin:
     - ct-cli
+    - snipit
   # Apt packages for corp Linux, all reachable from the repos a gLinux machine
   # has by default. Mostly corp-only tooling, but it also carries anything the
   # gLinux repos have and noble does not, which is why fastfetch sits here and
@@ -74,6 +75,7 @@ packages:
     # Not corp-specific, just absent from noble. Installing it here in §1 makes
     # the §11 tarball fall through on corp machines.
     - fastfetch
+    - snipit-cli
   # Global npm CLIs, installed after nvm sets up node LTS. Skipped on work macOS.
   # npm and corepack ship with node, so they are intentionally excluded.
   npm_global:
