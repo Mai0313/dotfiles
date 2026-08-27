@@ -14,19 +14,6 @@
   "permissions": {
     "defaultMode": "auto"
   },
-  "hooks": {
-    "PermissionRequest": [
-      {
-        "matcher": "ExitPlanMode",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "echo '{\"hookSpecificOutput\": {\"hookEventName\": \"PermissionRequest\", \"decision\": {\"behavior\": \"allow\"}}}'"
-          }
-        ]
-      }
-    ]
-  },
   "skillOverrides": {
     "buganizer-cli": "name-only",
     "critique": "name-only",
@@ -42,6 +29,19 @@
     "gsheets": "name-only",
     "gslides": "name-only",
     "x20": "name-only"
+  },
+  "hooks": {
+    "PermissionRequest": [
+      {
+        "matcher": "ExitPlanMode",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{\"hookSpecificOutput\": {\"hookEventName\": \"PermissionRequest\", \"decision\": {\"behavior\": \"allow\"}}}'"
+          }
+        ]
+      }
+    ]
   },
   "worktree": {
     "baseRef": "fresh"
@@ -105,6 +105,7 @@
   "viewMode": "default",
   "language": "zh-TW",
   "feedbackSurveyRate": 0,
+  "feedbackDrafts": "quiet",
   "spinnerTipsEnabled": true,
   "effortLevel": "xhigh",
   "showClearContextOnPlanAccept": false,
@@ -127,5 +128,6 @@
   "inputNeededNotifEnabled": false,
   "agentPushNotifEnabled": false,
   "skipAutoPermissionPrompt": true,
-  "useAutoModeDuringPlan": true
+  "useAutoModeDuringPlan": true,
+  "autoInstallIdeExtension": false
 }
