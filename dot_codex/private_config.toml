@@ -135,6 +135,8 @@ show-ultra-in-model-picker-slider = true
 open-local-url-in-target-preference = "external-browser"
 reviewDelivery = "detached"
 external-agent-import-sync-enabled = true
+open-link-in-target-preference = "external-browser"
+git-pr-watch-auto-merge = true
 
 [windows]
 sandbox = "elevated"
