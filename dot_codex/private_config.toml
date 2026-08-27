@@ -46,7 +46,7 @@ multi_agent = true
 personality = true
 enable_request_compression = true
 skill_mcp_dependency_install = true
-js_repl = true
+js_repl = false
 memories = true
 prevent_idle_sleep = true
 goals = true
@@ -134,6 +134,7 @@ enabled-reasoning-efforts = ["low", "medium", "high", "xhigh", "ultra", "max"]
 show-ultra-in-model-picker-slider = true
 open-local-url-in-target-preference = "external-browser"
 reviewDelivery = "detached"
+external-agent-import-sync-enabled = true
 
 [windows]
 sandbox = "elevated"
