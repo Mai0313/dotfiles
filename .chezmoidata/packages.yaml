@@ -107,7 +107,7 @@ packages:
     - "@charmland/crush"
     - "@google/gemini-cli"
     - "@mai0313/vct"
-    - "@openai/codex"
+    # - "@openai/codex"
     - "@deepseek-ai/dsh"
     - "@earendil-works/pi-coding-agent"
     - opencode-ai
