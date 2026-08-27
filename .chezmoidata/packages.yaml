@@ -33,8 +33,32 @@ packages:
     - gdu
   # Corp-only macOS packages distributed via Mule (go/mule).
   work_darwin:
+    # Cloudtop CLI & Screenshot
     - ct-cli
     - snipit
+    # Android & Pixel firmware work
+    - adb
+    - web-device-proxy
+    # google3 / Cider / VCS
+    - cidermux
+    - fig
+    - srcfs
+    - git
+    # Remote access & Networking
+    - roadwarrior
+    - gnubby-cli
+    # AI & Developer tools
+    - gemini-cli
+    - jetski-cli
+    # Terminal & Utilities
+    - tmux
+    # GUI Applications (installed via Mule)
+    - google-chrome
+    - google-crd
+    - googledrive
+    - visual-studio-code
+    - jetski
+    - iterm2
   # Apt packages for corp Linux, all reachable from the repos a gLinux machine
   # has by default. Mostly corp-only tooling, but it also carries anything the
   # gLinux repos have and noble does not, which is why fastfetch sits here and
