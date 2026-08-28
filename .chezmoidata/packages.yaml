@@ -53,6 +53,8 @@ packages:
     - Google.PlatformTools
     - Notepad++.Notepad++
     - CoreyButler.NVMforWindows
+    - Git.Git
+    - Gyan.FFmpeg
   # Corp-only macOS packages distributed via Mule (go/mule).
   work_darwin:
     # Cloudtop CLI & Screenshot
