@@ -3,7 +3,7 @@ $ErrorActionPreference = 'Stop'
 # ---------- Global npm CLIs ----------
 # node/npm are assumed to be installed already (nvm-windows / winget / manual).
 if (Get-Command npm -ErrorAction SilentlyContinue) {
-    npm install -g {{ range .packages.npm_global }}{{ . }} {{ end }}
+    npm install -g {{ range .packages.npm }}{{ . }} {{ end }}{{ if not .is_work }}{{ range .packages.home_npm }}{{ . }} {{ end }}{{ end }}
 } else {
     Write-Host 'npm not found on PATH, skipping global npm CLI install.'
 }

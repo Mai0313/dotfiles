@@ -1,3 +1,9 @@
+# Key naming, both halves of it. A bare name is installed everywhere, `work_`
+# only when is_work, `home_` only when not; every environment is therefore the
+# bare list plus its own additions, and no list is ever subtractive. The name
+# also picks the installer, which is why darwin and work_darwin cannot merge:
+# darwin is brew, work_darwin is `sudo mule install`, linux and work_linux are
+# apt, windows is winget, npm and home_npm are `npm install -g`.
 packages:
   darwin:
     - zsh
@@ -92,7 +98,7 @@ packages:
     - fastfetch
   # Global npm CLIs, installed after nvm sets up node LTS. Skipped on work macOS.
   # npm and corepack ship with node, so they are intentionally excluded.
-  npm_global:
+  npm:
     - "npm@latest"
     - "@anthropic-ai/claude-code"
     - "@google/gemini-cli"
@@ -100,7 +106,10 @@ packages:
     - "@deepseek-ai/dsh"
     - "@earendil-works/pi-coding-agent"
     - "tree-sitter-cli"
-    # - "@openai/codex"
-    # - "opencode-ai"
-    # - "reasonix"
-    # - "@charmland/crush"
+  # Installed on top of npm, on home machines only: these do not install on a
+  # corp machine, so a work run must not carry them.
+  home_npm:
+    - "@openai/codex"
+    - "opencode-ai"
+    - "reasonix"
+    - "@charmland/crush"
