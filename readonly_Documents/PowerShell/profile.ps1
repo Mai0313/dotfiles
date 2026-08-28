@@ -5,7 +5,7 @@
 # and rustup use the same two paths here as on *nix. The rest are Windows-only
 # tool directories. Some installers add their own user-environment entry (rustup
 # does for ~/.cargo/bin), so a path may end up listed twice, which is harmless.
-$env:PATH = "$HOME\.local\bin;$HOME\go\bin;$HOME\.cargo\bin;$HOME\.grok\bin;$HOME\.local\bin\adb;$HOME\AppData\Local\agy\bin;$HOME\AppData\Local\Programs\obsidian;$env:PATH"
+$env:PATH = "$HOME\.local\bin;$HOME\go\bin;$HOME\.cargo\bin;$HOME\.grok\bin;$HOME\AppData\Local\agy\bin;$HOME\AppData\Local\Programs\obsidian;$env:PATH"
 
 # PSReadLine: inline history suggestions (zsh-autosuggestions equivalent) and
 # prefix search on arrow keys. Not guarded by `Get-Module PSReadLine` -- the

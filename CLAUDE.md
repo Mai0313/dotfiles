@@ -171,7 +171,7 @@ Both `dot_zshrc` and `dot_bashrc` cover the same ground, with a few zsh-only pie
 
 zsh additionally loads oh-my-zsh (theme `powerlevel10k`, plugins `git`/`dotenv`/`nvm`/`z`/`zsh-autosuggestions`/`zsh-syntax-highlighting`); bash does not. `z` is oh-my-zsh's bundled copy of `agkozak/zsh-z`, so it updates with oh-my-zsh — do not add a `custom/plugins/zsh-z` clone alongside it, and note that oh-my-zsh gitignores all of `custom/`, so anything hand-cloned there is invisible to `git status` and managed by nothing.
 
-**Windows has a third copy of the PATH list.** `readonly_Documents/PowerShell/profile.ps1` prepends seven entries. The first three are the ones from item 1 that exist on Windows too (`~/.local/bin`, `~/go/bin`, `~/.cargo/bin`); the rest of item 1 is *nix-only paths. The other four are Windows-only tool directories with no `dot_zshrc` counterpart (`~/.grok/bin`, `~/.local/bin/adb`, `~/AppData/Local/agy/bin`, `~/AppData/Local/Programs/obsidian`). Changing the PATH line in `dot_zshrc` / `dot_bashrc` means checking whether the new entry belongs there as well.
+**Windows has a third copy of the PATH list.** `readonly_Documents/PowerShell/profile.ps1` prepends six entries. The first three are the ones from item 1 that exist on Windows too (`~/.local/bin`, `~/go/bin`, `~/.cargo/bin`); the rest of item 1 is *nix-only paths. The other three are Windows-only tool directories with no `dot_zshrc` counterpart (`~/.grok/bin`, `~/AppData/Local/agy/bin`, `~/AppData/Local/Programs/obsidian`). Changing the PATH line in `dot_zshrc` / `dot_bashrc` means checking whether the new entry belongs there as well.
 
 ### Bootstrap Architecture
 

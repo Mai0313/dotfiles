@@ -34,10 +34,18 @@ packages:
   # bare names and gh is an identifier. The script passes them through unchanged
   # and winget matches a name, moniker or id alike. A bare name that ever goes
   # ambiguous fails the install; the fix is to swap in its PackageIdentifier.
+  #
+  # Google.PlatformTools is a portable (zip) package whose binaries need the
+  # AdbWinApi DLLs beside them, so winget appends the extracted directory to the
+  # user PATH instead of shimming adb.exe into WinGet\Links the way it does for
+  # the others. That entry is what puts adb and fastboot on PATH, which is why
+  # the Windows profile has no adb path of its own -- but it lands at the end of
+  # the user PATH and only a new shell sees it.
   windows:
     - fastfetch
     - GitHub.cli
     - gdu
+    - Google.PlatformTools
   # Corp-only macOS packages distributed via Mule (go/mule).
   work_darwin:
     # Cloudtop CLI & Screenshot
