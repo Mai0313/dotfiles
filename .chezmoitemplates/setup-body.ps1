@@ -1,13 +1,5 @@
 $ErrorActionPreference = 'Stop'
 
-# ---------- Global npm CLIs ----------
-# node/npm are assumed to be installed already (nvm-windows / winget / manual).
-if (Get-Command npm -ErrorAction SilentlyContinue) {
-    npm install -g {{ range .packages.npm }}{{ . }} {{ end }}{{ if not .is_work }}{{ range .packages.home_npm }}{{ . }} {{ end }}{{ end }}
-} else {
-    Write-Host 'npm not found on PATH, skipping global npm CLI install.'
-}
-
 # ---------- winget packages ----------
 # winget ships with Windows 11 (App Installer), so unlike scoop or choco there
 # is nothing to bootstrap first. IDs live in packages.yaml.
@@ -47,6 +39,31 @@ if (Get-Command googet -ErrorAction SilentlyContinue) {
     Write-Host 'googet not found on PATH, skipping corp package install.'
 }
 {{ end }}
+# ---------- Node LTS via nvm ----------
+# nvm-windows comes from the winget list above, which is why that block has to
+# stay ahead of this one. The *nix body just sources nvm.sh at this point, but
+# the Windows installer only writes NVM_HOME and PATH into the registry, so a
+# machine that got nvm in this same run cannot see it until a new shell starts.
+# Hence the guard: a first run installs nvm and stops here, a second one after
+# reopening the shell gets node and the npm CLIs below.
+#
+# The version lives in .chezmoidata/node.yaml, shared with setup-body.sh, which
+# is also where the reason for pinning it is written down.
+if (Get-Command nvm -ErrorAction SilentlyContinue) {
+    nvm install {{ .node_version }}
+    nvm use {{ .node_version }}
+} else {
+    Write-Host 'nvm not found on PATH, skipping node install. Open a new shell and re-run.'
+}
+
+# ---------- Global npm CLIs ----------
+# node/npm are on PATH now (nvm ran above). List lives in packages.yaml.
+if (Get-Command npm -ErrorAction SilentlyContinue) {
+    npm install -g {{ range .packages.npm }}{{ . }} {{ end }}{{ if not .is_work }}{{ range .packages.home_npm }}{{ . }} {{ end }}{{ end }}
+} else {
+    Write-Host 'npm not found on PATH, skipping global npm CLI install.'
+}
+
 # ---------- Agent skills links ----------
 # ~/.agents is the skills external; each agent CLI looks for the same set under
 # its own path, so link rather than keep copies. Junctions, not symlinks: a

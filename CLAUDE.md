@@ -11,7 +11,7 @@ Bootstrap has the same two entry points on every platform, each pair sharing one
 - **chezmoi-driven** (`run_onchange_after_setup.sh.tmpl` / `.ps1.tmpl` under `.chezmoiscripts/`) — runs automatically as part of `chezmoi apply`, gated by OS.
 - **manual** (`executable_setup.sh.tmpl` → `~/setup.sh`, `setup.ps1.tmpl` → `~/setup.ps1`) — deployed to home for opt-in manual execution; `.chezmoiignore` deploys only the one matching the OS.
 
-Windows has no bash, so its pair shares `setup-body.ps1` rather than `setup-body.sh`. That body installs the global npm CLIs, the `windows` winget packages and, on corp machines, the `work_windows` googet packages, links the agent skills the way §10 of the *nix body does (with junctions, which need no Developer Mode), and has no counterpart to the remaining *nix-only sections.
+Windows has no bash, so its pair shares `setup-body.ps1` rather than `setup-body.sh`. That body installs the `windows` winget packages and, on corp machines, the `work_windows` googet packages, then node and the global npm CLIs the way §7 and §8 of the *nix body do, then links the agent skills the way §10 does (with junctions, which need no Developer Mode). It has no counterpart to the remaining *nix-only sections. The package blocks stay ahead of the node block because nvm itself comes from the winget list, which is also why a machine installing nvm for the first time needs a second run: the installer writes `NVM_HOME` and PATH into the registry, and the running shell never sees them.
 
 ## Common Commands
 
@@ -95,6 +95,7 @@ Only the files whose purpose is not obvious from opening them. Everything else i
 |---|---|
 | `.chezmoi.toml.tmpl` | The only chezmoi data. See Environment Detection Layer 1. |
 | `.chezmoidata/packages.yaml` | Package lists per OS. Editing it re-triggers setup, because `run_onchange` hashes rendered content. |
+| `.chezmoidata/node.yaml` | The one place the pinned node version lives, read by both setup bodies. Separate from `packages.yaml` because it is not a package list and nvm is not the installer that file's key naming describes. |
 | `.chezmoitemplates/setup-body.sh` | The *nix bootstrap body. See Bootstrap Architecture. |
 | `.chezmoitemplates/setup-body.ps1` | The Windows bootstrap body, shared by that platform's two entry points the same way. |
 | `.chezmoitemplates/agent-instructions/` | **The only copies of the agent guidelines**, split `common.md` / `personal.md` / `work.md`. Edit here, never the seven deployed files. See Shared Agent Instruction Files. |

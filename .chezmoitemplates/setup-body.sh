@@ -129,10 +129,9 @@ fi
 # needed PROFILE=/dev/null (it appends source lines to the chezmoi-managed
 # ~/.zshrc / ~/.bashrc). Shell configs already source ~/.nvm.
 export NVM_DIR="$HOME/.nvm"
-# Pinned to one release rather than tracking lts/*: a moving alias re-downloads
-# node and reinstalls every global CLI whenever the LTS line cuts a patch.
-# Bumping this line is the whole maintenance; it must stay an LTS release.
-NODE_VERSION="24.19.0"
+# The number lives in .chezmoidata/node.yaml, shared with setup-body.ps1, which
+# is also where the reason for pinning it is written down.
+NODE_VERSION="{{ .node_version }}"
 # Load nvm into this non-interactive shell, then make that version the default.
 set +u
 \. "$NVM_DIR/nvm.sh"

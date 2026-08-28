@@ -41,12 +41,18 @@ packages:
   # the others. That entry is what puts adb and fastboot on PATH, which is why
   # the Windows profile has no adb path of its own -- but it lands at the end of
   # the user PATH and only a new shell sees it.
+  #
+  # CoreyButler.NVMforWindows is what the *nix side gets from the .nvm external,
+  # which cannot serve Windows: nvm-windows is an inno installer that writes
+  # environment variables, not a git clone. The node section of setup-body.ps1
+  # depends on it, so this whole list installs before that section runs.
   windows:
     - fastfetch
     - GitHub.cli
     - gdu
     - Google.PlatformTools
     - Notepad++.Notepad++
+    - CoreyButler.NVMforWindows
   # Corp-only macOS packages distributed via Mule (go/mule).
   work_darwin:
     # Cloudtop CLI & Screenshot

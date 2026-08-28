@@ -1,0 +1,11 @@
+# The node release both setup bodies install through nvm, and the only place the
+# number appears. Splitting it out is what keeps setup-body.sh and setup-body.ps1
+# from each carrying their own copy and drifting apart at the next bump.
+#
+# Pinned to one release rather than tracking a moving lts alias: such an alias
+# re-downloads node and reinstalls every global CLI whenever the LTS line cuts a
+# patch. It must stay an LTS release.
+#
+# Editing this re-triggers setup on every machine, because run_onchange hashes
+# rendered content. That is the intended way to roll a new node out.
+node_version: "24.19.0"
