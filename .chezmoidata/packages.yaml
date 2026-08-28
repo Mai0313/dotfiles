@@ -93,13 +93,14 @@ packages:
   # Global npm CLIs, installed after nvm sets up node LTS. Skipped on work macOS.
   # npm and corepack ship with node, so they are intentionally excluded.
   npm_global:
+    - "npm@latest"
     - "@anthropic-ai/claude-code"
-    # - "@charmland/crush"
     - "@google/gemini-cli"
     - "@mai0313/vct"
-    # - "@openai/codex"
     - "@deepseek-ai/dsh"
     - "@earendil-works/pi-coding-agent"
-    # - opencode-ai
-    # - reasonix
-    - tree-sitter-cli
+    - "tree-sitter-cli"
+    # - "@openai/codex"
+    # - "opencode-ai"
+    # - "reasonix"
+    # - "@charmland/crush"
