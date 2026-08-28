@@ -46,6 +46,7 @@ packages:
     - GitHub.cli
     - gdu
     - Google.PlatformTools
+    - Notepad++.Notepad++
   # Corp-only macOS packages distributed via Mule (go/mule).
   work_darwin:
     # Cloudtop CLI & Screenshot
