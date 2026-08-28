@@ -3,7 +3,8 @@
 # bare list plus its own additions, and no list is ever subtractive. The name
 # also picks the installer, which is why darwin and work_darwin cannot merge:
 # darwin is brew, work_darwin is `sudo mule install`, linux and work_linux are
-# apt, windows is winget, npm and home_npm are `npm install -g`.
+# apt, windows is winget but work_windows is googet, npm and home_npm are
+# `npm install -g`.
 packages:
   darwin:
     - zsh
@@ -96,6 +97,12 @@ packages:
     # Not corp-specific, just absent from noble. Installing it here in §1 makes
     # the §11 tarball fall through on corp machines.
     - fastfetch
+  # Corp Windows packages, installed with googet (go/googet), the gWindows
+  # channel for corp software, not winget. The install needs an elevated shell
+  # and does not touch PATH: jetski-cli lands in C:\Program Files\Google\
+  # jetski-cli, which the machine still has to put on PATH itself.
+  work_windows:
+    - jetski-cli
   # Global npm CLIs, installed after nvm sets up node LTS. Skipped on work macOS.
   # npm and corepack ship with node, so they are intentionally excluded.
   npm:

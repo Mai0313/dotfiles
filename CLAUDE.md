@@ -11,7 +11,7 @@ Bootstrap has the same two entry points on every platform, each pair sharing one
 - **chezmoi-driven** (`run_onchange_after_setup.sh.tmpl` / `.ps1.tmpl` under `.chezmoiscripts/`) — runs automatically as part of `chezmoi apply`, gated by OS.
 - **manual** (`executable_setup.sh.tmpl` → `~/setup.sh`, `setup.ps1.tmpl` → `~/setup.ps1`) — deployed to home for opt-in manual execution; `.chezmoiignore` deploys only the one matching the OS.
 
-Windows has no bash, so its pair shares `setup-body.ps1` rather than `setup-body.sh`. That body installs the global npm CLIs and the `windows` winget packages, links the agent skills the way §10 of the *nix body does (with junctions, which need no Developer Mode), and has no counterpart to the remaining *nix-only sections.
+Windows has no bash, so its pair shares `setup-body.ps1` rather than `setup-body.sh`. That body installs the global npm CLIs, the `windows` winget packages and, on corp machines, the `work_windows` googet packages, links the agent skills the way §10 of the *nix body does (with junctions, which need no Developer Mode), and has no counterpart to the remaining *nix-only sections.
 
 ## Common Commands
 
@@ -61,7 +61,7 @@ OS detection comes from chezmoi built-ins: `eq .chezmoi.os "linux"` / `"darwin"`
 - `.chezmoiignore` — gates `.local/bin/kgrep`, `.local/bin/linux-kernel-mount`, `.local/bin/automation-mount` and the two `.config/systemd/user/*-sshfs.service` units off unless `is_work && linux`; `.config/environment.d/adb.conf` + `setup_adb.sh` off unless `is_work`; and `.chrome-remote-desktop-session` off unless `linux && not is_work`. The OS gates in the same file are independent of `is_work`: Windows drops the whole *nix set (`.zshrc`, `.zshenv`, `.zprofile`, `.profile`, `.bashrc`, `.p10k.zsh`, `cleanup.sh`, `setup.sh`, `.xinputrc`, `.config/{alacritty,environment.d,systemd,fcitx5,btop,htop,goobuntu-backups,uv,pip}`, `.local/share/fonts`, `.local/bin/{list_devices,toggle-display}`), non-Windows drops `Documents`, `AppData` + `setup.ps1`, and non-Linux drops `.config/environment.d/im.conf`.
 - `.chezmoiexternal.toml` — gates `adb-keys/security` (sso git-repo); gates oh-my-zsh + plugins on `chezmoi.os != "windows"` and the two CLI binaries on `chezmoi.os == "linux"`, neither of which depends on `is_work`.
 - `.chezmoitemplates/setup-body.sh` — §1 gates the corp-only apt packages, §2 routes VS Code (corp Linux → google3, else Microsoft repo), §8 skips global npm on work macOS and appends `home_npm` only off work, §11 gates the ADB pontisd restart. Container and OS gating inside the body is runtime, not chezmoi data.
-- `.chezmoitemplates/setup-body.ps1` — the same `home_npm` gate on its npm install.
+- `.chezmoitemplates/setup-body.ps1` — the same `home_npm` gate on its npm install, plus the whole `work_windows` googet block.
 - The seven agent instruction templates — pick between the work and personal body. See Shared Agent Instruction Files.
 - `dot_gitconfig.tmpl` — picks the `[user]` name/email pair. Everything else in that file is shared, and the corp machines' `[repo]` section is deliberately absent: `repo` writes `superprojectChoice` with an expiry and rewrites both on its own, so tracking them would fight the tool.
 
@@ -218,6 +218,8 @@ Note `setup.ps1.tmpl` carries no `executable_` prefix: Windows has no execute bi
 **Shebang at byte 0.** The `.sh.tmpl` gate uses `{{- if ... -}}` with both dashes so `#!/usr/bin/env bash` lands on line 1. A leading newline makes `fork/exec` fail with `exec format error`. After touching the gate, check `chezmoi execute-template < <script>.tmpl | head -c 2` returns `#!`.
 
 **Windows uses winget** rather than scoop or choco, because it ships with Windows 11 and needs no bootstrap of its own. Two things there have no bash equivalent to reason from: winget returns non-zero for "already installed" (`0x8A15002B`) as well as for real failures, and PowerShell 5.1's `$ErrorActionPreference = 'Stop'` does not cover native exit codes at all — so `$LASTEXITCODE` is tested by hand, tolerated codes are allow-listed, and it is reset at the end so a tolerated non-zero does not leak out as the script's status. **None of this is verifiable from Linux; check on `WEI` after changing that block.** Package names are matched by search (the form upstream documents); if one ever goes ambiguous, switch it to `--exact --id <PackageIdentifier>`.
+
+**Corp Windows software goes through googet instead** (`work_windows`), because that is the channel gWindows publishes it on. googet ships with the platform, so its `Get-Command` guard is not about optionality: a missing command is a terminating error under `Stop` and would take the skills links after it down too. `googet install` needs an elevated shell, and Software Center is the no-admin alternative. Its exit codes carry no allow-list yet: unlike the winget block, nothing here has ever run on a corp Windows machine, and there is none among the five in Machine Specs.
 
 ### Externals (`.chezmoiexternal.toml`)
 

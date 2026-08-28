@@ -29,7 +29,24 @@ if (Get-Command winget -ErrorAction SilentlyContinue) {
 } else {
     Write-Host 'winget not found on PATH, skipping package install.'
 }
-
+{{ if .is_work }}
+# ---------- Corp Windows packages ----------
+# googet (go/googet) is the gWindows channel for corp software and ships with
+# the platform. The guard is not there because it might be missing, but because
+# a missing command is a terminating error under $ErrorActionPreference =
+# 'Stop', which would take the skills links below down with it. `googet install`
+# needs an elevated shell, and Software Center installs the same packages
+# without admin. Exit codes are not allow-listed the way winget's are above and
+# nothing resets $LASTEXITCODE here, so a failed install surfaces: none of this
+# has been run on a corp Windows machine yet.
+if (Get-Command googet -ErrorAction SilentlyContinue) {
+{{- range .packages.work_windows }}
+    googet -noconfirm install {{ . }}
+{{- end }}
+} else {
+    Write-Host 'googet not found on PATH, skipping corp package install.'
+}
+{{ end }}
 # ---------- Agent skills links ----------
 # ~/.agents is the skills external; each agent CLI looks for the same set under
 # its own path, so link rather than keep copies. Junctions, not symlinks: a
