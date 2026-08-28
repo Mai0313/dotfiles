@@ -94,6 +94,12 @@ packages:
     # sshfs backs the ~/linux_kernel mount driven by .local/bin/linux-kernel-mount
     - sshfs
     - roadwarrior
+    # Git-on-Borg client tools. Unlike glaze, glint, gpylint, pyformat,
+    # google-clang-tools and google-f1-sql, which gLinux provisioning names on
+    # its own apt command line and which therefore need no entry here, nothing
+    # installs this one for you. The package ships no binary of its own name: it
+    # provides git-remote-rpc, git-remote-submodule-pilot and gob-ctl.
+    - git-remote-google
     # Not corp-specific, just absent from noble. Installing it here in §1 makes
     # the §11 tarball fall through on corp machines.
     - fastfetch
