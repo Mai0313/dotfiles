@@ -159,7 +159,14 @@ Both lines are load-bearing on whitespace. `common.md` already ends in a newline
 
 The per-tool settings files sitting next to them (`settings.json`, `config.toml`, `opencode.json`, `private_crush.json`, `private_config.toml`) are **not** shared — each is tool-specific and unrelated to the others. `dot_local/share/crush/` ships only a settings file, no instruction file.
 
-`~/.gemini/GEMINI.md` is the **eighth** copy, and the one this repo does not deploy: it lives in the `.gemini` external repo (see Externals below), which owns it. It is byte-identical to what `work.md` renders to, because that file was seeded from it and is meant to stay that way. Nothing enforces it, so a change to `work.md` or to `common.md` has to be carried over there by hand.
+`~/.gemini/AGENTS.md` is the **eighth** copy, and the one this repo does not deploy: it lives in the `.gemini` external repo (see Externals below), which owns it. It is byte-identical to `common.md` followed by `work.md`, because it was seeded from them and is meant to stay that way. It was called `GEMINI.md` until 2026-09-01; Gemini CLI and Antigravity both default to `AGENTS.md` now.
+
+Nothing enforces that equality, so **an edit to `common.md` or `work.md` is only half done until the same edit lands in `~/.gemini/AGENTS.md`.** That repo is an ordinary git checkout, not something `chezmoi apply` writes, so carrying it over means editing, committing and pushing there as well; the corp machine picks the change up by pulling `.gemini`. Do both in one sitting or the corp machine silently runs a version behind. Check the two still agree with:
+
+```bash
+C=.chezmoitemplates/agent-instructions/common.md
+diff "$C" <(head -n "$(wc -l < "$C")" ~/.gemini/AGENTS.md)
+```
 
 ### Shell Config Structure
 
