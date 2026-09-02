@@ -9,6 +9,7 @@ LICENSE
 .zprofile
 .profile
 .bashrc
+.config/shell
 .p10k.zsh
 cleanup.sh
 setup.sh

@@ -58,7 +58,7 @@ OS detection comes from chezmoi built-ins: `eq .chezmoi.os "linux"` / `"darwin"`
 **Note**: `.chezmoi.toml.tmpl` runs at `chezmoi init`, not at every `chezmoi apply`, so editing it needs `chezmoi init --force` once to regenerate `~/.config/chezmoi/chezmoi.toml`.
 
 **Current consumers of `is_work`:**
-- `.chezmoiignore` — gates `.local/bin/kgrep`, `.local/bin/linux-kernel-mount`, `.local/bin/automation-mount` and the two `.config/systemd/user/*-sshfs.service` units off unless `is_work && linux`; `.config/environment.d/adb.conf` + `setup_adb.sh` off unless `is_work`; and `.chrome-remote-desktop-session` off unless `linux && not is_work`. The OS gates in the same file are independent of `is_work`: Windows drops the whole *nix set (`.zshrc`, `.zshenv`, `.zprofile`, `.profile`, `.bashrc`, `.p10k.zsh`, `cleanup.sh`, `setup.sh`, `.xinputrc`, `.config/{alacritty,environment.d,systemd,fcitx5,btop,htop,goobuntu-backups,uv,pip}`, `.local/share/fonts`, `.local/bin/{list_devices,toggle-display}`), non-Windows drops `Documents`, `AppData` + `setup.ps1`, and non-Linux drops `.config/environment.d/im.conf`.
+- `.chezmoiignore` — gates `.local/bin/kgrep`, `.local/bin/linux-kernel-mount`, `.local/bin/automation-mount` and the two `.config/systemd/user/*-sshfs.service` units off unless `is_work && linux`; `.config/environment.d/adb.conf` + `setup_adb.sh` off unless `is_work`; and `.chrome-remote-desktop-session` off unless `linux && not is_work`. The OS gates in the same file are independent of `is_work`: Windows drops the whole *nix set (`.zshrc`, `.zshenv`, `.zprofile`, `.profile`, `.bashrc`, `.p10k.zsh`, `cleanup.sh`, `setup.sh`, `.xinputrc`, `.config/{alacritty,shell,environment.d,systemd,fcitx5,btop,htop,goobuntu-backups,uv,pip}`, `.local/share/fonts`, `.local/bin/{list_devices,toggle-display}`), non-Windows drops `Documents`, `AppData` + `setup.ps1`, and non-Linux drops `.config/environment.d/im.conf`.
 - `.chezmoiexternal.toml` — gates `adb-keys/security` (sso git-repo); gates oh-my-zsh + plugins on `chezmoi.os != "windows"` and the two CLI binaries on `chezmoi.os == "linux"`, neither of which depends on `is_work`.
 - `.chezmoitemplates/setup-body.sh` — §1 gates the corp-only apt packages, §2 routes VS Code (corp Linux → google3, else Microsoft repo), §8 skips global npm on work macOS and appends `home_npm` only off work, §11 gates the ADB pontisd restart, §12 gates the dhub install and picks its release directory (`mac` on darwin, `glinux` otherwise). Container and OS gating inside the body is runtime, not chezmoi data.
 - `.chezmoitemplates/setup-body.ps1` — the same `home_npm` gate on its npm install, plus the whole `work_windows` googet block.
@@ -67,13 +67,13 @@ OS detection comes from chezmoi built-ins: `eq .chezmoi.os "linux"` / `"darwin"`
 
 Inspect the current value with `chezmoi data | grep is_work`.
 
-**Layer 2 — runtime shell gating (actual behavior).** Shell configs (`dot_zshrc`, `dot_bashrc`) do their own `case` match (on `$(hostname -f 2>/dev/null || hostname)`) against the same FQDN patterns to toggle env-specific blocks (aliases, env vars). **All live gating for these mixed-content files happens here, not in chezmoi templates.**
+**Layer 2 — runtime shell gating (actual behavior).** `dot_config/shell/rc.sh` does its own `case` match (on `$(hostname -f 2>/dev/null || hostname)`) against the same FQDN patterns to toggle env-specific blocks (aliases, env vars). `dot_zshrc` and `dot_bashrc` each end by sourcing it, so that file is the only copy. **All live gating for these mixed-content files happens here, not in chezmoi templates.**
 
-**Why runtime, not template, for shell configs?** `chezmoi re-add` cannot reverse-merge local edits back into Go template syntax. Keeping `dot_zshrc` / `dot_bashrc` as plain (non-`.tmpl`) scripts means the user can edit them in `$HOME` and sync back with `chezmoi re-add ~/.zshrc` without hand-patching the source tree. This rule applies because these files mix universal and env-specific content in the same file — runtime gating is the only option.
+**Why runtime, not template, for shell configs?** `chezmoi re-add` cannot reverse-merge local edits back into Go template syntax. Keeping `dot_zshrc` / `dot_bashrc` / `dot_config/shell/rc.sh` as plain (non-`.tmpl`) scripts means the user can edit them in `$HOME` and sync back with `chezmoi re-add ~/.zshrc` without hand-patching the source tree. This rule applies because these files mix universal and env-specific content in the same file — runtime gating is the only option.
 
-**Future-agent guidance: do NOT "refactor" the `dot_zshrc` / `dot_bashrc` runtime `case` blocks into `{{ if .is_work }}` templates.** This conversion was made deliberately; reversing it would break the `re-add` workflow. If you think a `.tmpl` would be cleaner, you are missing the workflow constraint — read this section again.
+**Future-agent guidance: do NOT "refactor" the `dot_config/shell/rc.sh` runtime `case` blocks into `{{ if .is_work }}` templates.** This conversion was made deliberately; reversing it would break the `re-add` workflow. If you think a `.tmpl` would be cleaner, you are missing the workflow constraint — read this section again.
 
-**Known duplication.** The FQDN pattern `*.c.googlers.com|*.corp.google.com|*.roam.internal` appears in `.chezmoi.toml.tmpl` (Layer 1) plus `dot_zshrc` and `dot_bashrc` (Layer 2). If the pattern ever changes, grep for `c.googlers.com`, `corp.google.com`, and `roam.internal` to find every occurrence.
+**Known duplication.** The FQDN pattern `*.c.googlers.com|*.corp.google.com|*.roam.internal` appears in `.chezmoi.toml.tmpl` (Layer 1) and `dot_config/shell/rc.sh` (Layer 2). If the pattern ever changes, grep for `c.googlers.com`, `corp.google.com`, and `roam.internal` to find every occurrence.
 
 ### Machine Specs
 
@@ -101,6 +101,7 @@ Only the files whose purpose is not obvious from opening them. Everything else i
 | `.chezmoitemplates/agent-instructions/` | **The only copies of the agent guidelines**, split `common.md` / `personal.md` / `work.md`. Edit here, never the seven deployed files. See Shared Agent Instruction Files. |
 | `.chezmoiversion` | `2.40.0`, the oldest release verified against this source state. An older chezmoi aborts rather than silently degrading. Raise it only when the repo starts using a newer feature. |
 | `dot_zshrc` / `dot_bashrc` / `dot_zshenv` / `dot_zprofile` | Plain, non-`.tmpl`, so `chezmoi re-add` works. See Environment Detection Layer 2 before changing that. |
+| `dot_config/shell/rc.sh` | **The only copy of what `~/.zshrc` and `~/.bashrc` share**: the common aliases and every FQDN-gated block. Both rc files end by sourcing it. Edit here, not in either rc file. See Shell Config Structure. |
 | `private_dot_profile` | Byte-identical to Debian's `/etc/skel/.profile`. Tracked anyway, so `~/.local/bin` lands on PATH regardless of what a distro's skel contains. |
 | `dot_claude/`, `dot_codex/`, `dot_copilot/`, `dot_grok/`, `dot_config/opencode/`, `dot_local/share/crush/`, `dot_dsh/`, `dot_pi/`, `private_dot_hermes/` | Per-tool agent config: a settings file each, plus an instruction file that only includes the shared body. Gemini's equivalent is not here, it is the `.gemini` external. |
 | `dot_local/bin/` | Five scripts under two different gates: `kgrep`, `linux-kernel-mount`, `automation-mount` need `is_work && linux`; `list_devices` and `toggle-display` are corp tools but only gated off Windows, so they land on personal machines too. |
@@ -170,12 +171,18 @@ diff "$C" <(head -n "$(wc -l < "$C")" ~/.gemini/AGENTS.md)
 
 ### Shell Config Structure
 
-Both `dot_zshrc` and `dot_bashrc` cover the same ground, with a few zsh-only pieces called out:
-1. PATH extensions (`.local/bin`, Go, Cargo, Neovim at `~/.nvim/bin`, OpenOCD)
+`dot_zshrc` and `dot_bashrc` each hold only what is theirs, and end by sourcing `dot_config/shell/rc.sh` for everything they have in common.
+
+In each rc file, because the two shells do it differently or only one of them does it at all:
+1. PATH extensions (`.local/bin`, Go, Cargo, Neovim at `~/.nvim/bin`, OpenOCD) — the one line still copied into both; zsh sets it near the top, bash near the end
 2. NVM loading — zsh lazy-loads via the oh-my-zsh `nvm` plugin (`zstyle ':omz:plugins:nvm' lazy yes`); bash sources `~/.nvm/nvm.sh` eagerly
-3. Common aliases (`cc='claude'`, `cop='copilot'`, `cod='codex'`)
-4. Runtime-gated environment blocks — four FQDN `case` arms: work (`*.c.googlers.com|*.corp.google.com|*.roam.internal` → `sshping`, `ADB_VENDOR_KEYS`, `CORP_SSH_HELPER_OVERRIDES`), Cloudtop VM only (`*.c.googlers.com` → `AUTH_REMOTE_GCERT_ARGS`, which the corp desktop must not set), roam-only (`*.roam.internal` → `agy`, `jetski-cli`), and corp Linux (`*.c.googlers.com|*.corp.google.com` → sources `g4d` + `dc_setup.sh`, plus `gemini`/`agy`/`jetski`/`flash`/`recovery`/`listd`/`fetch`/`duckie` aliases). No-op on personal machines.
-5. Editor selection (zsh only: vim over SSH, nvim locally)
+3. Editor selection (zsh only: vim over SSH, nvim locally)
+
+In `dot_config/shell/rc.sh`, one copy sourced by both:
+4. Common aliases (`cc='claude'`, `cop='copilot'`, `cod='codex'`, `cu` for a chezmoi update)
+5. Runtime-gated environment blocks — four FQDN `case` arms: work (`*.c.googlers.com|*.corp.google.com|*.roam.internal` → `sshping`, `ADB_VENDOR_KEYS`, `CORP_SSH_HELPER_OVERRIDES`), Cloudtop VM only (`*.c.googlers.com` → `AUTH_REMOTE_GCERT_ARGS`, which the corp desktop must not set), roam-only (`*.roam.internal` → `agy`, `jetski-cli`), and corp Linux (`*.c.googlers.com|*.corp.google.com` → sources `g4d` + `dc_setup.sh`, plus `gemini`/`agy`/`jetski`/`flash`/`recovery`/`listd`/`fetch_artifact`/`duckie`/`issues`/`buganizer`/`gbrowser`/`gobcs` aliases). No-op on personal machines.
+
+It is sourced, not executed, because `alias` and `export` have to land in the current shell; a script run as a child process would exit with nothing set. That is also why it stays POSIX sh, with no bash-only or zsh-only syntax. The source line is guarded with `[ -f ... ]` so a shell still starts on a machine where chezmoi has not deployed it yet.
 
 zsh additionally loads oh-my-zsh (theme `powerlevel10k`, plugins `git`/`dotenv`/`nvm`/`z`/`zsh-autosuggestions`/`zsh-syntax-highlighting`); bash does not. `z` is oh-my-zsh's bundled copy of `agkozak/zsh-z`, so it updates with oh-my-zsh — do not add a `custom/plugins/zsh-z` clone alongside it, and note that oh-my-zsh gitignores all of `custom/`, so anything hand-cloned there is invisible to `git status` and managed by nothing.
 
