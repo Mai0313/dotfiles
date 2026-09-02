@@ -29,6 +29,7 @@ packages:
     - fd-find
     - fuse-overlayfs
     - tmux
+    - python-is-python3
   # winget packages, installed by run_onchange_after_setup.ps1.tmpl. Each entry
   # is whatever that project's own docs tell you to type, which is why some are
   # bare names and gh is an identifier. The script passes them through unchanged
