@@ -12,7 +12,8 @@ system-certs = false
 offline = false
 prerelease = "if-necessary"
 preview-features = true
-python-preference = "system"
+# https://docs.astral.sh/uv/reference/settings/#python-preference
+# python-preference = "managed"
 
 # https://docs.astral.sh/uv/reference/settings/#index
 [[index]]
