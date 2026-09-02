@@ -199,11 +199,17 @@ fi
 # that pulls the whole launcher in for one binary; this drops the same binary
 # into ~/.local/bin, which is already on PATH. `latest` holds the version
 # string, so the release path is only known after reading it.
-{{ if and .is_work (eq .chezmoi.os "linux") -}}
+# The launcher stays available either way, so this is the alternative rather
+# than the requirement: chained with && so a failure (no credentials, no
+# gcloud, bucket unreachable) skips the rest and reports instead of taking the
+# run down. That tolerance is what lets roam macOS try too, where the bucket
+# has a `mac` build but nothing installs gcloud.
+{{ if .is_work -}}
 if ! command -v dhub >/dev/null 2>&1 && [ ! -x "$HOME/.local/bin/dhub" ]; then
-    DHUB_VERSION="$(gcloud storage cat gs://gchips-dta-tools/dhub/rapid/latest)"
-    mkdir -p "$HOME/.local/bin"
-    gcloud storage cp "gs://gchips-dta-tools/dhub/rapid/${DHUB_VERSION}/glinux/dhub.par" "$HOME/.local/bin/dhub"
-    chmod +x "$HOME/.local/bin/dhub"
+    DHUB_VERSION="$(gcloud storage cat gs://gchips-dta-tools/dhub/rapid/latest)" &&
+        mkdir -p "$HOME/.local/bin" &&
+        gcloud storage cp "gs://gchips-dta-tools/dhub/rapid/${DHUB_VERSION}/{{ if eq .chezmoi.os "darwin" }}mac{{ else }}glinux{{ end }}/dhub.par" "$HOME/.local/bin/dhub" &&
+        chmod +x "$HOME/.local/bin/dhub" ||
+        echo "dhub install skipped; install it by hand if needed (go/dhub-host)" >&2
 fi
 {{- end }}
