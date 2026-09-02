@@ -121,6 +121,7 @@ packages:
     # Not corp-specific, just absent from noble. Installing it here in §1 makes
     # the §11 tarball fall through on corp machines.
     - fastfetch
+    - google-cloud-cli
   # Corp Windows packages, installed with googet (go/googet), the gWindows
   # channel for corp software, not winget. The install needs an elevated shell
   # and does not touch PATH: jetski-cli lands in C:\Program Files\Google\
