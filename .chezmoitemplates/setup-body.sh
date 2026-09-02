@@ -199,11 +199,11 @@ fi
 # that pulls the whole launcher in for one binary; this drops the same binary
 # into ~/.local/bin, which is already on PATH. `latest` holds the version
 # string, so the release path is only known after reading it.
-{{ if .is_work -}}
+{{ if and .is_work (eq .chezmoi.os "linux") -}}
 if ! command -v dhub >/dev/null 2>&1 && [ ! -x "$HOME/.local/bin/dhub" ]; then
     DHUB_VERSION="$(gcloud storage cat gs://gchips-dta-tools/dhub/rapid/latest)"
     mkdir -p "$HOME/.local/bin"
-    gcloud storage cp "gs://gchips-dta-tools/dhub/rapid/${DHUB_VERSION}/{{ if eq .chezmoi.os "darwin" }}mac{{ else }}glinux{{ end }}/dhub.par" "$HOME/.local/bin/dhub"
+    gcloud storage cp "gs://gchips-dta-tools/dhub/rapid/${DHUB_VERSION}/glinux/dhub.par" "$HOME/.local/bin/dhub"
     chmod +x "$HOME/.local/bin/dhub"
 fi
 {{- end }}
