@@ -161,7 +161,7 @@ case "$__fqdn" in
 esac
 case "$__fqdn" in
   *.c.googlers.com|*.corp.google.com)
-    # Cloudtop-only aliases.
+    # Cloudtop / Workstation Only aliases.
     source /etc/bash_completion.d/g4d
     source /etc/bash_completion.d/cogd
     # Device Cloud: adds dc_* tools to PATH, plus dc_envsetup / dc_tab_completion.
@@ -177,8 +177,12 @@ case "$__fqdn" in
     alias recovery='/google/bin/releases/android/flashstation/cl_rom_recovery'
     alias cl_flashstation='/google/bin/releases/android/flashstation/cl_flashstation'
     alias cl_rom_recovery='/google/bin/releases/android/flashstation/cl_rom_recovery'
-    alias fetch='/google/data/ro/projects/android/fetch_artifact'
+    alias fetch_artifact='/google/data/ro/projects/android/fetch_artifact'
     alias duckie='/google/bin/releases/gemini-agents-duckie/duckie_cli'
+    alias issues='/google/bin/releases/issues-cli/issues'
+    alias buganizer='/google/bin/releases/issues-cli/issues'
+    # go/buganizer-admin
+    alias buganizer_admin='/google/bin/releases/buganizer/public/buganizer_admin'
     alias gbrowser='/google/bin/releases/gemini-agents-gbrowser/gbrowser'
     alias gobcs='/google/bin/releases/gemini-agents-gob-code-search/gob_code_search_tool'
     ;;
