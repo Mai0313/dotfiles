@@ -178,7 +178,8 @@ if [ -d "$SKILLS_SRC" ]; then
 fi
 
 # ============================================================================
-# Work-only tail: service wiring for packages installed above.
+# Work-only tail: corp-only tools, plus service wiring for packages installed
+# above.
 # ============================================================================
 
 # ---------- 11. ADB systemd environment + pontisd ----------
@@ -190,5 +191,19 @@ if [ -d "$KEYS_DIR" ] && command -v systemctl >/dev/null 2>&1; then
     systemctl --user set-environment ADB_VENDOR_KEYS="$KEYS_DIR" || true
     systemctl --user daemon-reload || true
     systemctl --user restart pontisd 2>/dev/null || true
+fi
+{{- end }}
+
+# ---------- 12. dhub (go/dhub-host) ----------
+# The team also ships a launcher envsetup.sh to source from a shell config, but
+# that pulls the whole launcher in for one binary; this drops the same binary
+# into ~/.local/bin, which is already on PATH. `latest` holds the version
+# string, so the release path is only known after reading it.
+{{ if .is_work -}}
+if ! command -v dhub >/dev/null 2>&1 && [ ! -x "$HOME/.local/bin/dhub" ]; then
+    DHUB_VERSION="$(gcloud storage cat gs://gchips-dta-tools/dhub/rapid/latest)"
+    mkdir -p "$HOME/.local/bin"
+    gcloud storage cp "gs://gchips-dta-tools/dhub/rapid/${DHUB_VERSION}/{{ if eq .chezmoi.os "darwin" }}mac{{ else }}glinux{{ end }}/dhub.par" "$HOME/.local/bin/dhub"
+    chmod +x "$HOME/.local/bin/dhub"
 fi
 {{- end }}

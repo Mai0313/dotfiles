@@ -169,7 +169,8 @@ case "$__fqdn" in
     # Device Cloud: adds dc_* tools to PATH, plus dc_envsetup / dc_tab_completion.
     source /google/bin/releases/si-sw-eng-prod-team/dc_checkout/dc_setup.sh
     # Dhub: go/dhub-host
-    source /google/bin/releases/gchips-dta-tools-team/launcher/envsetup.sh
+    # We install dhub from gcloud instead; keep this line for an example only.
+    # source /google/bin/releases/gchips-dta-tools-team/launcher/envsetup.sh
     alias gemini='/google/bin/releases/gemini-cli/tools/gemini'
     alias agy='/google/bin/releases/jetski-devs/tools/cli'
     alias jetski='/google/bin/releases/jetski-devs/tools/cli'
