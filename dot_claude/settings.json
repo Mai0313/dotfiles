@@ -8,6 +8,7 @@
     "CLAUDE_CODE_ENABLE_TODO_TOOLS": "1"
   },
   "attribution": {
+    "commit": "",
     "pr": "",
     "sessionUrl": false
   },
