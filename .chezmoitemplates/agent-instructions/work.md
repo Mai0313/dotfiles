@@ -61,6 +61,14 @@ When investigating a crash/hang bug, look for the breadcrumbs FIRST. They give a
 
 Use the `pixel-breadcrumbs` skill to do it rather than decoding by hand. It owns the acquisition grep, the reading order across all five breadcrumb sets, the decode tables, what a healthy device looks like, and where to escalate when the crumb runs out. Reading a value backwards or off the wrong platform produces a confident and completely wrong root cause, which is exactly what that skill exists to prevent.
 
+## Personal Work Log
+
+Beside the team components sits the user's own, `[Personal issues, <ldap>]`, and it is their work record: a report they write months from now is assembled out of what is sitting in there. Nothing files itself, so raising it is on you.
+
+Offer when a piece of substantial work reaches the point where its outcome fits in a sentence (a conclusion reached, a CL pushed, an experiment that settled something, a bug now understood), before moving on to whatever is next. Substantial is the bar and it is not a low one: answering a question, reading a file, a one line edit, anything that took a single step is not work log material. Work that already has a team ticket or a CL still gets one, since the record is only worth reading back if it is complete. Offer once, and if the answer is no, drop it for that piece of work rather than raising it again later.
+
+The two Buganizer skills above cover reading and investigating; filing an issue is `create-issue`, and it owns everything from there: what goes in the issue, keeping it current as the work moves, and the one-way rule that keeps a private id off team artefacts. Read its `references/buganizer-personal-issue.md` before drafting.
+
 ## About Android Build (`ab/*`)
 
 `ab/<id>` and `android-build.googleplex.com` links point at Android Build, where firmware builds and their artifacts live. Two skills split it: `android-build-cli` owns the CLIs and the safety flags they inject, `pixel-build-artifacts` owns the Pixel side, turning a pasted link into a build, picking the right artifact glob, and what has to survive into the report.
