@@ -115,7 +115,7 @@ Search them with `kgrep <rg args...>`, never with `rg`, `grep`, or your own `ssh
 If you are asked to init or sync a repo, DO NOT REMOVE the logs we wrote such as: `./b_*_logs/**` , `./b_*.md`.
 Sync and init takes time, feel free to assign subagent to run `repo init` and `repo sync -c -j100` commands for you.
 
-Reference: [Pixel Codename](http://go/pixel-phone-codenames), [What Repo](http://go/whatrepo), [Code Isolation Playbook](http://go/pixel-isolation-playbook)
+Reference: [Pixel Codename](http://go/pixel-phone-codenames), [What Repo](http://go/whatrepo). Which branch a change starts on under code isolation, and where it goes after it lands, is the `pixel-code-isolation` skill's; read it before choosing a push target or a checkout branch for P26 and later.
 
 ## About Bootloader Logs
 
