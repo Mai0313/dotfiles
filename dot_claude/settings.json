@@ -55,6 +55,43 @@
     "type": "command",
     "command": "bash ~/.claude/subagent-statusline-command.sh"
   },
+  "footerLinksRegexes": [
+    {
+      "type": "regex",
+      "pattern": "\\bb/(?<id>\\d+)\\b",
+      "url": "https://b.corp.google.com/issues/{id}"
+    },
+    {
+      "type": "regex",
+      "pattern": "\\bgpar/(?<id>\\d+)\\b",
+      "url": "https://googleplex-polygon-android-review.git.corp.google.com/{id}"
+    },
+    {
+      "type": "regex",
+      "pattern": "\\bgpar/(?<hash>[0-9a-f]*[a-f][0-9a-f]*)\\b",
+      "url": "https://googleplex-polygon-android-review.git.corp.google.com/q/{hash}"
+    },
+    {
+      "type": "regex",
+      "pattern": "\\bcl/(?<id>\\d+)\\b",
+      "url": "https://critique.corp.google.com/{id}"
+    },
+    {
+      "type": "regex",
+      "pattern": "\\bag/(?<id>\\d+)\\b",
+      "url": "https://googleplex-android-review.git.corp.google.com/{id}"
+    },
+    {
+      "type": "regex",
+      "pattern": "\\bab/(?<id>\\d+)\\b",
+      "url": "https://android-build.corp.google.com/ab/{id}"
+    },
+    {
+      "type": "regex",
+      "pattern": "(?<![\\w/~.])go/(?<link>[a-zA-Z0-9][\\w.-]*)",
+      "url": "https://goto2.corp.google.com/{link}"
+    }
+  ],
   "enabledPlugins": {
     "rust-analyzer-lsp@claude-plugins-official": true,
     "typescript-lsp@claude-plugins-official": true,
