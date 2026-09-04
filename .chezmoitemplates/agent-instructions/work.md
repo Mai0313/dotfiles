@@ -61,6 +61,8 @@ When investigating a crash/hang bug, look for the breadcrumbs FIRST. They give a
 
 Use the `pixel-breadcrumbs` skill to do it rather than decoding by hand. It owns the acquisition grep, the reading order across all five breadcrumb sets, the decode tables, what a healthy device looks like, and where to escalate when the crumb runs out. Reading a value backwards or off the wrong platform produces a confident and completely wrong root cause, which is exactly what that skill exists to prevent.
 
+That skill decodes the Pixel breadcrumb, which is a progress code with its own encoding and is not the PSCI interface. The interface itself belongs to `pixel-psci-spec`: what a return code means, which optional calls a given SoC actually implements, whether a behaviour matches the specification. Reach for it even when you are sure you already know, because PSCI is a published Arm standard and what bites here is where the implementations depart from it. RF-A reports 1.3 while TF-A reports 1.1, Linux rewrites every return code before printing it, and Pixel accepts exactly five `power_state` values from a lookup table.
+
 ## About Android Build (`ab/*`)
 
 `ab/<id>` and `android-build.googleplex.com` links point at Android Build, where firmware builds and their artifacts live. Two skills split it: `android-build-cli` owns the CLIs and the safety flags they inject, `pixel-build-artifacts` owns the Pixel side, turning a pasted link into a build, picking the right artifact glob, and what has to survive into the report.
