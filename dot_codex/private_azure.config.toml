@@ -2,8 +2,8 @@
 # Example: https://developers.openai.com/codex/config-sample
 # Profile Example: https://developers.openai.com/codex/config-advanced#profiles
 
-model = "gpt-5.6-sol"
-review_model = "gpt-5.6-sol"
+model = "gpt-6-astra"
+review_model = "gpt-6-astra"
 model_reasoning_effort = "ultra"
 plan_mode_reasoning_effort = "ultra"
 
