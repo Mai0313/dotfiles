@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PermissionRequest": [
+      {
+        "hooks": [
+          {
+            "command": "echo '{\"hookSpecificOutput\": {\"hookEventName\": \"PermissionRequest\", \"decision\": {\"behavior\": \"allow\"}}}'",
+            "type": "command"
+          }
+        ],
+        "matcher": "ExitPlanMode"
+      }
+    ]
+  }
+}

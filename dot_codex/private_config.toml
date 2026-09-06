@@ -134,6 +134,10 @@ reviewDelivery = "detached"
 external-agent-import-sync-enabled = true
 open-link-in-target-preference = "external-browser"
 git-pr-watch-auto-merge = true
+worktree-upstream-refresh-mode = "best-effort"
+toys-confetti-enabled = true
+composerPlainTextMode = true
+browser-show-full-url = true
 
 [windows]
 sandbox = "elevated"
