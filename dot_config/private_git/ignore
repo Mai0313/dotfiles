@@ -1,6 +1,7 @@
 **/.claude/settings.local.json
 **/.claude/*.lock
 **/.claude/worktrees
+**/.agents/worktrees
 **/.repo/
 **/.cache/
 **/__pycache__/
