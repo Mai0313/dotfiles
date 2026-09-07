@@ -135,8 +135,6 @@ packages:
     - "@anthropic-ai/claude-code"
     - "@google/gemini-cli"
     - "@mai0313/vct"
-    - "@deepseek-ai/dsh"
-    - "@earendil-works/pi-coding-agent"
     - "tree-sitter-cli"
   # Installed on top of npm, on home machines only: these do not install on a
   # corp machine, so a work run must not carry them.
@@ -145,3 +143,5 @@ packages:
     - "opencode-ai"
     - "reasonix"
     - "@charmland/crush"
+    - "@deepseek-ai/dsh"
+    - "@earendil-works/pi-coding-agent"
