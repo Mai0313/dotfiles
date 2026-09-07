@@ -145,3 +145,4 @@ packages:
     - "@charmland/crush"
     - "@deepseek-ai/dsh"
     - "@earendil-works/pi-coding-agent"
+    - "@github/copilot"
