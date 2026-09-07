@@ -1,0 +1,118 @@
+#!/bin/bash
+# One front end for the two kinds of CitC workspace.
+#
+# Piper (google3) workspaces sit under /google/src/cloud/$USER and are driven by
+# `g4 citc`; Cog workspaces, which is what Git-on-Borg trees like Android and
+# gpar use, sit under /google/cog/cloud/$USER and are driven by `git citc`. The
+# two CLIs share a name and agree on nothing else, which is the whole reason
+# this exists: creating, deleting or listing a workspace should not start with
+# working out which of the two systems it belongs to.
+#
+#   citc list                        every workspace, both kinds
+#   citc create <name>               Piper
+#   citc create <name> <gob_repo>    Cog
+#   citc delete <name>               routed by where the name is found
+#   citc path <name>                 workspace root, for `cd $(citc path foo)`
+#
+# Trailing arguments go straight through to the underlying CLI, so `citc create
+# foo --head`, `citc create foo <repo> --ref=refs/heads/main` and `citc delete
+# foo -f` all reach it unchanged. g4d and cogd still do the cd; nothing here
+# replaces them.
+
+set -u
+
+PIPER_ROOT="/google/src/cloud/$USER"
+COG_ROOT="/google/cog/cloud/$USER"
+
+usage() {
+    cat >&2 <<'EOF'
+usage: citc list
+       citc create <name> [<gob_repo>] [<flags...>]
+       citc delete <name> [<flags...>]
+       citc path <name>
+EOF
+    exit 2
+}
+
+# Which side a name lives on. Refuses rather than guessing when both sides have
+# it, because picking wrong here deletes the wrong workspace.
+kind_of() {
+    local name=$1 piper=0 cog=0
+    [ -d "$PIPER_ROOT/$name" ] && piper=1
+    [ -d "$COG_ROOT/$name" ] && cog=1
+
+    if [ $piper -eq 1 ] && [ $cog -eq 1 ]; then
+        echo "citc: '$name' exists on both sides, use g4 citc or git citc directly" >&2
+        return 1
+    fi
+    [ $piper -eq 1 ] && { echo piper; return 0; }
+    [ $cog -eq 1 ] && { echo cog; return 0; }
+
+    echo "citc: no workspace named '$name' under $PIPER_ROOT or $COG_ROOT" >&2
+    return 1
+}
+
+cmd_list() {
+    # Reading the two directories answers this with no RPC at all. A bare
+    # `g4 clients` would query every client in Google and can take minutes.
+    local rows="" dir
+    for dir in "$PIPER_ROOT"/*; do
+        [ -d "$dir" ] && rows+="${dir##*/}"$'\t'"piper"$'\t'"$dir"$'\n'
+    done
+    for dir in "$COG_ROOT"/*; do
+        [ -d "$dir" ] && rows+="${dir##*/}"$'\t'"cog"$'\t'"$dir"$'\n'
+    done
+
+    if [ -z "$rows" ]; then
+        echo "No CitC workspaces."
+        return 0
+    fi
+
+    { printf 'NAME\tKIND\tROOT\n'; printf '%s' "$rows"; } \
+        | column -t -s $'\t' | sed 's/^/  /'
+}
+
+cmd_create() {
+    local name=$1
+    shift
+
+    # A second positional argument is a GoB repository to clone, and that is
+    # what makes this a Cog workspace; Piper has nothing to clone.
+    if [ $# -gt 0 ] && [ "${1#-}" = "$1" ]; then
+        local repo=$1
+        shift
+        exec git citc create "$name" "$repo" "$@"
+    fi
+
+    exec /usr/bin/g4 citc "$name" "$@"
+}
+
+cmd_delete() {
+    local name=$1 kind
+    shift
+    kind=$(kind_of "$name") || exit 1
+
+    # g4 wants its flags ahead of the name; git citc takes none of its own.
+    [ "$kind" = piper ] && exec /usr/bin/g4 citc -d "$@" "$name"
+    exec git citc delete "$name" "$@"
+}
+
+cmd_path() {
+    local kind
+    kind=$(kind_of "$1") || exit 1
+
+    [ "$kind" = piper ] && { echo "$PIPER_ROOT/$1"; return 0; }
+    echo "$COG_ROOT/$1"
+}
+
+[ $# -ge 1 ] || usage
+cmd=$1
+shift
+
+case "$cmd" in
+    list)   [ $# -eq 0 ] || usage; cmd_list ;;
+    create) [ $# -ge 1 ] || usage; cmd_create "$@" ;;
+    delete) [ $# -ge 1 ] || usage; cmd_delete "$@" ;;
+    path)   [ $# -eq 1 ] || usage; cmd_path "$@" ;;
+    *)      usage ;;
+esac

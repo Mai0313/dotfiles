@@ -35,6 +35,7 @@ setup.ps1
 {{- end }}
 
 {{ if not (and .is_work (eq .chezmoi.os "linux")) -}}
+.local/bin/citc
 .local/bin/kgrep
 .local/bin/linux-kernel-mount
 .local/bin/automation-mount

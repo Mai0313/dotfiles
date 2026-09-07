@@ -104,7 +104,7 @@ Only the files whose purpose is not obvious from opening them. Everything else i
 | `dot_config/shell/rc.sh` | **The only copy of what `~/.zshrc` and `~/.bashrc` share**: the common aliases and every FQDN-gated block. Both rc files end by sourcing it. Edit here, not in either rc file. See Shell Config Structure. |
 | `private_dot_profile` | Byte-identical to Debian's `/etc/skel/.profile`. Tracked anyway, so `~/.local/bin` lands on PATH regardless of what a distro's skel contains. |
 | `dot_claude/`, `dot_codex/`, `dot_copilot/`, `dot_grok/`, `dot_config/opencode/`, `dot_local/share/crush/`, `dot_dsh/`, `dot_pi/`, `private_dot_hermes/` | Per-tool agent config: a settings file each, plus an instruction file that only includes the shared body. Gemini's equivalent is not here, it is the `.gemini` external. |
-| `dot_local/bin/` | Five scripts under two different gates: `kgrep`, `linux-kernel-mount`, `automation-mount` need `is_work && linux`; `list_devices` and `toggle-display` are corp tools but only gated off Windows, so they land on personal machines too. |
+| `dot_local/bin/` | Six scripts under two different gates: `citc`, `kgrep`, `linux-kernel-mount`, `automation-mount` need `is_work && linux`; `list_devices` and `toggle-display` are corp tools but only gated off Windows, so they land on personal machines too. |
 | `install.sh` | Codespace one-liner. Not deployed to `$HOME`. |
 
 Five couplings that break quietly if you touch one side only:
