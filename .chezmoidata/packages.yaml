@@ -69,6 +69,10 @@ packages:
     - fig
     - srcfs
     - git
+    # Mule carries the upstream open-source jj, not the google3-supporting
+    # build gLinux installs as jj-cli: it drives git projects but not Piper
+    # (b/330776025).
+    - jj
     # Remote access & Networking
     - roadwarrior
     - gnubby-cli
@@ -95,6 +99,7 @@ packages:
     # google3 / Cider
     - cogfsd
     - cidermux
+    - jj-cli
     # Cloudtop CLI
     - ct-cli
     # Android and Pixel firmware work
