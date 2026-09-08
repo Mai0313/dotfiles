@@ -46,6 +46,7 @@ case "$__fqdn" in
     # Cloudtop / Workstation Only aliases.
     source /etc/bash_completion.d/g4d
     source /etc/bash_completion.d/cogd
+    source /etc/bash_completion.d/jjd
     # Device Cloud: adds dc_* tools to PATH, plus dc_envsetup / dc_tab_completion.
     source /google/bin/releases/si-sw-eng-prod-team/dc_checkout/dc_setup.sh
     # Dhub: go/dhub-host
