@@ -162,6 +162,5 @@
   "agentPushNotifEnabled": false,
   "skipAutoPermissionPrompt": true,
   "useAutoModeDuringPlan": true,
-  "autoInstallIdeExtension": false,
-  "advisorModel": "fable"
+  "autoInstallIdeExtension": false
 }
