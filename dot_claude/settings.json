@@ -86,11 +86,6 @@
       "type": "regex",
       "pattern": "\\bab/(?<id>\\d+)\\b",
       "url": "https://android-build.corp.google.com/ab/{id}"
-    },
-    {
-      "type": "regex",
-      "pattern": "(?<![\\w/~.])go/(?<link>[a-zA-Z0-9][\\w.-]*)",
-      "url": "https://goto2.corp.google.com/{link}"
     }
   ],
   "enabledPlugins": {
