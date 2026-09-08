@@ -25,6 +25,15 @@ if command -v mule >/dev/null 2>&1 || [ -x /usr/local/bin/mule ]; then
 fi
 {{ end }}
 {{ else if eq .chezmoi.os "linux" -}}
+{{ if .is_work }}
+# Every apt repo work_linux needs beyond the gLinux defaults, from
+# work_linux_repos in packages.yaml, so the update below sees all of them at
+# once. --batch skips the confirmation prompt, which nothing is there to answer
+# under a non-interactive apply; a re-run finds the same content and exits 0.
+{{- range .packages.work_linux_repos }}
+sudo glinux-add-repo --batch {{ . }}
+{{- end }}
+{{ end }}
 sudo apt-get update
 sudo apt-get install -y {{ range .packages.linux }}{{ . }} {{ end }}
 {{ if .is_work }}
@@ -41,10 +50,11 @@ sudo install-delayed-packages -u
 # ---------- 2. VS Code ----------
 {{ if .is_work -}}
 # Corp Linux (gLinux) gets VS Code from google3, not the Microsoft apt repo.
-# The installer reads the google3 depot, which needs a LOAS cert; `|| true`
-# keeps a gcert failure (usual under a non-interactive apply) from killing the
-# rest of setup. It installs code, bugged and vscode-google3 itself, so keep
-# those out of work_linux.
+# code, bugged and vscode-google3 are in work_linux, which satisfies the guard
+# the installer opens with, so what is left of it here is the crontab entry and
+# the google3 extension symlinks -- the parts no package does for you. It reads
+# the google3 depot, which needs a LOAS cert; `|| true` keeps a gcert failure
+# (usual under a non-interactive apply) from killing the rest of setup.
 if ! gcertstatus --quiet --check_remaining=1h 2>/dev/null; then
     gcert --nocorpssh --noprodssh || true
 fi

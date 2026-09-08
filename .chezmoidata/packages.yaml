@@ -4,7 +4,8 @@
 # also picks the installer, which is why darwin and work_darwin cannot merge:
 # darwin is brew, work_darwin is `sudo mule install`, linux and work_linux are
 # apt, windows is winget but work_windows is googet, npm and home_npm are
-# `npm install -g`.
+# `npm install -g`. work_linux_repos is the odd one out: not a package list at
+# all, but the repos work_linux is installed from, via glinux-add-repo.
 packages:
   darwin:
     - zsh
@@ -88,23 +89,37 @@ packages:
     - visual-studio-code
     - jetski
     - iterm2
-  # Apt packages for corp Linux, all reachable from the repos a gLinux machine
-  # has by default. Mostly corp-only tooling, but it also carries anything the
-  # gLinux repos have and noble does not, which is why fastfetch sits here and
-  # not under `linux`. Deliberately absent: bugged and vscode-google3, which
-  # install_vscode_for_google3.sh installs in section 2. bugged needs
-  # `glinux-add-repo bugged stable` first, so listing it here would fail the
-  # whole script on a fresh machine.
+  # The apt repos work_linux needs beyond the gLinux defaults, added in section
+  # 1 ahead of the one apt-get update, which is what lets the list below stay a
+  # plain list of names. An entry is a whole argument string rather than a repo
+  # name, and each one is its own invocation, because glinux-add-repo takes at
+  # most `<repo> [track]` and rejects a second repo on the same command line --
+  # and the arguments differ per repo anyway.
+  work_linux_repos:
+    - "bugged stable"
+    - "--priority --exact android-web-device-proxy"
+  # Apt packages for corp Linux. Most come from the repos a gLinux machine has
+  # by default; web-device-proxy and bugged come from the two above, so nothing
+  # here has to care which repo it came from. Mostly corp-only tooling, but it
+  # also carries anything the gLinux repos have and noble does not, which is
+  # why fastfetch sits here and not under `linux`.
   work_linux:
     # google3 / Cider
     - cogfsd
     - cidermux
     - jj-cli
+    # VS Code. Section 2 still runs install_vscode_for_google3.sh, but these
+    # three satisfy the guard it opens with, leaving it the crontab entry and
+    # the google3 extension symlinks that no package provides.
+    - code
+    - bugged
+    - vscode-google3
     # Cloudtop CLI
     - ct-cli
     # Android and Pixel firmware work
     - adb
     - repo
+    - web-device-proxy
     # Pontis USB device bridging, see go/pontis/userguide. usbip covers the
     # devices Pontis cannot bridge as plain adb/fastboot.
     - pontisd
@@ -133,6 +148,7 @@ packages:
   # jetski-cli, which the machine still has to put on PATH itself.
   work_windows:
     - jetski-cli
+    - web-device-proxy
   # Global npm CLIs, installed after nvm sets up node LTS. Skipped on work macOS.
   # npm and corepack ship with node, so they are intentionally excluded.
   npm:
