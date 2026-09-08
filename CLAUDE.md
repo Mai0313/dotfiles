@@ -27,6 +27,10 @@ chezmoi init --force  # Re-evaluate .chezmoi.toml.tmpl (e.g., after adding new d
 
 Tracking changes must go through chezmoi, never by hand-creating or `rm`-ing files in the source directory: use `chezmoi add` to start tracking and `chezmoi forget` to stop. `forget` leaves the deployed copy in `$HOME` alone; `chezmoi destroy` removes both.
 
+**Untracking a file is only half the removal; the other half is `.chezmoiremove`.** Neither command travels: `forget` leaves the deployed copy in place on every machine, and `destroy` removes it on the one you are sitting at while the other four keep theirs forever, because a path that has left the source state is one chezmoi no longer has an opinion about. So a removal is always two steps, `chezmoi forget ~/.the-file` and then its target path added to `.chezmoiremove`, plus dropping its `.chezmoiignore` entry if it had one.
+
+`.chezmoiremove` is a standing instruction rather than a one-shot: it deletes those paths on every apply, forever. Date each entry in a comment and drop it once every machine in Machine Specs has applied once, or it quietly becomes a rule that the path may never exist again.
+
 After editing templates, validate with `chezmoi execute-template < file.tmpl` or `chezmoi diff` to verify output.
 
 ## Architecture
