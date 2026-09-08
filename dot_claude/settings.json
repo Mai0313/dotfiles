@@ -52,10 +52,6 @@
     "command": "bash ~/.claude/statusline-command.sh",
     "padding": 0
   },
-  "subagentStatusLine": {
-    "type": "command",
-    "command": "bash ~/.claude/subagent-statusline-command.sh"
-  },
   "footerLinksRegexes": [
     {
       "type": "regex",
@@ -88,6 +84,10 @@
       "url": "https://android-build.corp.google.com/ab/{id}"
     }
   ],
+  "subagentStatusLine": {
+    "type": "command",
+    "command": "bash ~/.claude/subagent-statusline-command.sh"
+  },
   "enabledPlugins": {
     "rust-analyzer-lsp@claude-plugins-official": true,
     "typescript-lsp@claude-plugins-official": true,
@@ -162,5 +162,6 @@
   "agentPushNotifEnabled": false,
   "skipAutoPermissionPrompt": true,
   "useAutoModeDuringPlan": true,
-  "autoInstallIdeExtension": false
+  "autoInstallIdeExtension": false,
+  "advisorModel": "fable"
 }
