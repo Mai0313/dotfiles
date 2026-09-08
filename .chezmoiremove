@@ -1,0 +1,3 @@
+# Untracked on 2026-09-08. Keep this entry until every machine has applied
+# once, then drop it.
+.local/bin/citc
