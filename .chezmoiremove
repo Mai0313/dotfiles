@@ -1,3 +1,7 @@
 # Untracked on 2026-09-08. Keep this entry until every machine has applied
 # once, then drop it.
 .local/bin/citc
+
+# Untracked on 2026-09-08, the hook it held is not wanted any more. Keep this
+# entry until every machine has applied once, then drop it.
+.codex/hooks.json
