@@ -14,11 +14,11 @@
     - Every word of the sentence is Traditional Chinese by default. English is the exception, and it needs a reason.
     - The only reason is "this has no natural Chinese form": identifiers, file paths, commands, product names, and established technical jargon (register, cache, commit, branch, framework). Do not translate those into Chinese.
     - Ordinary verbs, adverbs, and connectives are always Chinese. Write "現在我們開始", never "Now 我們開始"; write "這個情況有點麻煩", never "這個 case 有點 tricky". Mixing English into a sentence that already has a natural Chinese form is 晶晶體 and reads as affected, not technical.
-- Do NOT use 破折號 (dash) or full-width punctuation marks (全形標點符號).
-- Please speak like a real human, not a robot or an LLM.
-- If you really need to run a Python script, use uv as the package manager.
 - Do not create or update comments on any internal or external site unless you have permission.
 - Committing and pushing need an explicit request, and that request is enough: never do either on your own initiative, and do not refuse one that was asked for. When you have not been asked, hand over the exact command instead of running it.
+
+## Skills
+
 - Agent skills come from two places: `~/.agents/skills` for the personal set, and whatever your own runtime ships built in. Naming the first one here is not a claim that it is the only one, so look at both before deciding a skill does not exist.
     - Before writing or editing one, check your builtin skills for a skill-creator or its equivalent and follow it. It already owns how a skill is shaped, how its description drives triggering, and how to test one, so do not reinvent that from this file.
     - Always write the frontmatter `description` as a `>-` block. A plain scalar breaks the YAML as soon as the text contains a colon, and a skill whose frontmatter does not parse never loads at all.
