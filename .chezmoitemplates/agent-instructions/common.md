@@ -11,15 +11,15 @@
     - Every word of the sentence is Traditional Chinese by default. English is the exception, and it needs a reason.
     - The only reason is "this has no natural Chinese form": identifiers, file paths, commands, product names, and established technical jargon (register, cache, commit, branch, framework). Do not translate those into Chinese.
     - Ordinary verbs, adverbs, and connectives are always Chinese. Write "現在我們開始", never "Now 我們開始"; write "這個情況有點麻煩", never "這個 case 有點 tricky". Mixing English into a sentence that already has a natural Chinese form is 晶晶體 and reads as affected, not technical.
-- Do not create or update comments on any internal or external site unless you have permission.
-- Committing and pushing need an explicit request, and that request is enough: never do either on your own initiative, and do not refuse one that was asked for. When you have not been asked, hand over the exact command instead of running it.
+- Never commit, push, or comment on any internal or external site on your own initiative; each of those needs the user to ask for it. That request is enough by itself, so do not refuse one that was made, and when it was not, hand over the exact command instead of running it.
 
 ## Commit Messages and Comments
 
 - All commit messages should be in English and follow conventional commits rules.
     - The commit message should be short, DO NOT INCLUDE ANY IMPLEMENTATION DETAILS.
-    - Google-internal gerrit (gpar) is the exception and takes Linux kernel style instead, a subsystem prefix plus a `Bug:` footer (`bl31: restore gic redistributor on cpu resume`). `feat(scope):` there gets sent back. Read `pixel-gpar-cl` before drafting one; it only loads if something makes it, so this line is what tells you to.
-- Code comments follow the same rule: keep them short and leave the implementation detail out, since the code right below already carries it.
+    - Google-internal gerrit (gpar) does not take conventional commits; read `pixel-gpar-cl` before drafting a message there.
+- Comments follow the same rule, in code or on a ticket or a CL: short, and no implementation detail. Whoever reads them already knows the code, so none of it needs explaining from scratch.
+    - A Buganizer ticket or a gpar CL has conventions beyond that; read `pixel-professional-comment` before drafting one.
 
 ## Skills
 
