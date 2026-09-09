@@ -89,12 +89,12 @@ packages:
     - visual-studio-code
     - jetski
     - iterm2
-  # The apt repos work_linux needs beyond the gLinux defaults, added in section
-  # 1 ahead of the one apt-get update, which is what lets the list below stay a
-  # plain list of names. An entry is a whole argument string rather than a repo
-  # name, and each one is its own invocation, because glinux-add-repo takes at
-  # most `<repo> [track]` and rejects a second repo on the same command line --
-  # and the arguments differ per repo anyway.
+  # The apt repos work_linux needs beyond the gLinux defaults, added by the apt
+  # section ahead of the one apt-get update, which is what lets the list below
+  # stay a plain list of names. An entry is a whole argument string rather than
+  # a repo name, and each one is its own invocation, because glinux-add-repo
+  # takes at most `<repo> [track]` and rejects a second repo on the same command
+  # line -- and the arguments differ per repo anyway.
   work_linux_repos:
     - "bugged stable"
     - "--priority --exact android-web-device-proxy"
