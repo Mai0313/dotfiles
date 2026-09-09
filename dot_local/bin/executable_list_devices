@@ -14,8 +14,32 @@
 #
 # The original is still at /google/bin/releases/android/flashstation/list_devices
 # and is not aliased, so reaching for it has to be deliberate.
+#
+# It does one thing beyond listing. `list_devices reboot bootloader <board>` and
+# `list_devices reboot <board>` spell the two adb / fastboot commands they stand
+# for, and pick between adb and fastboot from the mode the listing just read, so a
+# board goes to the bootloader or back to the system from whatever state it is in
+# now. `<board>` is a codename or a serial, or `all` for every attached board. A
+# board always has to be named, because a workstation usually has several attached
+# and rebooting the wrong one is not what anybody meant.
 
 set -uo pipefail
+
+target=""
+reboot_to=""
+case "${1:-}" in
+    "") ;;
+    reboot)
+        shift
+        [ "${1:-}" = bootloader ] && { reboot_to=bootloader; shift; }
+        target=${1:-}
+        [ -z "$target" ] && { echo "usage: list_devices reboot [bootloader] <codename|serial|all>" >&2; exit 1; }
+        ;;
+    *)
+        echo "usage: list_devices [reboot [bootloader] <codename|serial|all>]" >&2
+        exit 1
+        ;;
+esac
 
 # A second fastboot against a board that already has one in flight wedges its
 # bootloader: ABL's transport has no timeout, so whichever command loses the USB
@@ -97,6 +121,43 @@ if [ -z "$rows" ]; then
     fi
     echo "No devices attached."
     exit 1
+fi
+
+if [ -n "$target" ]; then
+    # No board is ever called `all`, so it needs no flag syntax to tell it apart
+    # from a codename.
+    if [ "$target" = all ]; then
+        match=$(printf '%s' "$rows")
+    else
+        match=$(printf '%s' "$rows" | awk -F'\t' -v t="$target" '$1 == t || $3 == t')
+    fi
+
+    n=$(printf '%s' "$match" | grep -c .)
+    if [ "$n" -eq 0 ]; then
+        echo "list_devices: no attached board matches '$target'" >&2
+        exit 1
+    fi
+    if [ "$n" -gt 1 ] && [ "$target" != all ]; then
+        echo "list_devices: '$target' matches $n boards, name one by serial:" >&2
+        printf '%s' "$match" | cut -f3 | sed 's/^/  /' >&2
+        exit 1
+    fi
+
+    status=0
+    while IFS=$'\t' read -r _ mode serial _; do
+        # fastboot and ramdump both speak the fastboot transport; every other mode
+        # in this table came from adb. One board at a time, each command finishing
+        # before the next starts, so two fastboots never share an endpoint.
+        case "$mode" in
+            adb/*) cmd=(adb -s "$serial" reboot) ;;
+            *)     cmd=(fastboot -s "$serial" reboot) ;;
+        esac
+        [ -n "$reboot_to" ] && cmd+=("$reboot_to")
+
+        echo "${cmd[*]}"
+        "${cmd[@]}" || status=1
+    done < <(printf '%s\n' "$match")
+    exit $status
 fi
 
 echo "Connected devices:"
