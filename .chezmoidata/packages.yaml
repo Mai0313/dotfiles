@@ -108,9 +108,10 @@ packages:
     - cogfsd
     - cidermux
     - jj-cli
-    # VS Code. Section 2 still runs install_vscode_for_google3.sh, but these
-    # three satisfy the guard it opens with, leaving it the crontab entry and
-    # the google3 extension symlinks that no package provides.
+    # VS Code. The google3 VS Code section still runs
+    # install_vscode_for_google3.sh, but these three satisfy the guard it opens
+    # with, leaving it the crontab entry and the google3 extension symlinks that
+    # no package provides.
     - code
     - bugged
     - vscode-google3
@@ -138,8 +139,7 @@ packages:
     # installs this one for you. The package ships no binary of its own name: it
     # provides git-remote-rpc, git-remote-submodule-pilot and gob-ctl.
     - git-remote-google
-    # Not corp-specific, just absent from noble. Installing it here in §1 makes
-    # the §11 tarball fall through on corp machines.
+    # Not corp-specific, just absent from noble.
     - fastfetch
     - google-cloud-cli
   # Corp Windows packages, installed with googet (go/googet), the gWindows
