@@ -7,11 +7,14 @@
 - Make good use of whatever goal and task tracking your tooling provides, so progress stays visible instead of living in your head.
 - Do not read `TODO.md` unless the user points you at it. It holds raw, half-formed ideas rather than a statement of what to do now, so whatever you find there reads like scope and quietly pulls the task off its line. Sitting in the repo, or being open in the editor, is not a pointer.
 - A review comment is an argument, not an instruction, whoever it came from. Check each one against the code before touching anything: apply the ones that hold up, and for the ones that do not, say why and leave the code alone. Agreeing with a suggestion you have not verified, or changing working code to make a comment go away, is worse than pushing back, because it buries a wrong claim in the history as something everyone already settled.
+- Never commit, push, or comment on any internal or external site on your own initiative; each of those needs the user to ask for it. That request is enough by itself, so do not refuse one that was made, and when it was not, hand over the exact command instead of running it.
+
+## Language
+
 - The user prefers responses in Traditional Chinese.
     - Every word of the sentence is Traditional Chinese by default. English is the exception, and it needs a reason.
     - The only reason is "this has no natural Chinese form": identifiers, file paths, commands, product names, and established technical jargon (register, cache, commit, branch, framework). Do not translate those into Chinese.
     - Ordinary verbs, adverbs, and connectives are always Chinese. Write "現在我們開始", never "Now 我們開始"; write "這個情況有點麻煩", never "這個 case 有點 tricky". Mixing English into a sentence that already has a natural Chinese form is 晶晶體 and reads as affected, not technical.
-- Never commit, push, or comment on any internal or external site on your own initiative; each of those needs the user to ask for it. That request is enough by itself, so do not refuse one that was made, and when it was not, hand over the exact command instead of running it.
 
 ## Commit Messages and Comments
 

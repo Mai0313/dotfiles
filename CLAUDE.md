@@ -127,7 +127,7 @@ Three body files in that directory, because corp and personal machines need diff
 
 | Body | Contents | Used when |
 |---|---|---|
-| `common.md` | `## General`, `## Commit Messages and Comments`, `## Skills`, `## Delegating Work`, `## Self-improvement` | included by both variants, never selected directly |
+| `common.md` | `## General`, `## Language`, `## Commit Messages and Comments`, `## Skills`, `## Delegating Work`, `## Self-improvement` | included by both variants, never selected directly |
 | `personal.md` | common + `## For GitHub Repositories Only` | `not is_work` |
 | `work.md` | common + the corp sections (gpar, Critique, Buganizer, Android Build, devices, TF-A / RF-A, TFTF) | `is_work` |
 
