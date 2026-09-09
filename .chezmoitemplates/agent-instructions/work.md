@@ -116,6 +116,8 @@ Which devices belong to each generation (P21 to P28), how a codename maps to its
 Some Linux Kernels are pre-cloned under `~/linux_kernel` if you need to check Linux Kernel for Pixel Phone. They are read-only and live on the cloudtop.
 Search them with `kgrep <rg args...>`, never with `rg`, `grep`, or your own `ssh ... rg`: through the sshfs mount those take minutes instead of a second, and a hand-rolled ssh silently searches nothing at all. Reading individual files is unrestricted. `kgrep` works out which machine it is on by itself, so there is nothing to check first.
 
+The cloudtop `wei0313.c.googlers.com` keeps its own `~/linux_kernel` and `~/aosp` at the latest baseline and never carries local work, so compare a local tree against those when you need to know whether a difference is yours.
+
 If you are asked to init or sync a repo, DO NOT REMOVE the logs we wrote such as: `./b_*_logs/**` , `./b_*.md`.
 Sync and init takes time, feel free to assign subagent to run `repo init` and `repo sync -c -j100` commands for you.
 
