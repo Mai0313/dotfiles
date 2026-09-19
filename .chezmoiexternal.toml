@@ -58,44 +58,37 @@
 # and the default alias live under paths nvm gitignores (`v*`, `alias`), so
 # neither the clone nor the pull touches them. Windows is excluded because
 # setup-body.ps1 assumes node is already there.
-{{ $nvm := "v0.40.7" -}}
 [".nvm"]
     type = "git-repo"
     url = "https://github.com/nvm-sh/nvm"
     refreshPeriod = "168h"
     [".nvm".clone]
-        args = ["--branch", "{{ $nvm }}"]
+        args = ["--branch", "v0.40.7"]
     [".nvm".pull]
-        args = ["--ff-only", "origin", "{{ $nvm }}"]
+        args = ["--ff-only", "origin", "v0.40.7"]
 {{- end }}
 
 {{ if eq .chezmoi.os "linux" -}}
 # Linux only, and deliberately not apt packages: noble freezes at release, so it
-# still offers gh 2.45 and gdu 5.25 against upstream's 2.97 and 5.37. brew and
-# winget both track upstream within a day or two, so darwin and windows take
-# these from packages.yaml instead.
+# still offers gh 2.45 and gdu 5.25 against the versions below. brew and winget
+# both track upstream within a day or two, so darwin and windows take these
+# from packages.yaml instead.
 #
-# gh spells the version inside both its URL and its archive path, so unlike gdu
-# below it needs the number up front. It comes from github.com's own redirect
-# rather than `gitHubLatestRelease`, because unauthenticated api.github.com is
-# 60/hr per IP and a shared-egress runner (Claude Code Cloud) burns that long
-# before chezmoi gets a turn — which failed the whole apply while reading this
-# file, setup script and all. A failed probe yields an empty string instead,
-# and the entry then renders away; an external that vanishes leaves an
-# already-installed ~/.local/bin/gh alone.
-{{ $gh := output "sh" "-c" "curl -fs -o /dev/null -w '%{redirect_url}' https://github.com/cli/cli/releases/latest | sed 's|.*/tag/v||'" | trim -}}
-{{ if $gh -}}
+# Both versions are pinned by hand, and bumping them is the whole maintenance.
+# Do not resolve one through api.github.com, `gitHubLatestRelease` included:
+# unauthenticated it is 60/hr per IP and a shared-egress runner (Claude Code
+# Cloud) burns that long before chezmoi gets a turn, which failed the whole
+# apply while reading this file, setup script and all.
 [".local/bin/gh"]
     type = "archive-file"
-    url = "https://github.com/cli/cli/releases/download/v{{ $gh }}/gh_{{ $gh }}_linux_{{ .chezmoi.arch }}.tar.gz"
-    path = "gh_{{ $gh }}_linux_{{ .chezmoi.arch }}/bin/gh"
+    url = "https://github.com/cli/cli/releases/download/v2.101.0/gh_2.101.0_linux_{{ .chezmoi.arch }}.tar.gz"
+    path = "gh_2.101.0_linux_{{ .chezmoi.arch }}/bin/gh"
     executable = true
     refreshPeriod = "168h"
-{{- end }}
 
 [".local/bin/gdu"]
     type = "archive-file"
-    url = "https://github.com/dundee/gdu/releases/latest/download/gdu_linux_{{ .chezmoi.arch }}.tgz"
+    url = "https://github.com/dundee/gdu/releases/download/v5.37.0/gdu_linux_{{ .chezmoi.arch }}.tgz"
     path = "gdu_linux_{{ .chezmoi.arch }}"
     executable = true
     refreshPeriod = "168h"
