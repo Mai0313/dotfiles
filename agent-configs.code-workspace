@@ -11,6 +11,10 @@
     {
       "name": "chezmoi",
       "path": ".local/share/chezmoi"
+    },
+    {
+      "name": "memories",
+      "path": ".memories"
     }
   ],
   "settings": {}
