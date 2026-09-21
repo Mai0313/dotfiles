@@ -143,6 +143,13 @@
   "effortLevel": "xhigh",
   "showClearContextOnPlanAccept": false,
   "askUserQuestionTimeout": "never",
+  "pluginConfigs": {
+    "agents-md@builtin": {
+      "options": {
+        "instructionFiles": "claude-md-or-agents-md"
+      }
+    }
+  },
   "tui": "fullscreen",
   "autoMemoryEnabled": true,
   "autoMemoryDirectory": "~/.memories",
@@ -162,12 +169,5 @@
   "agentPushNotifEnabled": false,
   "skipAutoPermissionPrompt": true,
   "useAutoModeDuringPlan": true,
-  "autoInstallIdeExtension": false,
-  "pluginConfigs": {
-    "agents-md@builtin": {
-      "options": {
-        "instructionFiles": "claude-md-or-agents-md"
-      }
-    }
-  }
+  "autoInstallIdeExtension": false
 }
