@@ -5,7 +5,8 @@
 alias cc='claude'
 alias cop='copilot'
 alias cod='codex'
-alias cu='chezmoi update --refresh-externals=always --force'
+alias cu='chezmoi update --force'
+# alias cu='chezmoi update --refresh-externals=always --force'
 
 # Environment-specific settings, gated at runtime via FQDN.
 # Work patterns mirror is_work in .chezmoi.toml.tmpl; cloudtop/roam split is runtime-only.
