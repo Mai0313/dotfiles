@@ -57,6 +57,8 @@ case "$__fqdn" in
     alias agy='/google/bin/releases/jetski-devs/tools/cli'
     alias jetski='/google/bin/releases/jetski-devs/tools/cli'
     alias jetski-cli='/google/bin/releases/jetski-devs/tools/cli'
+    # Builds from Piper HEAD on first use and caches in ~/.jetski-model-quota.
+    alias jetski-quota='/google/src/head/depot/google3/experimental/users/plamotte/jetski-model-quota/jetski-model-quota.sh'
     alias flash='/google/bin/releases/android/flashstation/cl_flashstation'
     alias recovery='/google/bin/releases/android/flashstation/cl_rom_recovery'
     alias cl_flashstation='/google/bin/releases/android/flashstation/cl_flashstation'
