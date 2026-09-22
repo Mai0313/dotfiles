@@ -15,7 +15,7 @@
     - Every word of the sentence is Traditional Chinese by default. English is the exception, and it needs a reason.
     - The only reason is "this has no natural Chinese form": identifiers, file paths, commands, product names, and established technical jargon (register, cache, commit, branch, framework). Do not translate those into Chinese.
     - Ordinary verbs, adverbs, and connectives are always Chinese. Write "現在我們開始", never "Now 我們開始"; write "這個情況有點麻煩", never "這個 case 有點 tricky". Mixing English into a sentence that already has a natural Chinese form is 晶晶體.
-- Skills and memories are written in English, whatever language the session that produced them ran in.
+- Anything written into a file or a repository is in English, whatever language the session ran in: code comments and docstrings, strings and log messages, commit messages, review comments, skills, and memories. Traditional Chinese is for talking to the user, and nowhere else.
 
 ## Commit Messages and Comments
 
