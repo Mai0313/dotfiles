@@ -38,6 +38,7 @@ setup.ps1
 .local/bin/kgrep
 .local/bin/linux-kernel-mount
 .local/bin/automation-mount
+.local/bin/jetski-quota-fast
 .config/systemd/user/linux-kernel-sshfs.service
 .config/systemd/user/automation-sshfs.service
 {{- end }}
@@ -54,4 +55,3 @@ setup_adb.sh
 {{ if or (ne .chezmoi.os "linux") .is_work -}}
 .chrome-remote-desktop-session
 {{- end }}
-

@@ -1,0 +1,54 @@
+#!/bin/bash
+# Minimal Jetski quota check: cached SSO token + retrieveUserQuotaSummary.
+set -euo pipefail
+umask 077
+
+readonly PROJECT="aipp-internal-testing"
+readonly URL="https://preprod-daily-cloudcode-pa.sandbox.googleapis.com/v1internal:retrieveUserQuotaSummary"
+readonly CACHE="${XDG_CACHE_HOME:-${HOME}/.cache}/jetski-quota.token"
+readonly TTL=3000
+
+fetch_token() {
+  mkdir -p "$(dirname "${CACHE}")"
+  stubby --deadline=20 call blade:sso CorpLogin.Exchange "
+    target { scope: GAIA_USER name: \"${USER}@google.com\" }
+    target_credential {
+      type: OAUTH2_TOKEN
+      oauth2_attributes {
+        scope: \"https://www.googleapis.com/auth/cloud-platform\"
+        scope: \"https://www.googleapis.com/auth/userinfo.email\"
+        scope: \"https://www.googleapis.com/auth/userinfo.profile\"
+        scope: \"https://www.googleapis.com/auth/cclog\"
+      }
+    }" | sed -n 's/^oauth2_token: "\(.*\)"$/\1/p' >"${CACHE}"
+  if [[ ! -s "${CACHE}" ]]; then
+    rm -f "${CACHE}"
+    echo "SSO token exchange failed; is gcert valid?" >&2
+    exit 1
+  fi
+}
+
+if [[ ! -s "${CACHE}" ]] || (( $(date +%s) - $(stat -c %Y "${CACHE}") >= TTL )); then
+  fetch_token
+fi
+
+curl -sS -X POST "${URL}" \
+  -H "Authorization: Bearer $(cat "${CACHE}")" \
+  -H "Content-Type: application/json" \
+  -H "X-Goog-User-Project: ${PROJECT}" \
+  -H "User-Agent: jetski/1.0 linux/amd64" \
+  -d "{\"project\": \"${PROJECT}\"}" |
+  jq -er '
+    def countdown:
+      (. - now) as $d
+      | if $d <= 0 then "refreshing soon"
+        else "\($d / 3600 | floor)h \($d % 3600 / 60 | floor)m" end;
+    if .error then (.error.message | halt_error(1)) else . end
+    | .groups[]
+    | .displayName as $group
+    | .buckets[]
+    | [$group,
+       "\(.remainingFraction * 100 | round)%",
+       (.resetTime | if . then fromdateiso8601 | countdown else "unlimited" end)]
+    | @tsv' |
+  column -t -s$'\t'
