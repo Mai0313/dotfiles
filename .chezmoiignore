@@ -1,7 +1,10 @@
 install.sh
+LICENSE
 README.md
 CLAUDE.md
-LICENSE
+AGENTS.md
+TODO.md
+.gitignore
 
 {{ if eq .chezmoi.os "windows" -}}
 .zshrc
