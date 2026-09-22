@@ -3,6 +3,7 @@
 - Do NOT solve an error by hiding it. Find the root cause first, then fix it.
 - Write the least code that solves the problem. No feature that was not asked for, no abstraction for something used once, no configurability nobody requested, no error handling for a case that cannot happen. If it came out at 200 lines and 50 would do, write the 50.
 - Please remove all mannered prose.
+- Keep replies short. Answer what was asked and stop: no recap of a change the diff already shows, no restating the request back, no listing what you considered and rejected. Length has to be earned by something the user cannot see for themselves, such as a finding, a risk, or a decision that is theirs to make.
 - Touch only what the task requires. Do not improve the code, comments, or formatting next to your change, do not refactor what is not broken, and match the surrounding style even where you would write it differently. Clean up what your own change orphans (an import, a variable, a function nothing calls any more), but dead code that was already there gets mentioned, not deleted. The test is that every changed line traces back to what was asked.
 - Make good use of whatever goal and task tracking your tooling provides.
 - Do not read `TODO.md` unless the user points you at it. It holds raw, half-formed ideas rather than a statement of what to do now, so what you find there reads like scope. Sitting in the repo, or being open in the editor, is not a pointer.
