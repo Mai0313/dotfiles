@@ -14,8 +14,8 @@ TODO.md
 .bashrc
 .config/shell
 .p10k.zsh
-cleanup.sh
-setup.sh
+.local/bin/cleanup
+.local/bin/setup
 .config/alacritty
 .xinputrc
 .config/environment.d
@@ -35,7 +35,7 @@ setup.sh
 {{ if ne .chezmoi.os "windows" -}}
 Documents
 AppData
-setup.ps1
+.local/bin/setup.ps1
 {{- end }}
 
 {{ if not (and .is_work (eq .chezmoi.os "linux")) -}}
@@ -49,7 +49,7 @@ setup.ps1
 
 {{ if not .is_work -}}
 .config/environment.d/adb.conf
-setup_adb.sh
+.local/bin/setup_adb
 {{- end }}
 
 {{ if ne .chezmoi.os "linux" -}}

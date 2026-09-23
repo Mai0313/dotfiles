@@ -60,12 +60,13 @@ The bootstrap script auto-runs on the first `chezmoi apply` and re-runs only
 when its content changes, for example when you edit `.chezmoidata/packages.yaml`.
 Each section is idempotent, so a re-run just installs what changed.
 
-`~/setup.sh` is also deployed (Linux/macOS only) as a manual entry point with
-the identical body. Run it yourself to bootstrap without invoking chezmoi.
+`~/.local/bin/setup` is also deployed (Linux/macOS only) as a manual entry
+point with the identical body. Run it yourself to bootstrap without invoking
+chezmoi. Windows gets `~/.local/bin/setup.ps1` the same way.
 
 ### Cleanup
 
-`~/cleanup.sh` is an ad-hoc utility (not run automatically) for clearing
+`~/.local/bin/cleanup` is an ad-hoc utility (not run automatically) for clearing
 stray hidden caches like `.ipython`, `.dotnet`, `.pki`. Use as needed.
 
 ### Some Useful Examples

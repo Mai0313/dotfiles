@@ -3,9 +3,9 @@ chezmoi-driven Windows bootstrap. Auto-runs during `chezmoi apply` when this
 rendered content changes (e.g., editing .chezmoidata/packages.yaml).
 
 Windows has no bash, so the body is a PowerShell one of its own rather than
-.chezmoitemplates/setup-body.sh. Body shared with setup.ps1.tmpl via
-.chezmoitemplates/setup-body.ps1 so the chezmoi-driven path and the manual
-~/setup.ps1 stay byte-identical.
+.chezmoitemplates/setup-body.sh. Body shared with
+dot_local/bin/setup.ps1.tmpl via .chezmoitemplates/setup-body.ps1 so the
+chezmoi-driven path and the manual ~/.local/bin/setup.ps1 stay byte-identical.
 
 Renders empty (chezmoi skips it) on non-Windows.
 */ -}}

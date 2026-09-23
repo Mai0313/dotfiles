@@ -6,8 +6,9 @@ actually changed.
 
 Skipped on Windows (no bash); the .ps1 counterpart handles that.
 
-Body shared with executable_setup.sh.tmpl via .chezmoitemplates/setup-body.sh
-so the chezmoi-driven path and the manual ~/setup.sh stay byte-identical.
+Body shared with dot_local/bin/executable_setup.tmpl via
+.chezmoitemplates/setup-body.sh so the chezmoi-driven path and the manual
+~/.local/bin/setup stay byte-identical.
 */ -}}
 {{- if ne .chezmoi.os "windows" -}}
 {{ template "setup-body.sh" . }}

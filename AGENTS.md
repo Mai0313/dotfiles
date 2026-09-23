@@ -9,7 +9,7 @@ Chezmoi-managed dotfiles repo (`Mai0313/dotfiles`). Deploys shell configs, IDE s
 Bootstrap has the same two entry points on every platform, each pair sharing one body under `.chezmoitemplates/`:
 
 - **chezmoi-driven** (`run_onchange_after_setup.sh.tmpl` / `.ps1.tmpl` under `.chezmoiscripts/`) — runs automatically as part of `chezmoi apply`, gated by OS.
-- **manual** (`executable_setup.sh.tmpl` → `~/setup.sh`, `setup.ps1.tmpl` → `~/setup.ps1`) — deployed to home for opt-in manual execution; `.chezmoiignore` deploys only the one matching the OS.
+- **manual** (`dot_local/bin/executable_setup.tmpl` → `~/.local/bin/setup`, `dot_local/bin/setup.ps1.tmpl` → `~/.local/bin/setup.ps1`) — deployed onto PATH for opt-in manual execution; `.chezmoiignore` deploys only the one matching the OS. The PowerShell one keeps its `.ps1` extension because PowerShell will not run an extensionless file.
 
 Windows has no bash, so its pair shares `setup-body.ps1` rather than `setup-body.sh`. That body installs the `windows` winget packages and, on corp machines, the `work_windows` googet packages, then node and the global npm CLIs the way the node and npm sections of the *nix body do, then links the agent skills the way its skills section does (with junctions, which need no Developer Mode). It has no counterpart to the remaining *nix-only sections. The package blocks stay ahead of the node block because nvm itself comes from the winget list, which is also why a machine installing nvm for the first time needs a second run: the installer writes `NVM_HOME` and PATH into the registry, and the running shell never sees them.
 
@@ -38,7 +38,7 @@ After editing templates, validate with `chezmoi execute-template < file.tmpl` or
 ### Chezmoi Naming Conventions
 
 - `dot_*` -> files with leading `.` (e.g., `dot_zshrc` -> `~/.zshrc`)
-- `executable_*` -> deployed with execute permission (e.g., `executable_cleanup.sh` -> `~/cleanup.sh`)
+- `executable_*` -> deployed with execute permission (e.g., `dot_local/bin/executable_cleanup` -> `~/.local/bin/cleanup`)
 - `private_*` -> deployed with `0600` permission (no group/other read)
 - `.tmpl` suffix -> processed as Go templates with chezmoi data
 - `.chezmoitemplates/<name>` -> shared template fragments included with `{{ template "<name>" . }}`
@@ -62,7 +62,7 @@ OS detection comes from chezmoi built-ins: `eq .chezmoi.os "linux"` / `"darwin"`
 **Note**: `.chezmoi.toml.tmpl` runs at `chezmoi init`, not at every `chezmoi apply`, so editing it needs `chezmoi init --force` once to regenerate `~/.config/chezmoi/chezmoi.toml`.
 
 **Current consumers of `is_work`:**
-- `.chezmoiignore` — gates `.local/bin/kgrep`, `.local/bin/linux-kernel-mount`, `.local/bin/automation-mount` and the two `.config/systemd/user/*-sshfs.service` units off unless `is_work && linux`; `.config/environment.d/adb.conf` + `setup_adb.sh` off unless `is_work`; and `.chrome-remote-desktop-session` off unless `linux && not is_work`. The OS gates in the same file are independent of `is_work`: Windows drops the whole *nix set (`.zshrc`, `.zshenv`, `.zprofile`, `.profile`, `.bashrc`, `.p10k.zsh`, `cleanup.sh`, `setup.sh`, `.xinputrc`, `.config/{alacritty,shell,environment.d,systemd,fcitx5,btop,htop,goobuntu-backups,uv,pip}`, `.local/share/fonts`, `.local/bin/{list_devices,toggle-display}`), non-Windows drops `Documents`, `AppData` + `setup.ps1`, and non-Linux drops `.config/environment.d/im.conf`.
+- `.chezmoiignore` — gates `.local/bin/kgrep`, `.local/bin/linux-kernel-mount`, `.local/bin/automation-mount` and the two `.config/systemd/user/*-sshfs.service` units off unless `is_work && linux`; `.config/environment.d/adb.conf` + `.local/bin/setup_adb` off unless `is_work`; and `.chrome-remote-desktop-session` off unless `linux && not is_work`. The OS gates in the same file are independent of `is_work`: Windows drops the whole *nix set (`.zshrc`, `.zshenv`, `.zprofile`, `.profile`, `.bashrc`, `.p10k.zsh`, `.local/bin/{cleanup,setup}`, `.xinputrc`, `.config/{alacritty,shell,environment.d,systemd,fcitx5,btop,htop,goobuntu-backups,uv,pip}`, `.local/share/fonts`, `.local/bin/{list_devices,toggle-display}`), non-Windows drops `Documents`, `AppData` + `.local/bin/setup.ps1`, and non-Linux drops `.config/environment.d/im.conf`.
 - `.chezmoiexternal.toml` — gates `adb-keys/security` (sso git-repo); gates oh-my-zsh + plugins on `chezmoi.os != "windows"` and the two CLI binaries on `chezmoi.os == "linux"`, neither of which depends on `is_work`.
 - `.chezmoitemplates/setup-body.sh` — the apt section appends `work_linux` and its repos on corp machines, VS Code is two sections (corp Linux from google3, personal Linux from the Microsoft repo), the npm section is skipped on work macOS and appends `home_npm` only off work, pontisd is work-Linux-only, and dhub is work-only and picks its release directory (`mac` on darwin, `glinux` otherwise). Container and CPU-arch gating inside the body is runtime, not chezmoi data.
 - `.chezmoitemplates/setup-body.ps1` — the same `home_npm` gate on its npm install, plus the whole `work_windows` googet block.
@@ -108,7 +108,7 @@ Only the files whose purpose is not obvious from opening them. Everything else i
 | `dot_config/shell/rc.sh` | **The only copy of what `~/.zshrc` and `~/.bashrc` share**: the common aliases and every FQDN-gated block. Both rc files end by sourcing it. Edit here, not in either rc file. See Shell Config Structure. |
 | `private_dot_profile` | Byte-identical to Debian's `/etc/skel/.profile`. Tracked anyway, so `~/.local/bin` lands on PATH regardless of what a distro's skel contains. |
 | `dot_claude/`, `dot_codex/`, `dot_copilot/`, `dot_grok/`, `dot_config/opencode/`, `dot_local/share/crush/`, `dot_dsh/`, `dot_pi/`, `private_dot_hermes/` | Per-tool agent config: a settings file each, plus an instruction file that only includes the shared body. Gemini's equivalent is not here, it is the `.gemini` external. |
-| `dot_local/bin/` | Five scripts under two different gates: `kgrep`, `linux-kernel-mount`, `automation-mount` need `is_work && linux`; `list_devices` and `toggle-display` are corp tools but only gated off Windows, so they land on personal machines too. |
+| `dot_local/bin/` | Standalone scripts, deployed onto PATH. Most are gated by OS or `is_work`, so read `.chezmoiignore` before assuming one lands everywhere. |
 | `install.sh` | Codespace one-liner. Not deployed to `$HOME`. |
 
 Five couplings that break quietly if you touch one side only:
@@ -202,7 +202,7 @@ System layer: Homebrew packages, Mule packages, apt packages, VS Code from googl
 
 **Section shape.** One step under at most one gate: a `{{ if ... -}}` on the line above the title, closed by `{{ end -}}` after the blank line that ends the section. Inside a section `.is_work` only ever adds lines or extends a list, and `.chezmoi.os` only ever picks one word on a single line (the `chsh` command, dhub's release directory); anything that needs more than that is two sections, which is why VS Code is two. Gate lines render to nothing and every section ends with one blank line, so the rendered script holds exactly the sections that apply, one blank line apart, and a skipped section leaves no trace (the render ends in a blank line for the same reason; harmless). The title names the gate and one of two contracts: *always* runs on every pass and upgrades what is there, *once* is guarded on presence and never upgrades, so a newer version of a *once* tool means removing the old install first. Package lists render with `join " "`.
 
-**Ordering constraints.** Nothing needing a LOAS cert may run before the apt section: corp apt repos authenticate with the *machine* cert, so `apt-get` never needs `gcert`, but the google3 depot the VS Code section reads does — hence `work_linux` installs in the apt section, ahead of it. Every `glinux-add-repo` sits at the top of that section, ahead of the one `apt-get update`, because a repo added after that update is invisible to every install below it; `work_linux_repos` in `packages.yaml` is that list, and it is what lets `web-device-proxy` and `bugged` be ordinary `work_linux` entries instead of special cases with an update of their own. The npm section must follow the node section, which is what puts node on PATH. The node section no longer installs nvm — the `.nvm` external does — so it now depends on chezmoi having deployed externals first. That holds for both entry points: externals land with the rest of the source state, and `run_onchange_after_` scripts are named to run after it (verified with a throwaway `--destination`). The manual `~/setup.sh` inherits the same assumption harmlessly, since chezmoi is what put that file in `$HOME` to begin with.
+**Ordering constraints.** Nothing needing a LOAS cert may run before the apt section: corp apt repos authenticate with the *machine* cert, so `apt-get` never needs `gcert`, but the google3 depot the VS Code section reads does — hence `work_linux` installs in the apt section, ahead of it. Every `glinux-add-repo` sits at the top of that section, ahead of the one `apt-get update`, because a repo added after that update is invisible to every install below it; `work_linux_repos` in `packages.yaml` is that list, and it is what lets `web-device-proxy` and `bugged` be ordinary `work_linux` entries instead of special cases with an update of their own. The npm section must follow the node section, which is what puts node on PATH. The node section no longer installs nvm — the `.nvm` external does — so it now depends on chezmoi having deployed externals first. That holds for both entry points: externals land with the rest of the source state, and `run_onchange_after_` scripts are named to run after it (verified with a throwaway `--destination`). The manual `~/.local/bin/setup` inherits the same assumption harmlessly, since chezmoi is what put that file there to begin with.
 
 **Corp `gcert` (the google3 VS Code section).** It is interactive, driving the gnubby over `ssh-agent`, so it fails whenever `SSH_AUTH_SOCK` is unset — the normal case under a non-interactive apply, and inside tmux (go/sk-screen-tmux). Do not put `--lifetime` back; the cert only has to outlive this run. **Never let a failing `gcert` be the last command of a list**, or `set -e` takes nvm, npm and uv down with it. The installer after it runs unconditionally on purpose: with no cert it fails loudly, which is the intended "go run gcert and re-run" signal, so do not add a `gcertstatus` gate there.
 
@@ -216,11 +216,11 @@ System layer: Homebrew packages, Mule packages, apt packages, VS Code from googl
 
 #### Entry points
 
-Four, in two matching pairs, each a thin wrapper: an auto one under `.chezmoiscripts/` that runs during `chezmoi apply`, and a manual one deployed to `$HOME` to run yourself. Both members of a pair include the same body and must stay byte-identical, which is the whole reason the bodies live in `.chezmoitemplates`:
+Four, in two matching pairs, each a thin wrapper: an auto one under `.chezmoiscripts/` that runs during `chezmoi apply`, and a manual one deployed to `~/.local/bin` to run yourself. Both members of a pair include the same body and must stay byte-identical, which is the whole reason the bodies live in `.chezmoitemplates`:
 
 ```bash
 diff <(chezmoi execute-template < .chezmoiscripts/run_onchange_after_setup.sh.tmpl) \
-     <(chezmoi execute-template < executable_setup.sh.tmpl)   # expect no output
+     <(chezmoi execute-template < dot_local/bin/executable_setup.tmpl)   # expect no output
 ```
 
 The `.ps1` pair cannot be checked that way from Linux, since the auto one renders empty off Windows. Rewrite the built-in into a data key first:
@@ -229,10 +229,10 @@ The `.ps1` pair cannot be checked that way from Linux, since the auto one render
 sed 's/\.chezmoi\.os/.tos/g' .chezmoiscripts/run_onchange_after_setup.ps1.tmpl > /tmp/probe.tmpl
 printf 'sourceDir = "%s"\n[data]\ntos = "windows"\n' "$PWD" > /tmp/cfg.toml
 diff <(chezmoi --config=/tmp/cfg.toml execute-template < /tmp/probe.tmpl) \
-     <(chezmoi --config=/tmp/cfg.toml execute-template < setup.ps1.tmpl)   # expect no output
+     <(chezmoi --config=/tmp/cfg.toml execute-template < dot_local/bin/setup.ps1.tmpl)   # expect no output
 ```
 
-Note `setup.ps1.tmpl` carries no `executable_` prefix: Windows has no execute bit for chezmoi to set, and the file deploys nowhere else.
+Note `dot_local/bin/setup.ps1.tmpl` carries no `executable_` prefix: Windows has no execute bit for chezmoi to set, and the file deploys nowhere else. It is also the one manual entry point that keeps its extension, because PowerShell only executes a file named `.ps1`, where the bash one relies on its shebang and drops the `.sh`.
 
 `run_onchange_` alone gives run-once-then-quiet: it re-runs only when the *rendered* content changes. There is no `is_setup` sentinel and none is needed.
 
