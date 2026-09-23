@@ -53,6 +53,7 @@ esac
 case "$__fqdn" in
   *.c.googlers.com|*.corp.google.com)
     # Cloudtop / Workstation Only aliases.
+    # go/g4-vs-git
     source /etc/bash_completion.d/g4d
     source /etc/bash_completion.d/cogd
     source /etc/bash_completion.d/jjd
