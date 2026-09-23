@@ -1,0 +1,44 @@
+#!/bin/bash
+# Install the latest claude-code binary from Mai0313/claude-code-binaries as ~/.local/bin/cc.
+
+set -euo pipefail
+
+repo=Mai0313/claude-code-binaries
+dest="$HOME/.local/bin/cc"
+
+case "$(uname -s)" in
+  Darwin) os=darwin ;;
+  Linux) os=linux ;;
+  *) echo "unsupported OS: $(uname -s)" >&2; exit 1 ;;
+esac
+
+case "$(uname -m)" in
+  x86_64 | amd64) arch=x64 ;;
+  aarch64 | arm64) arch=arm64 ;;
+  *) echo "unsupported architecture: $(uname -m)" >&2; exit 1 ;;
+esac
+
+# From github.com's own redirect rather than api.github.com, which is 60/hr per
+# IP unauthenticated and shared by everyone behind the same egress.
+version=$(curl -fsSL -o /dev/null -w '%{url_effective}' "https://github.com/$repo/releases/latest" | sed 's|.*/tag/||')
+if [[ -z $version ]]; then
+  echo "could not resolve the latest release of $repo" >&2
+  exit 1
+fi
+
+# The asset is over 200 MB, so don't re-fetch what is already installed.
+if [[ -x $dest ]] && "$dest" --version 2>/dev/null | grep -qF "$version"; then
+  echo "cc is already at $version"
+  exit 0
+fi
+
+mkdir -p "$(dirname "$dest")"
+tmp=$(mktemp "$dest.XXXXXX")
+trap 'rm -f "$tmp"' EXIT
+
+curl -fL --progress-bar -o "$tmp" \
+  "https://github.com/$repo/releases/download/$version/claude-$version-$os-$arch"
+chmod +x "$tmp"
+mv "$tmp" "$dest"
+
+echo "installed cc $version at $dest"

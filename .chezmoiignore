@@ -24,6 +24,7 @@ setup.sh
 .config/btop
 .config/htop
 .config/goobuntu-backups
+.local/bin/install-cc
 .local/bin/list_devices
 .local/bin/toggle-display
 .local/share/fonts
