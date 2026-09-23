@@ -56,6 +56,7 @@ case "$__fqdn" in
     source /etc/bash_completion.d/g4d
     source /etc/bash_completion.d/cogd
     source /etc/bash_completion.d/jjd
+    source /etc/bash_completion.d/hgd
     # Device Cloud: adds dc_* tools to PATH, plus dc_envsetup / dc_tab_completion.
     source /google/bin/releases/si-sw-eng-prod-team/dc_checkout/dc_setup.sh
     # Dhub: go/dhub-host
@@ -79,6 +80,8 @@ case "$__fqdn" in
     alias buganizer_admin='/google/bin/releases/buganizer/public/buganizer_admin'
     alias gbrowser='/google/bin/releases/gemini-agents-gbrowser/gbrowser'
     alias gobcs='/google/bin/releases/gemini-agents-gob-code-search/gob_code_search_tool'
+    # go/delete-empty-clients
+    alias delete_empty_clients='/google/bin/releases/delete-empty-clients-cli/delete_empty_clients'
     ;;
 esac
 unset __fqdn
