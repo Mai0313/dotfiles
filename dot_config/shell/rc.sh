@@ -2,7 +2,10 @@
 # copy of the aliases and environment they have in common. Keep it POSIX sh:
 # no bash-only or zsh-only syntax, since both shells source this same file.
 
-alias cc='claude'
+# An alias is expanded before PATH is searched, so ~/.local/bin/cc (installed by
+# install-cc) would never be reached if this were unconditional.
+[ -x "$HOME/.local/bin/cc" ] || alias cc='claude'
+
 alias cop='copilot'
 alias cod='codex'
 alias cu='chezmoi update --force'
