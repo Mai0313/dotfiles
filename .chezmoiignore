@@ -14,7 +14,6 @@ TODO.md
 .bashrc
 .config/shell
 .p10k.zsh
-.local/bin/cleanup
 .local/bin/setup
 .config/alacritty
 .xinputrc

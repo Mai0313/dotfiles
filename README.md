@@ -64,11 +64,6 @@ Each section is idempotent, so a re-run just installs what changed.
 point with the identical body. Run it yourself to bootstrap without invoking
 chezmoi. Windows gets `~/.local/bin/setup.ps1` the same way.
 
-### Cleanup
-
-`~/.local/bin/cleanup` is an ad-hoc utility (not run automatically) for clearing
-stray hidden caches like `.ipython`, `.dotnet`, `.pki`. Use as needed.
-
 ### Some Useful Examples
 
 SSH Login (one time effort)

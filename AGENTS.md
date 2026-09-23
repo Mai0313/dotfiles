@@ -38,7 +38,7 @@ After editing templates, validate with `chezmoi execute-template < file.tmpl` or
 ### Chezmoi Naming Conventions
 
 - `dot_*` -> files with leading `.` (e.g., `dot_zshrc` -> `~/.zshrc`)
-- `executable_*` -> deployed with execute permission (e.g., `dot_local/bin/executable_cleanup` -> `~/.local/bin/cleanup`)
+- `executable_*` -> deployed with execute permission (e.g., `dot_local/bin/executable_kgrep` -> `~/.local/bin/kgrep`)
 - `private_*` -> deployed with `0600` permission (no group/other read)
 - `.tmpl` suffix -> processed as Go templates with chezmoi data
 - `.chezmoitemplates/<name>` -> shared template fragments included with `{{ template "<name>" . }}`
@@ -62,7 +62,7 @@ OS detection comes from chezmoi built-ins: `eq .chezmoi.os "linux"` / `"darwin"`
 **Note**: `.chezmoi.toml.tmpl` runs at `chezmoi init`, not at every `chezmoi apply`, so editing it needs `chezmoi init --force` once to regenerate `~/.config/chezmoi/chezmoi.toml`.
 
 **Current consumers of `is_work`:**
-- `.chezmoiignore` — gates `.local/bin/kgrep`, `.local/bin/linux-kernel-mount`, `.local/bin/automation-mount` and the two `.config/systemd/user/*-sshfs.service` units off unless `is_work && linux`; `.config/environment.d/adb.conf` + `.local/bin/setup_adb` off unless `is_work`; and `.chrome-remote-desktop-session` off unless `linux && not is_work`. The OS gates in the same file are independent of `is_work`: Windows drops the whole *nix set (`.zshrc`, `.zshenv`, `.zprofile`, `.profile`, `.bashrc`, `.p10k.zsh`, `.local/bin/{cleanup,setup}`, `.xinputrc`, `.config/{alacritty,shell,environment.d,systemd,fcitx5,btop,htop,goobuntu-backups,uv,pip}`, `.local/share/fonts`, `.local/bin/{list_devices,toggle-display}`), non-Windows drops `Documents`, `AppData` + `.local/bin/setup.ps1`, and non-Linux drops `.config/environment.d/im.conf`.
+- `.chezmoiignore` — gates `.local/bin/kgrep`, `.local/bin/linux-kernel-mount`, `.local/bin/automation-mount` and the two `.config/systemd/user/*-sshfs.service` units off unless `is_work && linux`; `.config/environment.d/adb.conf` + `.local/bin/setup_adb` off unless `is_work`; and `.chrome-remote-desktop-session` off unless `linux && not is_work`. The OS gates in the same file are independent of `is_work`: Windows drops the whole *nix set (`.zshrc`, `.zshenv`, `.zprofile`, `.profile`, `.bashrc`, `.p10k.zsh`, `.local/bin/setup`, `.xinputrc`, `.config/{alacritty,shell,environment.d,systemd,fcitx5,btop,htop,goobuntu-backups,uv,pip}`, `.local/share/fonts`, `.local/bin/{list_devices,toggle-display}`), non-Windows drops `Documents`, `AppData` + `.local/bin/setup.ps1`, and non-Linux drops `.config/environment.d/im.conf`.
 - `.chezmoiexternal.toml` — gates `adb-keys/security` (sso git-repo); gates oh-my-zsh + plugins on `chezmoi.os != "windows"` and the two CLI binaries on `chezmoi.os == "linux"`, neither of which depends on `is_work`.
 - `.chezmoitemplates/setup-body.sh` — the apt section appends `work_linux` and its repos on corp machines, VS Code is two sections (corp Linux from google3, personal Linux from the Microsoft repo), the npm section is skipped on work macOS and appends `home_npm` only off work, pontisd is work-Linux-only, and dhub is work-only and picks its release directory (`mac` on darwin, `glinux` otherwise). Container and CPU-arch gating inside the body is runtime, not chezmoi data.
 - `.chezmoitemplates/setup-body.ps1` — the same `home_npm` gate on its npm install, plus the whole `work_windows` googet block.
