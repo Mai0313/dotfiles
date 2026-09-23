@@ -24,14 +24,14 @@ if [[ "$CURRENT_MODE" == "crd" ]]; then
 elif [[ "$CURRENT_MODE" == "local" ]]; then
   TARGET_MODE="crd"
 else
-  echo "錯誤：無法決定目前的圖形會話模式 ($CURRENT_MODE)。請執行 switch-graphical-session current 確認。"
+  echo "Error: cannot determine the current graphical session mode ($CURRENT_MODE). Run switch-graphical-session current to check."
   exit 1
 fi
 
 echo "=========================================================="
-echo "目前會話模式 (Current session): ${CURRENT_MODE}"
-echo "目標切換模式 (Target session) : ${TARGET_MODE}"
+echo "Current session: ${CURRENT_MODE}"
+echo "Target session : ${TARGET_MODE}"
 echo "=========================================================="
 
-# 傳遞所有參數給 switch-graphical-session (例如 -y 可自動確認略過問答)
+# Pass every argument through to switch-graphical-session (e.g. -y to skip the prompt)
 exec sudo switch-graphical-session "$@" "${TARGET_MODE}"
