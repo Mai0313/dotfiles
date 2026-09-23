@@ -2,9 +2,14 @@
 # copy of the aliases and environment they have in common. Keep it POSIX sh:
 # no bash-only or zsh-only syntax, since both shells source this same file.
 
-# An alias is expanded before PATH is searched, so ~/.local/bin/cc (installed by
-# install-cc) would never be reached if this were unconditional.
-[ -x "$HOME/.local/bin/cc" ] || alias cc='claude'
+# An alias is only expanded by an interactive shell, so this leaves make and
+# configure with /usr/bin/cc. Which is why install-cc lands its binary as
+# ccode rather than putting cc on PATH.
+if [ -x "$HOME/.local/bin/ccode" ]; then
+  alias cc='ccode'
+else
+  alias cc='claude'
+fi
 
 alias cop='copilot'
 alias cod='codex'

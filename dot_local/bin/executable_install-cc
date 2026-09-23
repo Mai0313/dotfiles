@@ -1,10 +1,12 @@
 #!/bin/bash
-# Install the latest claude-code binary from Mai0313/claude-code-binaries as ~/.local/bin/cc.
+# Install the latest claude-code binary from Mai0313/claude-code-binaries as
+# ~/.local/bin/ccode. Not as cc: that is the C compiler's name, and make's
+# built-in CC resolves it through PATH.
 
 set -euo pipefail
 
 repo=Mai0313/claude-code-binaries
-dest="$HOME/.local/bin/cc"
+dest="$HOME/.local/bin/ccode"
 
 case "$(uname -s)" in
   Darwin) os=darwin ;;
@@ -28,7 +30,7 @@ fi
 
 # The asset is over 200 MB, so don't re-fetch what is already installed.
 if [[ -x $dest ]] && "$dest" --version 2>/dev/null | grep -qF "$version"; then
-  echo "cc is already at $version"
+  echo "ccode is already at $version"
   exit 0
 fi
 
@@ -41,4 +43,4 @@ curl -fL --progress-bar -o "$tmp" \
 chmod +x "$tmp"
 mv "$tmp" "$dest"
 
-echo "installed cc $version at $dest"
+echo "installed ccode $version at $dest"

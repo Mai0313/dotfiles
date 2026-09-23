@@ -183,7 +183,7 @@ In each rc file, because the two shells do it differently or only one of them do
 3. Editor selection (zsh only: vim over SSH, nvim locally)
 
 In `dot_config/shell/rc.sh`, one copy sourced by both:
-4. Common aliases (`cc='claude'`, `cop='copilot'`, `cod='codex'`, `cu` for a chezmoi update)
+4. Common aliases (`cc` → `ccode` or `claude`, `cop='copilot'`, `cod='codex'`, `cu` for a chezmoi update)
 5. Runtime-gated environment blocks — four FQDN `case` arms: work (`*.c.googlers.com|*.corp.google.com|*.roam.internal` → `sshping`, `ADB_VENDOR_KEYS`, `CORP_SSH_HELPER_OVERRIDES`), Cloudtop VM only (`*.c.googlers.com` → `AUTH_REMOTE_GCERT_ARGS`, which the corp desktop must not set), roam-only (`*.roam.internal` → `agy`, `jetski-cli`), and corp Linux (`*.c.googlers.com|*.corp.google.com` → sources `g4d` + `dc_setup.sh`, plus `gemini`/`agy`/`jetski`/`flash`/`recovery`/`listd`/`fetch_artifact`/`duckie`/`issues`/`buganizer`/`gbrowser`/`gobcs` aliases). No-op on personal machines.
 
 It is sourced, not executed, because `alias` and `export` have to land in the current shell; a script run as a child process would exit with nothing set. That is also why it stays POSIX sh, with no bash-only or zsh-only syntax. The source line is guarded with `[ -f ... ]` so a shell still starts on a machine where chezmoi has not deployed it yet.
