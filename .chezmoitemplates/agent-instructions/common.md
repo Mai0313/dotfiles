@@ -31,6 +31,8 @@
 - Agent skills come from two places: `~/.agents/skills` for the personal set, and whatever your own runtime ships built in. Look at both before deciding a skill does not exist.
     - Before writing or editing one, check your builtin skills for a skill-creator or its equivalent and follow it. It owns how a skill is shaped, how its description drives triggering, and how to test one.
     - Always write the frontmatter `description` as a `>-` block. A plain scalar breaks the YAML as soon as the text contains a colon, and a skill whose frontmatter does not parse never loads at all.
+    - Keep a skill runtime-neutral. Where work can run in parallel, say so and let the runtime choose how; never name one runtime's tool.
+    - Write the task's own steps and the limits that must hold, not the basics any agent handles on its own: the route and the stops, not the keys and the parking.
 
 ## Delegating Work
 
