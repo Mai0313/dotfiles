@@ -57,7 +57,7 @@ The keys under `[data]`:
 |---|---|---|
 | `is_work` | `false` | FQDN ends with `.c.googlers.com`, `.corp.google.com`, or `.roam.internal`. Corp Linux (gLinux/cloudtop) is `is_work && linux`; roam is `is_work && darwin`. |
 | `is_container` | `false` | `CODESPACES`, `REMOTE_CONTAINERS` or `DEVCONTAINER` is set, or `/.dockerenv` / `/run/.containerenv` exists: Codespaces, devcontainers, and any Docker or Podman container. |
-| `is_cloud` | `false` | `CLAUDE_CODE_REMOTE=true`. Claude Code cloud sets it in its sessions, but the cloud environment's setup script (kept in the claude.ai environment settings, not in this repo) must `export CLAUDE_CODE_REMOTE=true` itself before its `chezmoi init`: the environment's own variables are verifiably absent while that script runs. |
+| `is_cloud` | `false` | `CLOUD_ENV=true`, which no platform sets: a cloud agent environment (Claude Code cloud, Codex cloud) exports it in its own setup script, kept in that platform's settings rather than in this repo, before `chezmoi init`. The name is deliberately platform-neutral, and the export has to live in the script itself because Claude Code cloud's configured environment variables are verifiably absent while that script runs. |
 
 `is_container` and `is_cloud` also have a fallback in `.chezmoidata/env.yaml`, so a machine whose config predates them keeps applying without a `chezmoi init`; the config's own `[data]` wins over it.
 

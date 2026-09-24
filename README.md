@@ -18,12 +18,13 @@ sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin" init --apply Mai03
 
 New codespaces will be configured automatically.
 
-### Claude Code cloud
+### Cloud agent environments (Claude Code, Codex)
 
 Put the one-liner in the cloud environment's setup script, after
-`export CLAUDE_CODE_REMOTE=true`: the environment's own variables are not set
-yet while that script runs. `.agents` is a private repo, so the script also has
-to give git a token that can read it.
+`export CLOUD_ENV=true`. Nothing sets that variable for you, and in Claude Code
+cloud the environment's own variables are not set yet while that script runs.
+`.agents` is a private repo, so the script also has to give git a token that can
+read it.
 
 ## Environment Detection
 
@@ -38,7 +39,7 @@ agent skills.
 | Cloudtop (gLinux) | `*.c.googlers.com` / `*.corp.google.com` | `is_work` |
 | Roam (work macOS) | `*.roam.internal` | `is_work` |
 | Codespaces / devcontainers / containers | `CODESPACES`, `REMOTE_CONTAINERS`, `DEVCONTAINER`, `/.dockerenv`, `/run/.containerenv` | `is_container` |
-| Claude Code cloud | `CLAUDE_CODE_REMOTE=true` | `is_cloud` |
+| Cloud agent environments | `CLOUD_ENV=true` | `is_cloud` |
 | Personal | default | none |
 
 ## Daily Usage

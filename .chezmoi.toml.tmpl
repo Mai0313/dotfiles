@@ -8,9 +8,9 @@
 {{- if or (env "CODESPACES") (env "REMOTE_CONTAINERS") (env "DEVCONTAINER") (stat "/.dockerenv") (stat "/run/.containerenv") -}}
 {{-   $isContainer = true -}}
 {{- end -}}
-{{- /* Claude Code cloud sets this in its sessions, but its setup script has  */ -}}
-{{- /* to export it before `chezmoi init`.                                    */ -}}
-{{- $isCloud := eq (env "CLAUDE_CODE_REMOTE") "true" -}}
+{{- /* Nothing sets this for you: a cloud agent environment (Claude Code,    */ -}}
+{{- /* Codex) exports it in its setup script before `chezmoi init`.           */ -}}
+{{- $isCloud := eq (env "CLOUD_ENV") "true" -}}
 {{- /* Pin sourceDir so a custom `--source` (e.g. Codespaces clones to        */ -}}
 {{- /* ~/dotfiles) survives future `chezmoi init` runs.                        */ -}}
 sourceDir = {{ .chezmoi.sourceDir | quote }}
