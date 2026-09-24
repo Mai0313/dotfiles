@@ -110,6 +110,11 @@
   "feedbackDrafts": "quiet",
   "spinnerTipsEnabled": true,
   "effortLevel": "xhigh",
+  "modelSettings": {
+    "claude-opus-5-5": {
+      "effortLevel": "xhigh"
+    }
+  },
   "showClearContextOnPlanAccept": false,
   "askUserQuestionTimeout": "never",
   "pluginConfigs": {
