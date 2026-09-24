@@ -1,11 +1,21 @@
-{{- /* Environment detection (runs once at `chezmoi init`). Only is_work is   */ -}}
-{{- /* consumed, by .chezmoiignore + .chezmoiexternal. Container and OS gating */ -}}
-{{- /* happen at runtime in .chezmoitemplates/setup-body.sh. See CLAUDE.md.    */ -}}
+{{- /* Environment detection (runs once at `chezmoi init`). OS gating uses    */ -}}
+{{- /* chezmoi built-ins instead. See CLAUDE.md.                               */ -}}
 {{- $fqdn := .chezmoi.fqdnHostname -}}
 {{- $isWork := or (hasSuffix ".c.googlers.com" $fqdn) (hasSuffix ".corp.google.com" $fqdn) (hasSuffix ".roam.internal" $fqdn) -}}
+{{- /* Devcontainers and Codespaces set one of these variables, and Docker /  */ -}}
+{{- /* Podman leave a marker file in every container.                         */ -}}
+{{- $isContainer := false -}}
+{{- if or (env "CODESPACES") (env "REMOTE_CONTAINERS") (env "DEVCONTAINER") (stat "/.dockerenv") (stat "/run/.containerenv") -}}
+{{-   $isContainer = true -}}
+{{- end -}}
+{{- /* Claude Code cloud sets this in its sessions, but its setup script has  */ -}}
+{{- /* to export it before `chezmoi init`.                                    */ -}}
+{{- $isCloud := eq (env "CLAUDE_CODE_REMOTE") "true" -}}
 {{- /* Pin sourceDir so a custom `--source` (e.g. Codespaces clones to        */ -}}
 {{- /* ~/dotfiles) survives future `chezmoi init` runs.                        */ -}}
 sourceDir = {{ .chezmoi.sourceDir | quote }}
 
 [data]
     is_work = {{ $isWork }}
+    is_container = {{ $isContainer }}
+    is_cloud = {{ $isCloud }}
