@@ -153,13 +153,13 @@ packages:
   # npm and corepack ship with node, so they are intentionally excluded.
   npm:
     - "npm@latest"
-    - "@anthropic-ai/claude-code"
     - "@google/gemini-cli"
     - "@mai0313/vct"
     - "tree-sitter-cli"
   # Installed on top of npm, on home machines only: these do not install on a
   # corp machine, so a work run must not carry them.
   home_npm:
+    - "@anthropic-ai/claude-code"
     - "@openai/codex"
     - "opencode-ai"
     - "reasonix"
