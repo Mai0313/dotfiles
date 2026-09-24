@@ -65,6 +65,17 @@ Use the `pixel-breadcrumbs` skill to do it rather than decoding by hand. It owns
 
 That skill decodes the Pixel breadcrumb, which is a progress code with its own encoding and is not the PSCI interface. The interface itself belongs to `pixel-psci-spec`: what a return code means, which optional calls a given SoC actually implements, whether a behaviour matches the specification. Reach for it even when you are sure you already know, because PSCI is a published Arm standard and what bites here is where the implementations depart from it. RF-A reports 1.3 while TF-A reports 1.1, Linux rewrites every return code before printing it, and Pixel accepts exactly five `power_state` values from a lookup table.
 
+## Personal Work Record
+
+Every piece of work gets an entry in the user's personal Buganizer component, `[Personal issues, <ldap>]`. `create-issue` owns how an entry is written; this section says when, and that nobody has to approve it.
+
+- **Open the entry when the work starts.** In the same step, put "update the personal entry" on the task list as a task of its own. That way the entry says how the work ended before anyone calls the work done.
+- **It is private.** Only the user and their agents read it, which makes it the one internal site you write to on your own; this is the exception to the General rule about commenting. File, update and close entries without asking, then say in your reply which entry you touched.
+- **Wrong is worse than missing.** The next session reads the entry to pick a topic back up, and each quarter's expectations are assembled from it.
+- **What counts as work:** an investigation, an experiment, a CL, a review that found something, or a finding worth keeping. A one-off lookup or question does not count.
+- **Memory keeps a pointer.** Where a topic has an entry, its progress goes into the entry. Memory keeps only a one-line pointer to it, plus whatever is not tied to one topic.
+- **Links point out of the entry, never back at it.** No team ticket, CL, commit or public issue ever cites a personal entry. Anything someone else can read, such as a team ticket or a comment on another person's bug or CL, still waits for the user.
+
 ## About Android Build (`ab/*`)
 
 `ab/<id>` and `android-build.googleplex.com` links point at Android Build, where firmware builds and their artifacts live. Two skills split it: `android-build-cli` owns the CLIs and the safety flags they inject, `pixel-build-artifacts` owns the Pixel side, turning a pasted link into a build, picking the right artifact glob, and what has to survive into the report.
