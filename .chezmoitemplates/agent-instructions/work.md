@@ -67,10 +67,10 @@ That skill decodes the Pixel breadcrumb, which is a progress code with its own e
 
 ## Personal Work Record
 
-Every piece of work gets an entry in the user's personal Buganizer component, `[Personal issues, <ldap>]`. `create-issue` owns how an entry is written; this section says when, and that nobody has to approve it.
+Every piece of work can have an entry in the user's personal Buganizer component, `[Personal issues, <ldap>]`. `create-issue` owns how an entry is written; this section says when, and what needs asking.
 
-- **Open the entry when the work starts.** In the same step, put "update the personal entry" on the task list as a task of its own. That way the entry says how the work ended before anyone calls the work done.
-- **It is private.** Only the user and their agents read it, which makes it the one internal site you write to on your own; this is the exception to the General rule about commenting. File, update and close entries without asking, then say in your reply which entry you touched.
+- **Ask whether to open an entry when the work starts.** Ask only whether to open it; the user does not review its text. When there are several, ask about them in one question. On a yes, open it, and in the same step put "update the personal entry" on the task list as a task of its own. That way the entry says how the work ended before anyone calls the work done.
+- **It is private.** Only the user and their agents read it, which makes it the one internal site you write to on your own; this is the exception to the General rule about commenting. Update, correct and close entries without asking, then say in your reply which entry you touched.
 - **Wrong is worse than missing.** The next session reads the entry to pick a topic back up, and each quarter's expectations are assembled from it.
 - **What counts as work:** an investigation, an experiment, a CL, a review that found something, or a finding worth keeping. A one-off lookup or question does not count.
 - **Memory keeps a pointer.** Where a topic has an entry, its progress goes into the entry. Memory keeps only a one-line pointer to it, plus whatever is not tied to one topic.
