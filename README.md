@@ -18,16 +18,28 @@ sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin" init --apply Mai03
 
 New codespaces will be configured automatically.
 
+### Claude Code cloud
+
+Put the one-liner in the cloud environment's setup script, after
+`export CLAUDE_CODE_REMOTE=true`: the environment's own variables are not set
+yet while that script runs. `.agents` is a private repo, so the script also has
+to give git a token that can read it.
+
 ## Environment Detection
 
-The config template computes a single `is_work` flag from the FQDN; container
-and OS differences are handled at runtime by the setup script.
+The config template computes three flags at `chezmoi init`; OS differences come
+from chezmoi's built-ins. Containers skip the VS Code install and the default
+shell change. A cloud session also skips the OS packages, neovim, node and the
+npm CLIs, and the zsh plugins, which leaves little beyond the dotfiles and the
+agent skills.
 
-| Environment | Detection | `is_work` |
+| Environment | Detection | Flag |
 |---|---|---|
-| Cloudtop (gLinux) | `*.c.googlers.com` / `*.corp.google.com` | `true` |
-| Roam (work macOS) | `*.roam.internal` | `true` |
-| Personal / Codespaces / containers | default | `false` |
+| Cloudtop (gLinux) | `*.c.googlers.com` / `*.corp.google.com` | `is_work` |
+| Roam (work macOS) | `*.roam.internal` | `is_work` |
+| Codespaces / devcontainers / containers | `CODESPACES`, `REMOTE_CONTAINERS`, `DEVCONTAINER`, `/.dockerenv`, `/run/.containerenv` | `is_container` |
+| Claude Code cloud | `CLAUDE_CODE_REMOTE=true` | `is_cloud` |
+| Personal | default | none |
 
 ## Daily Usage
 

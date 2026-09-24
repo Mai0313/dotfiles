@@ -49,13 +49,17 @@ After editing templates, validate with `chezmoi execute-template < file.tmpl` or
 
 **This repo detects the environment in two layers for two different purposes. Do not consolidate them without understanding why.**
 
-**Layer 1 — chezmoi data (`.chezmoi.toml.tmpl`).** Computed at `chezmoi init` time and emitted to `~/.config/chezmoi/chezmoi.toml`. It computes exactly one value (`is_work`); anything that only affects what the setup script does is detected at runtime in the bash body instead, so it stays out of chezmoi data.
+**Layer 1 — chezmoi data (`.chezmoi.toml.tmpl`).** Computed at `chezmoi init` time and emitted to `~/.config/chezmoi/chezmoi.toml`. It computes three values. Container detection used to be a runtime helper in the bash body; it moved here alongside `is_cloud`, which gates externals and so cannot be runtime, so both kinds of environment are decided in one place.
 
-The only key under `[data]`:
+The keys under `[data]`:
 
 | Variable | Default | Condition / Use |
 |---|---|---|
 | `is_work` | `false` | FQDN ends with `.c.googlers.com`, `.corp.google.com`, or `.roam.internal`. Corp Linux (gLinux/cloudtop) is `is_work && linux`; roam is `is_work && darwin`. |
+| `is_container` | `false` | `CODESPACES`, `REMOTE_CONTAINERS` or `DEVCONTAINER` is set, or `/.dockerenv` / `/run/.containerenv` exists: Codespaces, devcontainers, and any Docker or Podman container. |
+| `is_cloud` | `false` | `CLAUDE_CODE_REMOTE=true`. Claude Code cloud sets it in its sessions, but the cloud environment's setup script (kept in the claude.ai environment settings, not in this repo) must `export CLAUDE_CODE_REMOTE=true` itself before its `chezmoi init`: the environment's own variables are verifiably absent while that script runs. |
+
+`is_container` and `is_cloud` also have a fallback in `.chezmoidata/env.yaml`, so a machine whose config predates them keeps applying without a `chezmoi init`; the config's own `[data]` wins over it.
 
 OS detection comes from chezmoi built-ins: `eq .chezmoi.os "linux"` / `"darwin"` / `"windows"`, and `.chezmoi.osRelease.id` for distro variants. There is no precomputed `osid`; the built-ins already cover it.
 
@@ -64,12 +68,14 @@ OS detection comes from chezmoi built-ins: `eq .chezmoi.os "linux"` / `"darwin"`
 **Current consumers of `is_work`:**
 - `.chezmoiignore` — gates `.local/bin/kgrep`, `.local/bin/linux-kernel-mount`, `.local/bin/automation-mount` and the two `.config/systemd/user/*-sshfs.service` units off unless `is_work && linux`; `.config/environment.d/adb.conf` + `.local/bin/setup_adb` off unless `is_work`; and `.chrome-remote-desktop-session` off unless `linux && not is_work`. The OS gates in the same file are independent of `is_work`: Windows drops the whole *nix set (`.zshrc`, `.zshenv`, `.zprofile`, `.profile`, `.bashrc`, `.p10k.zsh`, `.local/bin/setup`, `.xinputrc`, `.config/{alacritty,shell,environment.d,systemd,fcitx5,btop,htop,goobuntu-backups,uv,pip}`, `.local/share/fonts`, `.local/bin/{list_devices,toggle-display}`), non-Windows drops `Documents`, `AppData` + `.local/bin/setup.ps1`, and non-Linux drops `.config/environment.d/im.conf`.
 - `.chezmoiexternal.toml` — gates `adb-keys/security` (sso git-repo); gates oh-my-zsh + plugins on `chezmoi.os != "windows"` and the two CLI binaries on `chezmoi.os == "linux"`, neither of which depends on `is_work`.
-- `.chezmoitemplates/setup-body.sh` — the apt section appends `work_linux` and its repos on corp machines, VS Code is two sections (corp Linux from google3, personal Linux from the Microsoft repo), the npm section is skipped on work macOS and appends `home_npm` only off work, pontisd is work-Linux-only, and dhub is work-only and picks its release directory (`mac` on darwin, `glinux` otherwise). Container and CPU-arch gating inside the body is runtime, not chezmoi data.
+- `.chezmoitemplates/setup-body.sh` — the apt section appends `work_linux` and its repos on corp machines, VS Code is two sections (corp Linux from google3, personal Linux from the Microsoft repo), the npm section is skipped on work macOS and appends `home_npm` only off work, pontisd is work-Linux-only, and dhub is work-only and picks its release directory (`mac` on darwin, `glinux` otherwise). CPU-arch gating inside the body is runtime, not chezmoi data.
 - `.chezmoitemplates/setup-body.ps1` — the same `home_npm` gate on its npm install, plus the whole `work_windows` googet block.
 - The seven agent instruction templates — pick between the work and personal body. See Shared Agent Instruction Files.
 - `dot_gitconfig.tmpl` — picks the `[user]` name/email pair. Everything else in that file is shared, and the corp machines' `[repo]` section is deliberately absent: `repo` writes `superprojectChoice` with an expiry and rewrites both on its own, so tracking them would fight the tool.
 
-Inspect the current value with `chezmoi data | grep is_work`.
+**Consumers of `is_container` and `is_cloud`:** only `.chezmoitemplates/setup-body.sh` and `.chezmoiexternal.toml`. A container skips VS Code and the default shell. A cloud session skips those plus apt, neovim, LazyVim, node and the npm CLIs, and the `.gemini`, oh-my-zsh and `.nvm` externals, which leaves the dotfiles, `.agents` and the skills links as the point of the run.
+
+Inspect the current values with `chezmoi data | grep -E 'is_(work|container|cloud)'`.
 
 **Layer 2 — runtime shell gating (actual behavior).** `dot_config/shell/rc.sh` does its own `case` match (on `$(hostname -f 2>/dev/null || hostname)`) against the same FQDN patterns to toggle env-specific blocks (aliases, env vars). `dot_zshrc` and `dot_bashrc` each end by sourcing it, so that file is the only copy. **All live gating for these mixed-content files happens here, not in chezmoi templates.**
 
@@ -97,7 +103,8 @@ Only the files whose purpose is not obvious from opening them. Everything else i
 
 | Path | Note |
 |---|---|
-| `.chezmoi.toml.tmpl` | The only chezmoi data. See Environment Detection Layer 1. |
+| `.chezmoi.toml.tmpl` | Where the environment keys are computed. See Environment Detection Layer 1. |
+| `.chezmoidata/env.yaml` | Fallbacks for `is_container` / `is_cloud`, for a config that predates them. See Environment Detection Layer 1. |
 | `.chezmoidata/packages.yaml` | Package lists per OS, plus `work_linux_repos`, the apt repos the apt section adds before installing from them. Editing it re-triggers setup, because `run_onchange` hashes rendered content. |
 | `.chezmoidata/node.yaml` | The one place the pinned node version lives, read by both setup bodies. Separate from `packages.yaml` because it is not a package list and nvm is not the installer that file's key naming describes. |
 | `.chezmoitemplates/setup-body.sh` | The *nix bootstrap body. See Bootstrap Architecture. |
@@ -194,7 +201,7 @@ zsh additionally loads oh-my-zsh (theme `powerlevel10k`, plugins `git`/`dotenv`/
 
 ### Bootstrap Architecture
 
-The *nix pair shares `.chezmoitemplates/setup-body.sh`. That body opens with an `in_container` helper (`/.dockerenv`, `/run/.containerenv`, `CODESPACES` / `REMOTE_CONTAINERS` / `DEVCONTAINER`) and runs fifteen idempotent sections in two layers: a system layer (everything that needs sudo, kept first and contiguous so one password prompt at the start covers the run) and a user layer (installs into `$HOME`, no sudo). Work-only steps are not a layer of their own; each is a section with a work gate, placed by whether it needs sudo.
+The *nix pair shares `.chezmoitemplates/setup-body.sh`. That body runs fifteen idempotent sections in two layers: a system layer (everything that needs sudo, kept first and contiguous so one password prompt at the start covers the run) and a user layer (installs into `$HOME`, no sudo). Work-only steps are not a layer of their own; each is a section with a work gate, placed by whether it needs sudo.
 
 Within those layers the order is topical: fonts before the editor that uses them, neovim next to the LazyVim starter that configures it. That ordering only works because no user-layer step needs sudo, so **a new step that needs sudo goes in the system layer, never below** — adding one lower down splits the password prompt in two and the grouping stops meaning anything.
 
@@ -247,12 +254,12 @@ Note `dot_local/bin/setup.ps1.tmpl` carries no `executable_` prefix: Windows has
 | Path | URL | Refresh | Condition |
 |---|---|---|---|
 | `.agents` | `Mai0313/skills` (GitHub) | 1h | always |
-| `.gemini` | `Mai0313/.gemini` (GitHub) | 1h | always |
-| `.oh-my-zsh` | `ohmyzsh/ohmyzsh` (GitHub) | 24h | non-Windows |
-| `.oh-my-zsh/custom/themes/powerlevel10k` | `romkatv/powerlevel10k` | 24h | non-Windows |
-| `.oh-my-zsh/custom/plugins/zsh-autosuggestions` | `zsh-users/zsh-autosuggestions` | 24h | non-Windows |
-| `.oh-my-zsh/custom/plugins/zsh-syntax-highlighting` | `zsh-users/zsh-syntax-highlighting` | 24h | non-Windows |
-| `.nvm` | `nvm-sh/nvm`, pinned to a tag | 168h | non-Windows |
+| `.gemini` | `Mai0313/.gemini` (GitHub) | 1h | not cloud |
+| `.oh-my-zsh` | `ohmyzsh/ohmyzsh` (GitHub) | 24h | non-Windows, not cloud |
+| `.oh-my-zsh/custom/themes/powerlevel10k` | `romkatv/powerlevel10k` | 24h | non-Windows, not cloud |
+| `.oh-my-zsh/custom/plugins/zsh-autosuggestions` | `zsh-users/zsh-autosuggestions` | 24h | non-Windows, not cloud |
+| `.oh-my-zsh/custom/plugins/zsh-syntax-highlighting` | `zsh-users/zsh-syntax-highlighting` | 24h | non-Windows, not cloud |
+| `.nvm` | `nvm-sh/nvm`, pinned to a tag | 168h | non-Windows, not cloud |
 | `adb-keys/security` | `sso://googleplex-android/.../security` | 1h | `is_work` |
 | `.local/bin/gh` | `cli/cli` release | 168h | linux |
 | `.local/bin/gdu` | `dundee/gdu` release | 168h | linux |

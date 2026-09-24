@@ -2,18 +2,14 @@
 set -euo pipefail
 
 # One step per section. Its gate, if any, is the template line right above the
-# title, and the title names it: the OS it runs on, whether it is work-only,
-# and which of two contracts it follows. "always" runs on every pass and
+# title, and the title names it: the OS it runs on, whether it is work-only or
+# skipped in containers or cloud sessions, and which of two contracts it
+# follows. "always" runs on every pass and
 # upgrades what is already there (package managers are idempotent). "once" is
 # guarded on presence: it installs when nothing is there and never upgrades, so
 # a newer version means removing the old install first. Gate lines render to
 # nothing and every section ends with one blank line, so a skipped section
 # leaves no trace in the rendered script.
-
-# Detect container-like environments (Docker/Podman, Dev Container, Codespaces).
-in_container() {
-    [ -f /.dockerenv ] || [ -f /run/.containerenv ] || [ -n "${CODESPACES:-}" ] || [ -n "${REMOTE_CONTAINERS:-}" ] || [ -n "${DEVCONTAINER:-}" ]
-}
 
 # ============================================================================
 # System layer: every step that needs sudo, kept first and contiguous so one
@@ -37,8 +33,8 @@ if command -v mule >/dev/null 2>&1 || [ -x /usr/local/bin/mule ]; then
 fi
 
 {{ end -}}
-{{ if eq .chezmoi.os "linux" -}}
-# ---------- apt packages (linux; always) ----------
+{{ if and (eq .chezmoi.os "linux") (not .is_cloud) -}}
+# ---------- apt packages (linux, not cloud; always) ----------
 # On corp machines (roam is macOS, so is_work here means gLinux), first every
 # apt repo work_linux needs beyond the gLinux defaults, from work_linux_repos
 # in packages.yaml, so the one update below sees all of them. --batch skips
@@ -74,8 +70,8 @@ fi
 /google/src/files/head/depot/google3/devtools/editors/vscode/install_vscode_for_google3.sh
 
 {{ end -}}
-{{ if and (not .is_work) (eq .chezmoi.os "linux") -}}
-# ---------- VS Code from the Microsoft repo (personal linux; always) ----------
+{{ if and (not .is_work) (eq .chezmoi.os "linux") (not .is_container) (not .is_cloud) -}}
+# ---------- VS Code from the Microsoft repo (personal linux, not container or cloud; always) ----------
 # The key and the repo are added once; the install sits outside those guards
 # so a machine that already has the repo still gets code.
 if [ ! -f /usr/share/keyrings/microsoft.gpg ]; then
@@ -97,14 +93,16 @@ fi
 sudo apt-get install -y code
 
 {{ end -}}
-# ---------- default shell (always) ----------
-# Skipped in containers: the image controls the shell, chsh can hang
-# non-interactively, and the change does not survive a rebuild.
+{{ if not (or .is_container .is_cloud) -}}
+# ---------- default shell (not container or cloud; always) ----------
+# Skipped in containers and cloud sessions: the image controls the shell,
+# chsh can hang non-interactively, and the change does not survive a rebuild.
 ZSH_PATH="$(command -v zsh || true)"
-if ! in_container && [ -n "$ZSH_PATH" ] && [ "${SHELL:-}" != "$ZSH_PATH" ]; then
+if [ -n "$ZSH_PATH" ] && [ "${SHELL:-}" != "$ZSH_PATH" ]; then
     {{ if eq .chezmoi.os "darwin" }}chsh -s /bin/zsh{{ else }}sudo chsh -s "$ZSH_PATH" "$(whoami)"{{ end }}
 fi
 
+{{ end -}}
 # ============================================================================
 # User layer: everything below installs into $HOME and never needs sudo.
 # ============================================================================
@@ -116,8 +114,8 @@ if command -v fc-cache >/dev/null 2>&1; then
 fi
 
 {{ end -}}
-{{ if eq .chezmoi.os "linux" -}}
-# ---------- neovim (linux; once) ----------
+{{ if and (eq .chezmoi.os "linux") (not .is_cloud) -}}
+# ---------- neovim (linux, not cloud; once) ----------
 # Distro nvim is often too old (or absent) for LazyVim, and the neovim PPA is
 # Ubuntu-only (breaks on Debian/glinux). Upstream's INSTALL.md unpacks to /opt,
 # but the tarball is relocatable (nvim derives $VIMRUNTIME from its own path),
@@ -137,7 +135,8 @@ if [ -n "$NVIM_ARCH" ] && ! command -v nvim >/dev/null 2>&1 && [ ! -x "$HOME/.nv
 fi
 
 {{ end -}}
-# ---------- LazyVim starter (once) ----------
+{{ if not .is_cloud -}}
+# ---------- LazyVim starter (not cloud; once) ----------
 # Deliberately a clone here rather than a chezmoi external: the starter is a
 # seed you are meant to edit afterwards, and an external would re-pull on its
 # refreshPeriod and clobber those edits. Dropping .git and guarding on the
@@ -148,7 +147,9 @@ if [ ! -d "$NVIM_DIR" ]; then
     rm -rf "$NVIM_DIR/.git"
 fi
 
-# ---------- node LTS via nvm (always) ----------
+{{ end -}}
+{{ if not .is_cloud -}}
+# ---------- node LTS via nvm (not cloud; always) ----------
 # nvm itself is a chezmoi external, which lands before this script runs; its
 # own installer is skipped entirely, which also removes the reason the old one
 # needed PROFILE=/dev/null (it appends source lines to the chezmoi-managed
@@ -164,8 +165,9 @@ nvm install "$NODE_VERSION"
 nvm alias default "$NODE_VERSION"
 set -u
 
-{{ if not (and .is_work (eq .chezmoi.os "darwin")) -}}
-# ---------- global npm CLIs (skipped on work darwin; always) ----------
+{{ end -}}
+{{ if not (or (and .is_work (eq .chezmoi.os "darwin")) .is_cloud) -}}
+# ---------- global npm CLIs (skipped on work darwin and cloud; always) ----------
 # node/npm are on PATH now (nvm loaded above). Lists live in packages.yaml;
 # home_npm joins in off work only.
 if command -v npm >/dev/null 2>&1; then

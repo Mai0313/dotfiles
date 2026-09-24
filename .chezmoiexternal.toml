@@ -3,12 +3,16 @@
     url = "https://github.com/Mai0313/skills"
     refreshPeriod = "1h"
 
+{{ if not .is_cloud -}}
 [".gemini"]
     type = "git-repo"
     url = "https://github.com/Mai0313/.gemini"
     refreshPeriod = "1h"
+{{- end }}
 
-{{ if ne .chezmoi.os "windows" -}}
+# A cloud session has no interactive shell and takes node from its image, so
+# it skips this whole block.
+{{ if and (ne .chezmoi.os "windows") (not .is_cloud) -}}
 [".oh-my-zsh"]
     type = "git-repo"
     url = "https://github.com/ohmyzsh/ohmyzsh"
