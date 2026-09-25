@@ -57,6 +57,7 @@ packages:
     - CoreyButler.NVMforWindows
     - Git.Git
     - Gyan.FFmpeg
+    - cURL.cURL
   # Corp-only macOS packages distributed via Mule (go/mule).
   work_darwin:
     # Cloudtop CLI & Screenshot
