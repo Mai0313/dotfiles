@@ -60,8 +60,8 @@ rate_part() {
 DIR=$(echo "$input" | jq -r '.workspace.current_dir')
 SHORT_DIR="${DIR/#"$HOME"/\~}"
 
-# Model identifier (API model id, e.g. "claude-opus-4-7[1m]")
-MODEL=$(echo "$input" | jq -r '.model.id')
+# Model display name, e.g. "Opus 5.5"
+MODEL=$(echo "$input" | jq -r '.model.display_name')
 
 # Reasoning effort level (only present when the model supports it)
 EFFORT=$(echo "$input" | jq -r '.effort.level // empty')
@@ -90,6 +90,19 @@ else
     CTX_PART=""
 fi
 
+# Prompt cache hit ratio (0-1; the block is absent before the first request)
+HIT_RAW=$(echo "$input" | jq -r '.prompt_cache.hit_ratio // empty | . * 100')
+if [ -n "$HIT_RAW" ]; then
+    HIT=$(printf '%.0f' "$HIT_RAW")
+    if   [ "$HIT" -ge 90 ]; then HIT_C="$GREEN"
+    elif [ "$HIT" -ge 70 ]; then HIT_C="$YELLOW"
+    else                          HIT_C="$RED"
+    fi
+    HIT_PART="${DIM}cache${RESET} ${HIT_C}${HIT}%${RESET}"
+else
+    HIT_PART=""
+fi
+
 # Total session cost in USD
 COST_RAW=$(echo "$input" | jq -r '.cost.total_cost_usd // empty')
 if [ -n "$COST_RAW" ]; then
@@ -108,9 +121,10 @@ SEVEN_PART=$(rate_part "7d" \
 
 # Assemble the status line
 LINE="${CYAN}${SHORT_DIR}${RESET}${SEP}${MODEL_C}${MODEL}${RESET}"
-[ -n "$EFFORT" ]     && LINE="${LINE}${SEP}${EFFORT_C}${EFFORT}${RESET}"
+[ -n "$EFFORT" ]     && LINE="${LINE} ${EFFORT_C}(${EFFORT})${RESET}"
 [ -n "$BRANCH" ]     && LINE="${LINE}${SEP}${GREEN}${BRANCH}${RESET}"
 [ -n "$CTX_PART" ]   && LINE="${LINE}${SEP}${CTX_PART}"
+[ -n "$HIT_PART" ]   && LINE="${LINE}${SEP}${HIT_PART}"
 [ -n "$COST_PART" ]  && LINE="${LINE}${SEP}${COST_PART}"
 [ -n "$FIVE_PART" ]  && LINE="${LINE}${SEP}${FIVE_PART}"
 [ -n "$SEVEN_PART" ] && LINE="${LINE}${SEP}${SEVEN_PART}"
