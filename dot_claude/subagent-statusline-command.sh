@@ -5,9 +5,12 @@
 # 5s timeout, so keep the per-task sidecar reads to bash builtins.
 #
 # Layout is a fixed-width table so rows line up vertically, columns 3 apart:
-#   mark name(22) elapsed(6) bar+pct(10) model[/effort]
-# The label/description is deliberately left out: what a subagent is doing is
-# the main agent's problem, this panel only answers how far along it is.
+#   mark name(22) label(<=60) elapsed(6) bar+pct(10) model[/effort]
+# .label is the model-written progress summary ("Reading runAgent.ts", 3-5
+# words), and falls back to .description before the first one exists. The
+# description is the main agent's own prompt title, so that fallback is left
+# blank. The label takes what .columns leaves over, up to 60, and drops out
+# entirely on a terminal too narrow for it.
 # There is no cost anywhere in this payload, per task or per session.
 #
 # .tasks[] fields: id name type status description label startTime model effort
@@ -88,6 +91,8 @@ def mark:
 # id -> [agentType, effort sent], "" where the sidecar had none
 ($side | split("\n") | map(select(. != "") | split("\t") | { key: .[0], value: .[1:] })
  | from_entries) as $side
+# 71 = mark(2) + name(22) + elapsed(6) + bar(10) + model/effort(19) + 4 gaps(12)
+| ((.columns // 0) - 71 | if . > 60 then 60 else . end) as $lw
 | (.tasks // [])[]
 | . as $t
 | ($side[$t.id] // ["", ""]) as [$role, $sent]
@@ -100,6 +105,9 @@ def mark:
 | (($t.status // "") | mark) as $m
 | [
     (($t.name // (($role | select(. != "")) // "agent" | sub("^[^:]+:"; ""))) | pad(22) | paint("1;35")),
+    (if $lw > 0
+     then (if $t.label != $t.description then $t.label // "" else "" end) | pad($lw) | paint("2")
+     else empty end),
     ((if ($t.startTime // 0) > 0 then ($t.startTime | elapsed) else "" end) | lpad(6) | paint("2")),
     (if $pct >= 0
      then (($pct | bar5) + " " + ($pct | tostring | lpad(3)) + "%") | paint($pct | pctcolor)
