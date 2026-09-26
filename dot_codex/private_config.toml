@@ -34,7 +34,6 @@ hide_agent_reasoning = false
 show_raw_agent_reasoning = false
 disable_paste_burst = false
 check_for_update_on_startup = true
-notify = ["turn-ended"]
 
 [model_providers.oai]
 name = "oai"
@@ -151,7 +150,7 @@ sansFontSize = 16
 codeFontSize = 14
 appearanceDiffMarkerStyle = "color"
 enabled-reasoning-efforts = ["low", "medium", "high", "xhigh", "ultra", "max"]
-show-ultra-in-model-picker-slider = true
+show-ultra-in-model-picker-slider = false
 open-local-url-in-target-preference = "external-browser"
 reviewDelivery = "detached"
 external-agent-import-sync-enabled = true
@@ -165,10 +164,13 @@ keepRemoteControlAwakeWhilePluggedIn = true
 default-workspace-full-view = true
 
 [desktop.external-agent-import-sync-item-types]
-SESSIONS = "original"
-CONFIG = "original"
-PLUGINS = "original"
-HOOKS = "original"
+SESSIONS = true
+AGENTS_MD = true
+CONFIG = false
+SKILLS = false
+PLUGINS = false
+SUBAGENTS = true
+HOOKS = false
 
 [windows]
 sandbox = "elevated"
