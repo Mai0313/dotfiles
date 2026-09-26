@@ -1,6 +1,9 @@
 #!/bin/bash
-# Read JSON data that Claude Code sends to stdin
-input=$(cat)
+# Read JSON data that Claude Code sends to stdin, keeping the last payload for
+# reference: the real thing is the only reliable schema. stderr is dropped so a
+# missing dir can't fail the render.
+mkdir -p "$HOME/.claude/logs" 2>/dev/null
+input=$(tee "$HOME/.claude/logs/statusline_payload.json" 2>/dev/null)
 
 # ANSI color codes
 RESET='\033[0m'
@@ -71,11 +74,8 @@ case "$EFFORT" in
     *)      EFFORT_C="$RESET" ;;
 esac
 
-# Git branch from git worktree field, fallback to git CLI
-BRANCH=$(echo "$input" | jq -r '.workspace.git_worktree // empty')
-if [ -z "$BRANCH" ]; then
-    BRANCH=$(git -C "$DIR" rev-parse --abbrev-ref HEAD 2>/dev/null || true)
-fi
+# Git branch. Not .workspace.git_worktree: that is the linked worktree's name.
+BRANCH=$(git -C "$DIR" rev-parse --abbrev-ref HEAD 2>/dev/null || true)
 
 # Context used percentage with threshold colors
 PCT_RAW=$(echo "$input" | jq -r '.context_window.used_percentage // empty')
